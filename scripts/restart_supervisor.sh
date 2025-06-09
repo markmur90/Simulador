@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+VENV_PATH="/home/markmur88/envAPP"
 
 echo "🔁 Parando todas las instancias de supervisord..."
 
@@ -16,7 +17,7 @@ rm -f /home/markmur88/api_bank_h2/scripts/utils/simulator_bank/logs/supervisord.
 echo "✅ Limpieza hecha."
 
 # Activar entorno y relanzar
-source /home/markmur88/api_bank_h2/scripts/utils/simulator_bank/venv/bin/activate
+source $VENV_PATH/bin/activate
 
 echo "🚀 Lanzando supervisord limpio..."
 supervisord -c /home/markmur88/api_bank_h2/scripts/utils/simulator_bank/config/supervisor_simulador.conf

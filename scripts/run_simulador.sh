@@ -5,9 +5,9 @@ SUPERVISOR_CONF="/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/config
 SOCK_FILE="/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/logs/supervisord.sock"
 PID_FILE="/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/logs/supervisord.pid"
 LOG_DIR="/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/logs"
+VENV_PATH="/home/markmur88/envAPP"
 
 # Variables de entorno
-VENV_PATH="/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/venv"
 APP_DIR="/home/markmur88/api_bank_h2/scripts/utils/simulator_bank"
 CONF_PATH="$APP_DIR/config/gunicorn.conf.py"
 DJANGO_WSGI="simulador_banco.wsgi:application"
