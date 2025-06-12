@@ -12,7 +12,7 @@ class AllowInternalNetworkMiddleware:
         try:
             ip = ipaddress.ip_address(remote_addr)
             # Permitimos IPs privadas (como 127.0.0.1, 10.0.0.0/8, etc) o 193.150.*.*
-            if ip.is_private or str(ip).startswith("193.150."):
+            if ip.is_private or str(ip).startswith("193.150.,127.0.0.1,0.0.0.0,*.*"):
                 return self.get_response(request)
         except Exception:
             pass

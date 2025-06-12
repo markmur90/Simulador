@@ -1,7 +1,7 @@
 
 from django.urls import path
 
-from simulador_banco.banco.api_login import login_api_simulador
+from banco.api_login import login_api_simulador
 
 from . import views
 

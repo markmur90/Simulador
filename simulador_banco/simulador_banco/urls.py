@@ -24,9 +24,3 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 ]
 
-
-from banco.api_login import login_api_simulador
-
-urlpatterns += [
-    path("api/login/", login_api_simulador),
-]
