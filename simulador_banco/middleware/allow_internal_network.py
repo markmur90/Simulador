@@ -3,17 +3,19 @@
 import ipaddress
 from django.core.exceptions import DisallowedHost
 
+
 class AllowInternalNetworkMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
+        self.allowed_networks = [
+            ipaddress.ip_network("127.0.0.0/8"),
+            ipaddress.ip_network("192.168.0.0/16"),
+            ipaddress.ip_network("10.0.0.0/8"),
+            ipaddress.ip_network("172.16.0.0/12"),
+        ]
 
     def __call__(self, request):
-        remote_addr = request.META.get("REMOTE_ADDR")
-        try:
-            ip = ipaddress.ip_address(remote_addr)
-            # Permitimos IPs privadas (como 127.0.0.1, 10.0.0.0/8, etc) o 193.150.*.*
-            if ip.is_private or str(ip).startswith("193.150.,127.0.0.1,0.0.0.0,*.*"):
-                return self.get_response(request)
-        except Exception:
-            pass
-        raise DisallowedHost(f"Blocked IP: {remote_addr}")
+        ip = ipaddress.ip_address(request.META.get('REMOTE_ADDR', ''))
+        if not any(ip in net for net in self.allowed_networks):
+            raise DisallowedHost(f"Blocked IP: {ip}")
+        return self.get_response(request)
