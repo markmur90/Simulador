@@ -2,7 +2,7 @@
 
 from celery import shared_task
 from django.db import transaction
-from simulator.models import Transfer, DebtorAccount
+from banco.models import Transfer, DebtorAccount
 import requests
 
 @shared_task
