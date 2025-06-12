@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-igb*b=1u(bqlmt#m)9(@gy^+g3rfd29br!ejf22x#8-f2cn_2p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'coretransapi.com', '80.78.30.242']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'coretransapi.com', '80.78.30.242', '*']
 
 
 # Application definition
