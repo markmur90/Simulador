@@ -353,3 +353,39 @@ Jun 08 16:50:50.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough di
 Jun 08 16:50:51.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
 Jun 08 16:50:51.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
 Jun 08 16:50:51.000 [notice] Bootstrapped 100% (done): Done
+Jun 12 22:53:53.306 [notice] Tor 0.4.8.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.5.0, Zlib 1.3.1, Liblzma 5.8.1, Libzstd 1.5.7 and Glibc 2.41 as libc.
+Jun 12 22:53:53.306 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jun 12 22:53:53.306 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 12 22:53:53.309 [notice] Opening Socks listener on 127.0.0.1:9053
+Jun 12 22:53:53.309 [warn] Could not bind to 127.0.0.1:9053: Address already in use. Is Tor already running?
+Jun 12 22:53:53.309 [notice] Opening Control listener on 127.0.0.1:9054
+Jun 12 22:53:53.309 [warn] Could not bind to 127.0.0.1:9054: Address already in use. Is Tor already running?
+Jun 12 22:53:53.309 [warn] Failed to parse/validate config: Failed to bind one of the listener ports.
+Jun 12 22:53:53.309 [err] Reading config failed--see warnings above.
+Jun 12 22:53:54.335 [notice] Tor 0.4.8.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.5.0, Zlib 1.3.1, Liblzma 5.8.1, Libzstd 1.5.7 and Glibc 2.41 as libc.
+Jun 12 22:53:54.335 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jun 12 22:53:54.335 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 12 22:53:54.338 [notice] Opening Socks listener on 127.0.0.1:9053
+Jun 12 22:53:54.338 [warn] Could not bind to 127.0.0.1:9053: Address already in use. Is Tor already running?
+Jun 12 22:53:54.338 [notice] Opening Control listener on 127.0.0.1:9054
+Jun 12 22:53:54.338 [warn] Could not bind to 127.0.0.1:9054: Address already in use. Is Tor already running?
+Jun 12 22:53:54.338 [warn] Failed to parse/validate config: Failed to bind one of the listener ports.
+Jun 12 22:53:54.338 [err] Reading config failed--see warnings above.
+Jun 12 22:53:56.364 [notice] Tor 0.4.8.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.5.0, Zlib 1.3.1, Liblzma 5.8.1, Libzstd 1.5.7 and Glibc 2.41 as libc.
+Jun 12 22:53:56.364 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jun 12 22:53:56.364 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 12 22:53:56.367 [notice] Opening Socks listener on 127.0.0.1:9053
+Jun 12 22:53:56.367 [warn] Could not bind to 127.0.0.1:9053: Address already in use. Is Tor already running?
+Jun 12 22:53:56.367 [notice] Opening Control listener on 127.0.0.1:9054
+Jun 12 22:53:56.367 [warn] Could not bind to 127.0.0.1:9054: Address already in use. Is Tor already running?
+Jun 12 22:53:56.367 [warn] Failed to parse/validate config: Failed to bind one of the listener ports.
+Jun 12 22:53:56.367 [err] Reading config failed--see warnings above.
+Jun 12 22:53:59.625 [notice] Tor 0.4.8.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.5.0, Zlib 1.3.1, Liblzma 5.8.1, Libzstd 1.5.7 and Glibc 2.41 as libc.
+Jun 12 22:53:59.625 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jun 12 22:53:59.625 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 12 22:53:59.628 [notice] Opening Socks listener on 127.0.0.1:9053
+Jun 12 22:53:59.628 [warn] Could not bind to 127.0.0.1:9053: Address already in use. Is Tor already running?
+Jun 12 22:53:59.628 [notice] Opening Control listener on 127.0.0.1:9054
+Jun 12 22:53:59.628 [warn] Could not bind to 127.0.0.1:9054: Address already in use. Is Tor already running?
+Jun 12 22:53:59.628 [warn] Failed to parse/validate config: Failed to bind one of the listener ports.
+Jun 12 22:53:59.628 [err] Reading config failed--see warnings above.

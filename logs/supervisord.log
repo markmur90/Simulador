@@ -11035,3 +11035,20 @@
 2025-06-08 16:50:44,914 INFO spawned: 'gunicorn' with pid 583434
 2025-06-08 16:50:45,735 WARN exited: gunicorn (exit status 1; not expected)
 2025-06-08 16:50:46,737 INFO gave up: gunicorn entered FATAL state, too many start retries too quickly
+2025-06-12 22:53:52,247 INFO RPC interface 'supervisor' initialized
+2025-06-12 22:53:52,262 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2025-06-12 22:53:52,263 INFO RPC interface 'supervisor' initialized
+2025-06-12 22:53:52,263 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2025-06-12 22:53:52,266 INFO daemonizing the supervisord process
+2025-06-12 22:53:52,267 INFO supervisord started with pid 189798
+2025-06-12 22:53:53,272 INFO spawned: 'gunicorn' with pid 189808
+2025-06-12 22:53:53,276 INFO spawned: 'tor' with pid 189809
+2025-06-12 22:53:53,311 WARN exited: tor (exit status 1; not expected)
+2025-06-12 22:53:54,313 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 22:53:54,317 INFO spawned: 'tor' with pid 189824
+2025-06-12 22:53:54,340 WARN exited: tor (exit status 1; not expected)
+2025-06-12 22:53:56,345 INFO spawned: 'tor' with pid 189852
+2025-06-12 22:53:56,369 WARN exited: tor (exit status 1; not expected)
+2025-06-12 22:53:59,605 INFO spawned: 'tor' with pid 189884
+2025-06-12 22:53:59,630 WARN exited: tor (exit status 1; not expected)
+2025-06-12 22:54:00,631 INFO gave up: tor entered FATAL state, too many start retries too quickly
