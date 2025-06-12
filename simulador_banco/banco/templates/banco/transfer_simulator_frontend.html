@@ -1,0 +1,45 @@
+{% extends 'banco/base.html' %}
+{% block title %}Simulador Transferencia{% endblock %}
+{% block content %}
+<h2>Simulador de Transferencias</h2>
+<form id="form">
+    <label>Payment ID</label>
+    <input type="text" id="payment_id" required>
+    <label>Monto</label>
+    <input type="number" id="monto" step="0.01" required>
+    <button type="submit">Probar</button>
+</form>
+<pre id="log"></pre>
+<button id="btnOk" type="button">Simular Éxito</button>
+<button id="btnFail" type="button">Simular Error</button>
+<script>
+async function ejecutar(simularError){
+  const log = document.getElementById('log');
+  const pid = document.getElementById('payment_id').value;
+  log.textContent = 'Solicitando token...';
+  let res = await fetch('/api/token', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({usuario:'demo', clave:'demo'})});
+  let data = await res.json();
+  const token = data.token;
+  log.textContent += '\nToken: '+token;
+  res = await fetch('/api/challenge', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body: JSON.stringify({payment_id: pid})
+  });
+  data = await res.json();
+  const otp = simularError ? '000000' : data.otp;
+  log.textContent += '\nChallenge: '+data.challenge_id+' OTP:'+data.otp;
+  res = await fetch('/api/send-transfer', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body: JSON.stringify({payment_id: pid, otp: otp})
+  });
+  data = await res.json();
+  log.textContent += '\nResultado: '+JSON.stringify(data);
+}
+
+document.getElementById('form').addEventListener('submit', e=>{e.preventDefault(); ejecutar(false);});
+document.getElementById('btnOk').addEventListener('click', ()=>ejecutar(false));
+document.getElementById('btnFail').addEventListener('click', ()=>ejecutar(true));
+</script>
+{% endblock %}

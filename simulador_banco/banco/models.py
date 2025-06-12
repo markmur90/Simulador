@@ -27,6 +27,8 @@ class TransferenciaSimulada(models.Model):
 
 from django.db import models
 from django.contrib.auth.hashers import make_password, check_password
+from django.utils import timezone
+import uuid
 
 class OficialBancario(models.Model):
     username = models.CharField(max_length=50, unique=True)
@@ -37,3 +39,13 @@ class OficialBancario(models.Model):
 
     def check_password(self, raw_password):
         return check_password(raw_password, self.password_hash)
+
+class OTPChallenge(models.Model):
+    payment_id = models.CharField(max_length=100)
+    challenge_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    otp = models.CharField(max_length=6)
+    status = models.CharField(max_length=20, default="CREATED")
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.payment_id} - {self.challenge_id}"

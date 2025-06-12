@@ -8,7 +8,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 import json
 
-from .models import DebtorSimulado, CreditorSimulado, TransferenciaSimulada
+from .models import (
+    DebtorSimulado,
+    CreditorSimulado,
+    TransferenciaSimulada,
+    OficialBancario,
+    OTPChallenge,
+)
+from django.utils.crypto import get_random_string
+import uuid
 
 @csrf_exempt
 def recibir_transferencia(request):
@@ -148,3 +156,63 @@ def crear_transferencia(request):
     t.save()
 
     return JsonResponse({'estado': 'ok', 'id': t.id})
+
+@csrf_exempt
+def api_challenge(request):
+    """Genera un OTP para una transferencia simulada."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    if not hasattr(request, 'user_jwt'):
+        return JsonResponse({'error': 'Autenticación requerida'}, status=401)
+
+    data = json.loads(request.body.decode())
+    payment_id = data.get('payment_id')
+    if not payment_id:
+        return JsonResponse({'error': 'payment_id requerido'}, status=400)
+
+    otp = get_random_string(6, allowed_chars='0123456789')
+    challenge = OTPChallenge.objects.create(payment_id=payment_id, otp=otp)
+    return JsonResponse({'challenge_id': str(challenge.challenge_id), 'otp': otp})
+
+
+@csrf_exempt
+def api_send_transfer(request):
+    """Procesa la transferencia validando el OTP."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    if not hasattr(request, 'user_jwt'):
+        return JsonResponse({'error': 'Autenticación requerida'}, status=401)
+
+    data = json.loads(request.body.decode())
+    payment_id = data.get('payment_id')
+    otp = data.get('otp')
+
+    try:
+        challenge = OTPChallenge.objects.get(payment_id=payment_id, otp=otp, status='CREATED')
+    except OTPChallenge.DoesNotExist:
+        return JsonResponse({'error': 'OTP inválido'}, status=400)
+
+    challenge.status = 'USED'
+    challenge.save()
+
+    TransferenciaSimulada.objects.get_or_create(payment_id=payment_id,
+                                               defaults={'debtor': DebtorSimulado.objects.first(),
+                                                        'creditor': CreditorSimulado.objects.first(),
+                                                        'monto': 0})
+
+    return JsonResponse({'transactionStatus': 'ACSC', 'authId': str(challenge.challenge_id)})
+
+
+def api_status_transfer(request):
+    payment_id = request.GET.get('payment_id')
+    if not payment_id:
+        return JsonResponse({'error': 'payment_id requerido'}, status=400)
+    exists = TransferenciaSimulada.objects.filter(payment_id=payment_id).exists()
+    status = 'ACSC' if exists else 'RJCT'
+    return JsonResponse({'payment_id': payment_id, 'status': status})
+
+
+def transfer_simulator_frontend(request):
+    return render(request, 'banco/transfer_simulator_frontend.html')
