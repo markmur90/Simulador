@@ -12,12 +12,16 @@ EXEMPT_PATHS = {
     '/frontend/transfer',
 }
 
+# Only enforce JWT on API endpoints.
+API_PREFIX = '/api/'
+
+
 class JWTAuthenticationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path in EXEMPT_PATHS:
+        if request.path in EXEMPT_PATHS or not request.path.startswith(API_PREFIX):
             return self.get_response(request)
         
         auth_header = request.META.get('HTTP_AUTHORIZATION', '')
