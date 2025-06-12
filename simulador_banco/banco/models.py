@@ -1,4 +1,8 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password, check_password
+from django.core.files.base import ContentFile
+from django.utils import timezone
+import uuid
 
 class DebtorSimulado(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
@@ -24,11 +28,6 @@ class TransferenciaSimulada(models.Model):
 
 
 
-
-from django.db import models
-from django.contrib.auth.hashers import make_password, check_password
-from django.utils import timezone
-import uuid
 
 class OficialBancario(models.Model):
     username = models.CharField(max_length=50, unique=True)
