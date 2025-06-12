@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'middleware.allow_internal_network.AllowInternalNetworkMiddleware',
+    #'middleware.allow_internal_network.AllowInternalNetworkMiddleware',
 
 ]
 
@@ -136,3 +136,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'api_bank_h2.utils.allow_internal_network': {
+            'handlers': ['console'],
+            'level': 'WARNING',
+        },
+    },
+}
