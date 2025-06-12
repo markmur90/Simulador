@@ -24,7 +24,36 @@ class OTPChallenge(models.Model):
     def __str__(self):
         return f"{self.payment_id} - {self.challenge_id}"
     
+class DebtorSimulado(models.Model):
+    nombre = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.nombre
+
+
+class CreditorSimulado(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+
+class TransferenciaSimulada(models.Model):
+    payment_id = models.CharField(max_length=100, unique=True)
+    debtor = models.ForeignKey(DebtorSimulado, on_delete=models.CASCADE)
+    creditor = models.ForeignKey(CreditorSimulado, on_delete=models.CASCADE)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    oficial = models.ForeignKey(
+        OficialBancario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+    )
+    destino = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return self.payment_id
+    
 # models.py
 
 """
@@ -104,8 +133,8 @@ class PostalAddress(models.Model):
     city = models.CharField(max_length=70)
 
     class Meta:
-        abstract = True
-
+        db_table = 'sim_postal_address'
+        
 
 class Party(models.Model):
     """Entidad genérica (deudor o acreedor)."""
@@ -156,7 +185,8 @@ class DebtorAccount(Account):
         Debtor, on_delete=models.CASCADE,
         related_name='accounts'
     )
-
+    balance = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    
     class Meta:
         db_table = 'sim_debtor_account'
 
@@ -267,6 +297,69 @@ class Transfer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def to_schema_data(self):
+        return {
+            "purposeCode": self.purpose_code or "GDSV",
+            "requestedExecutionDate": self.requested_execution_date.strftime(
+                '%Y-%m-%d'),
+            "debtor": {
+                "debtorName": self.debtor.name,
+                "debtorPostalAddress": {
+                    "country": self.debtor.postal_address_country,
+                    "addressLine": {
+                        "streetAndHouseNumber": self.debtor.postal_address_street,
+                        "zipCodeAndCity": self.debtor.postal_address_city,
+                    }
+                }
+            },
+            "debtorAccount": {
+                "iban": self.debtor_account.iban,
+                "currency": self.debtor_account.currency,
+            },
+            "paymentIdentification": {
+                "instructionId": self.payment_identification.instruction_id,
+                "endToEndId": self.payment_identification.end_to_end_id
+            },
+            "instructedAmount": {
+                "amount": float(self.instructed_amount),
+                "currency": self.currency,
+            },
+            "creditorAgent": {
+                "financialInstitutionId":
+                    self.creditor_agent.financial_institution_id or "",
+            },
+            "creditor": {
+                "creditorName": self.creditor.name,
+                "creditorPostalAddress": {
+                    "country": self.creditor.postal_address_country,
+                    "addressLine": {
+                        "streetAndHouseNumber": self.creditor.postal_address_street,
+                        "zipCodeAndCity": self.creditor.postal_address_city,
+                    }
+                }
+            },
+            "creditorAccount": {
+                "iban": self.creditor_account.iban,
+                "currency": self.creditor_account.currency,
+            },
+            "remittanceInformationUnstructured":
+                self.remittance_information_unstructured or ""
+        }
+
+    def get_status_color(self):
+        return {
+            'PDNG': 'warning',
+            'ACSC': 'success',
+            'RJCT': 'danger',
+            'CANC': 'secondary'
+        }.get(self.status, 'dark')
+
+    class Meta:
+        ordering = ['created_at']
+
+    def __str__(self):
+        return self.payment_id
+    
     class Meta:
         db_table = 'sim_transfer'
         ordering = ['-created_at']

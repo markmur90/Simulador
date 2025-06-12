@@ -13,6 +13,15 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+
+load_dotenv(os.path.join(Path(__file__).resolve().parent.parent, '.env'))
+
+def get_env(var_name, default=None, required=False):
+    value = os.environ.get(var_name, default)
+    if required and value is None:
+        raise ImproperlyConfigured(f'La variable de entorno {var_name} no está definida.')
+    return value
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,22 +29,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Clave para cifrado de campos sensibles (Fernet, AES-256+HMAC).
 # Generar con:
 #   from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())
-FIELD_ENCRYPTION_KEY = os.environ.get('FIELD_ENCRYPTION_KEY')
-if not FIELD_ENCRYPTION_KEY:
-    raise ImproperlyConfigured(
-        "La variable de entorno FIELD_ENCRYPTION_KEY no está definida."
-    )
+FIELD_ENCRYPTION_KEY = get_env('FIELD_ENCRYPTION_KEY', required=True)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-igb*b=1u(bqlmt#m)9(@gy^+g3rfd29br!ejf22x#8-f2cn_2p'
+SECRET_KEY = get_env('SECRET_KEY', required=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = get_env('DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'coretransapi.com', '80.78.30.242', '*']
+ALLOWED_HOSTS = get_env('ALLOWED_HOSTS', 'localhost').split(',')
 
 
 # Application definition
@@ -143,6 +148,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 LOGIN_URL = '/login/'
 

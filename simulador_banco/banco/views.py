@@ -197,8 +197,12 @@ def api_send_transfer(request):
     challenge.status = 'USED'
     challenge.save()
 
-    TransferenciaSimulada.objects.get_or_create(payment_id=payment_id, defaults={'debtor': DebtorSimulado.objects.first(),  'creditor': CreditorSimulado.objects.first(),
-                                                        'monto': 0})
+    TransferenciaSimulada.objects.get_or_create(
+        payment_id=payment_id,
+        defaults={'debtor': DebtorSimulado.objects.first(),
+                 'creditor': CreditorSimulado.objects.first(),
+                 'monto': 0}
+    )
 
     return JsonResponse({'transactionStatus': 'ACSC', 'authId': str(challenge.challenge_id)})
 

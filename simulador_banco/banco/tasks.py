@@ -3,6 +3,7 @@
 from celery import shared_task
 from django.db import transaction
 from banco.models import Transfer, DebtorAccount
+from django.conf import settings
 import requests
 
 @shared_task
@@ -46,7 +47,7 @@ def process_transfer_task(transfer_id: int):
     }
     # URL configurada en settings.SIMULATOR_NOTIFY_URL
     requests.post(
-        transfer.settings.SIMULATOR_NOTIFY_URL,
+        settings.SIMULATOR_NOTIFY_URL,
         json=payload,
         timeout=5
     )

@@ -1,8 +1,9 @@
 # simulador_banco/middleware/jwt_auth.py
+import os
 import jwt
 from django.http import JsonResponse
 
-SECRET_KEY = 'clave_secreta_bien_larga_123456'  # ponela en env en prod
+SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'change-me')
 ALGORITHM = 'HS256'
 
 
