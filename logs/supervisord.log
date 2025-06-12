@@ -11492,3 +11492,1288 @@
 2025-06-12 23:37:32,825 INFO spawned: 'gunicorn' with pid 218345
 2025-06-12 23:37:33,831 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2025-06-12 23:37:35,185 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:37:36,196 INFO spawned: 'gunicorn' with pid 218390
+2025-06-12 23:37:37,198 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:37,853 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:37:38,857 INFO spawned: 'gunicorn' with pid 218429
+2025-06-12 23:37:39,858 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:40,303 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:37:41,307 INFO spawned: 'gunicorn' with pid 218462
+2025-06-12 23:37:42,311 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:42,406 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:37:43,410 INFO spawned: 'gunicorn' with pid 218483
+2025-06-12 23:37:44,411 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:44,733 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:37:45,737 INFO spawned: 'gunicorn' with pid 218510
+2025-06-12 23:37:46,743 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:47,463 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:37:48,467 INFO spawned: 'gunicorn' with pid 218542
+2025-06-12 23:37:49,469 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:49,797 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:37:50,808 INFO spawned: 'gunicorn' with pid 218563
+2025-06-12 23:37:51,810 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:52,215 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:37:53,219 INFO spawned: 'gunicorn' with pid 218591
+2025-06-12 23:37:54,244 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:54,244 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:37:55,248 INFO spawned: 'gunicorn' with pid 218614
+2025-06-12 23:37:56,257 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:57,564 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:37:58,568 INFO spawned: 'gunicorn' with pid 218793
+2025-06-12 23:37:59,634 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:37:59,635 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:00,639 INFO spawned: 'gunicorn' with pid 218829
+2025-06-12 23:38:01,641 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:01,732 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:02,736 INFO spawned: 'gunicorn' with pid 218854
+2025-06-12 23:38:03,737 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:03,848 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:04,851 INFO spawned: 'gunicorn' with pid 218896
+2025-06-12 23:38:05,863 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:06,185 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:07,189 INFO spawned: 'gunicorn' with pid 218998
+2025-06-12 23:38:08,191 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:08,282 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:09,285 INFO spawned: 'gunicorn' with pid 219053
+2025-06-12 23:38:10,256 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:11,260 INFO spawned: 'gunicorn' with pid 219074
+2025-06-12 23:38:12,289 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:12,289 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:13,293 INFO spawned: 'gunicorn' with pid 219104
+2025-06-12 23:38:14,295 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:14,363 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:15,367 INFO spawned: 'gunicorn' with pid 219269
+2025-06-12 23:38:16,369 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:16,593 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:17,596 INFO spawned: 'gunicorn' with pid 219311
+2025-06-12 23:38:18,598 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:18,755 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:19,758 INFO spawned: 'gunicorn' with pid 219334
+2025-06-12 23:38:20,761 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:20,969 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:21,975 INFO spawned: 'gunicorn' with pid 219357
+2025-06-12 23:38:22,979 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:24,629 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:25,632 INFO spawned: 'gunicorn' with pid 219406
+2025-06-12 23:38:26,638 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:26,805 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:27,809 INFO spawned: 'gunicorn' with pid 219430
+2025-06-12 23:38:28,811 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:28,880 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:29,885 INFO spawned: 'gunicorn' with pid 219471
+2025-06-12 23:38:30,891 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:32,283 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:33,287 INFO spawned: 'gunicorn' with pid 219531
+2025-06-12 23:38:34,291 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:34,584 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:35,589 INFO spawned: 'gunicorn' with pid 219569
+2025-06-12 23:38:36,591 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:37,012 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:38,016 INFO spawned: 'gunicorn' with pid 219602
+2025-06-12 23:38:39,018 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:39,126 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:40,130 INFO spawned: 'gunicorn' with pid 219626
+2025-06-12 23:38:41,131 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:41,320 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:42,323 INFO spawned: 'gunicorn' with pid 219656
+2025-06-12 23:38:43,325 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:43,635 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:44,639 INFO spawned: 'gunicorn' with pid 219681
+2025-06-12 23:38:45,641 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:45,805 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:46,808 INFO spawned: 'gunicorn' with pid 219705
+2025-06-12 23:38:47,810 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:47,919 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:48,923 INFO spawned: 'gunicorn' with pid 219727
+2025-06-12 23:38:49,925 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:50,188 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:51,192 INFO spawned: 'gunicorn' with pid 219748
+2025-06-12 23:38:52,194 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:52,262 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:38:53,265 INFO spawned: 'gunicorn' with pid 219769
+2025-06-12 23:38:54,267 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:54,435 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:55,439 INFO spawned: 'gunicorn' with pid 219800
+2025-06-12 23:38:56,441 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:56,709 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:57,713 INFO spawned: 'gunicorn' with pid 219826
+2025-06-12 23:38:58,715 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:38:58,948 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:38:59,952 INFO spawned: 'gunicorn' with pid 219846
+2025-06-12 23:39:00,906 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:01,909 INFO spawned: 'gunicorn' with pid 219883
+2025-06-12 23:39:02,908 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:02,952 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:03,956 INFO spawned: 'gunicorn' with pid 219933
+2025-06-12 23:39:04,958 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:04,984 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:39:05,988 INFO spawned: 'gunicorn' with pid 219954
+2025-06-12 23:39:07,031 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:07,032 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:08,035 INFO spawned: 'gunicorn' with pid 219975
+2025-06-12 23:39:09,037 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:09,234 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:39:10,238 INFO spawned: 'gunicorn' with pid 219998
+2025-06-12 23:39:11,239 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:11,347 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:12,351 INFO spawned: 'gunicorn' with pid 220028
+2025-06-12 23:39:13,355 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:14,559 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:15,563 INFO spawned: 'gunicorn' with pid 220060
+2025-06-12 23:39:16,562 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:16,630 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:17,634 INFO spawned: 'gunicorn' with pid 220081
+2025-06-12 23:39:18,635 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:18,707 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:19,710 INFO spawned: 'gunicorn' with pid 220102
+2025-06-12 23:39:20,715 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:20,846 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:21,849 INFO spawned: 'gunicorn' with pid 220124
+2025-06-12 23:39:22,851 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:23,160 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:24,164 INFO spawned: 'gunicorn' with pid 220144
+2025-06-12 23:39:25,137 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:39:26,141 INFO spawned: 'gunicorn' with pid 220165
+2025-06-12 23:39:27,189 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:27,189 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:28,193 INFO spawned: 'gunicorn' with pid 220187
+2025-06-12 23:39:29,195 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:29,351 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:30,354 INFO spawned: 'gunicorn' with pid 220217
+2025-06-12 23:39:31,355 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:31,440 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:32,443 INFO spawned: 'gunicorn' with pid 220238
+2025-06-12 23:39:33,445 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:33,560 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:34,564 INFO spawned: 'gunicorn' with pid 220266
+2025-06-12 23:39:35,566 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:35,668 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:39:36,671 INFO spawned: 'gunicorn' with pid 220288
+2025-06-12 23:39:37,673 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:37,824 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:38,829 INFO spawned: 'gunicorn' with pid 220308
+2025-06-12 23:39:39,831 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:40,049 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:41,053 INFO spawned: 'gunicorn' with pid 220334
+2025-06-12 23:39:42,054 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:42,525 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:43,529 INFO spawned: 'gunicorn' with pid 220367
+2025-06-12 23:39:44,531 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:44,629 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:39:45,633 INFO spawned: 'gunicorn' with pid 220393
+2025-06-12 23:39:46,635 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:46,795 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:47,798 INFO spawned: 'gunicorn' with pid 220415
+2025-06-12 23:39:48,803 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:49,026 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:50,029 INFO spawned: 'gunicorn' with pid 220440
+2025-06-12 23:39:51,031 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:51,189 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:39:52,193 INFO spawned: 'gunicorn' with pid 220461
+2025-06-12 23:39:53,195 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:53,478 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:39:54,481 INFO spawned: 'gunicorn' with pid 220493
+2025-06-12 23:39:55,483 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:55,566 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:39:56,570 INFO spawned: 'gunicorn' with pid 220516
+2025-06-12 23:39:57,571 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:57,602 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:39:58,605 INFO spawned: 'gunicorn' with pid 220536
+2025-06-12 23:39:59,611 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:39:59,611 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:00,614 INFO spawned: 'gunicorn' with pid 220556
+2025-06-12 23:40:01,619 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:01,759 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:40:02,762 INFO spawned: 'gunicorn' with pid 220577
+2025-06-12 23:40:03,764 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:03,824 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:04,828 INFO spawned: 'gunicorn' with pid 220597
+2025-06-12 23:40:05,847 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:05,847 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:06,851 INFO spawned: 'gunicorn' with pid 220619
+2025-06-12 23:40:07,853 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:07,929 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:08,933 INFO spawned: 'gunicorn' with pid 220640
+2025-06-12 23:40:09,935 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:10,001 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:40:11,005 INFO spawned: 'gunicorn' with pid 220661
+2025-06-12 23:40:12,007 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:12,111 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:13,115 INFO spawned: 'gunicorn' with pid 220684
+2025-06-12 23:40:14,117 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:14,295 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:15,299 INFO spawned: 'gunicorn' with pid 220705
+2025-06-12 23:40:16,301 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:16,481 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:17,484 INFO spawned: 'gunicorn' with pid 220734
+2025-06-12 23:40:18,486 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:18,578 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:19,581 INFO spawned: 'gunicorn' with pid 220756
+2025-06-12 23:40:20,583 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:20,770 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:21,773 INFO spawned: 'gunicorn' with pid 220779
+2025-06-12 23:40:22,775 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:22,833 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:23,836 INFO spawned: 'gunicorn' with pid 220799
+2025-06-12 23:40:24,924 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:24,925 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:25,928 INFO spawned: 'gunicorn' with pid 220820
+2025-06-12 23:40:26,930 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:27,021 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:28,024 INFO spawned: 'gunicorn' with pid 220840
+2025-06-12 23:40:29,026 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:29,027 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:40:30,031 INFO spawned: 'gunicorn' with pid 220862
+2025-06-12 23:40:31,033 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:31,146 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:32,150 INFO spawned: 'gunicorn' with pid 220891
+2025-06-12 23:40:33,151 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:33,359 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:34,365 INFO spawned: 'gunicorn' with pid 220911
+2025-06-12 23:40:35,367 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:35,513 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:36,516 INFO spawned: 'gunicorn' with pid 220941
+2025-06-12 23:40:37,519 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:37,936 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:38,940 INFO spawned: 'gunicorn' with pid 220963
+2025-06-12 23:40:39,942 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:40,066 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:41,069 INFO spawned: 'gunicorn' with pid 220988
+2025-06-12 23:40:42,071 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:42,141 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:40:43,145 INFO spawned: 'gunicorn' with pid 221008
+2025-06-12 23:40:44,147 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:44,243 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:45,247 INFO spawned: 'gunicorn' with pid 221033
+2025-06-12 23:40:46,386 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:46,386 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:47,390 INFO spawned: 'gunicorn' with pid 221056
+2025-06-12 23:40:48,391 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:48,539 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:49,543 INFO spawned: 'gunicorn' with pid 221085
+2025-06-12 23:40:50,569 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:50,569 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:51,573 INFO spawned: 'gunicorn' with pid 221106
+2025-06-12 23:40:52,575 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:52,735 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:53,738 INFO spawned: 'gunicorn' with pid 221126
+2025-06-12 23:40:54,740 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:54,874 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:40:55,877 INFO spawned: 'gunicorn' with pid 221150
+2025-06-12 23:40:56,879 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:56,992 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:40:57,996 INFO spawned: 'gunicorn' with pid 221174
+2025-06-12 23:40:58,999 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:40:59,228 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:41:00,232 INFO spawned: 'gunicorn' with pid 221194
+2025-06-12 23:41:01,234 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:01,319 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:02,323 INFO spawned: 'gunicorn' with pid 221215
+2025-06-12 23:41:03,434 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:03,434 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:04,437 INFO spawned: 'gunicorn' with pid 221235
+2025-06-12 23:41:05,439 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:05,508 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:06,512 INFO spawned: 'gunicorn' with pid 221264
+2025-06-12 23:41:07,514 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:07,631 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:08,635 INFO spawned: 'gunicorn' with pid 221286
+2025-06-12 23:41:09,681 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:09,681 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:10,684 INFO spawned: 'gunicorn' with pid 221307
+2025-06-12 23:41:11,686 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:11,858 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:12,863 INFO spawned: 'gunicorn' with pid 221333
+2025-06-12 23:41:13,871 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:14,257 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:15,260 INFO spawned: 'gunicorn' with pid 221357
+2025-06-12 23:41:16,263 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:16,487 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:17,490 INFO spawned: 'gunicorn' with pid 221386
+2025-06-12 23:41:18,492 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:18,594 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:19,597 INFO spawned: 'gunicorn' with pid 221407
+2025-06-12 23:41:20,599 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:20,737 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:21,741 INFO spawned: 'gunicorn' with pid 221428
+2025-06-12 23:41:22,767 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:22,768 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:23,771 INFO spawned: 'gunicorn' with pid 221448
+2025-06-12 23:41:24,778 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:24,778 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:25,782 INFO spawned: 'gunicorn' with pid 221469
+2025-06-12 23:41:26,783 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:26,844 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:27,847 INFO spawned: 'gunicorn' with pid 221489
+2025-06-12 23:41:28,849 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:28,938 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:29,943 INFO spawned: 'gunicorn' with pid 221511
+2025-06-12 23:41:30,927 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:31,932 INFO spawned: 'gunicorn' with pid 221532
+2025-06-12 23:41:32,936 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:33,233 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:41:34,237 INFO spawned: 'gunicorn' with pid 221556
+2025-06-12 23:41:35,324 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:35,324 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:36,328 INFO spawned: 'gunicorn' with pid 221578
+2025-06-12 23:41:37,330 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:37,536 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:38,539 INFO spawned: 'gunicorn' with pid 221606
+2025-06-12 23:41:39,541 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:39,588 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:40,592 INFO spawned: 'gunicorn' with pid 221630
+2025-06-12 23:41:41,595 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:41,733 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:42,737 INFO spawned: 'gunicorn' with pid 221651
+2025-06-12 23:41:43,743 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:44,072 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:41:45,076 INFO spawned: 'gunicorn' with pid 221677
+2025-06-12 23:41:46,078 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:46,185 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:41:47,189 INFO spawned: 'gunicorn' with pid 221700
+2025-06-12 23:41:48,191 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:48,362 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:49,365 INFO spawned: 'gunicorn' with pid 221722
+2025-06-12 23:41:50,367 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:50,582 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:51,585 INFO spawned: 'gunicorn' with pid 221751
+2025-06-12 23:41:52,589 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:52,812 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:53,816 INFO spawned: 'gunicorn' with pid 221771
+2025-06-12 23:41:54,818 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:54,999 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:56,002 INFO spawned: 'gunicorn' with pid 221794
+2025-06-12 23:41:57,004 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:57,107 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:41:58,110 INFO spawned: 'gunicorn' with pid 221814
+2025-06-12 23:41:59,112 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:41:59,299 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:00,302 INFO spawned: 'gunicorn' with pid 221834
+2025-06-12 23:42:01,307 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:01,566 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:42:02,570 INFO spawned: 'gunicorn' with pid 221864
+2025-06-12 23:42:03,571 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:04,819 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:05,823 INFO spawned: 'gunicorn' with pid 221894
+2025-06-12 23:42:06,825 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:07,026 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:08,029 INFO spawned: 'gunicorn' with pid 221915
+2025-06-12 23:42:09,035 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:09,297 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:10,301 INFO spawned: 'gunicorn' with pid 221940
+2025-06-12 23:42:11,303 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:11,496 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:12,500 INFO spawned: 'gunicorn' with pid 221964
+2025-06-12 23:42:13,501 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:13,552 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:14,555 INFO spawned: 'gunicorn' with pid 221992
+2025-06-12 23:42:15,557 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:15,580 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:42:16,584 INFO spawned: 'gunicorn' with pid 222013
+2025-06-12 23:42:17,586 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:17,783 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:42:18,787 INFO spawned: 'gunicorn' with pid 222034
+2025-06-12 23:42:19,789 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:19,902 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:20,905 INFO spawned: 'gunicorn' with pid 222055
+2025-06-12 23:42:21,907 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:22,077 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:23,080 INFO spawned: 'gunicorn' with pid 222075
+2025-06-12 23:42:24,082 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:24,139 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:25,142 INFO spawned: 'gunicorn' with pid 222095
+2025-06-12 23:42:26,195 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:26,195 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:42:27,198 INFO spawned: 'gunicorn' with pid 222116
+2025-06-12 23:42:28,200 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:28,299 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:29,302 INFO spawned: 'gunicorn' with pid 222138
+2025-06-12 23:42:30,304 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:30,383 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:31,387 INFO spawned: 'gunicorn' with pid 222159
+2025-06-12 23:42:32,371 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:33,374 INFO spawned: 'gunicorn' with pid 222179
+2025-06-12 23:42:34,379 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:34,625 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:35,629 INFO spawned: 'gunicorn' with pid 222208
+2025-06-12 23:42:36,631 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:36,679 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:42:37,682 INFO spawned: 'gunicorn' with pid 222229
+2025-06-12 23:42:38,684 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:38,815 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:39,818 INFO spawned: 'gunicorn' with pid 222253
+2025-06-12 23:42:40,840 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:40,841 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:41,844 INFO spawned: 'gunicorn' with pid 222274
+2025-06-12 23:42:42,846 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:42,988 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:43,992 INFO spawned: 'gunicorn' with pid 222295
+2025-06-12 23:42:44,994 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:45,007 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:42:46,011 INFO spawned: 'gunicorn' with pid 222321
+2025-06-12 23:42:47,013 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:47,169 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:48,172 INFO spawned: 'gunicorn' with pid 222342
+2025-06-12 23:42:49,174 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:49,239 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:50,242 INFO spawned: 'gunicorn' with pid 222362
+2025-06-12 23:42:51,244 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:51,359 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:52,363 INFO spawned: 'gunicorn' with pid 222383
+2025-06-12 23:42:53,367 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:53,526 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:42:54,530 INFO spawned: 'gunicorn' with pid 222405
+2025-06-12 23:42:55,531 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:55,656 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:56,660 INFO spawned: 'gunicorn' with pid 222436
+2025-06-12 23:42:57,657 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:57,765 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:42:58,769 INFO spawned: 'gunicorn' with pid 222456
+2025-06-12 23:42:59,771 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:42:59,855 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:00,859 INFO spawned: 'gunicorn' with pid 222477
+2025-06-12 23:43:01,861 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:01,931 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:43:02,935 INFO spawned: 'gunicorn' with pid 222497
+2025-06-12 23:43:03,937 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:03,985 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:04,989 INFO spawned: 'gunicorn' with pid 222517
+2025-06-12 23:43:06,118 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:06,118 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:07,122 INFO spawned: 'gunicorn' with pid 222539
+2025-06-12 23:43:08,124 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:08,126 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:43:09,130 INFO spawned: 'gunicorn' with pid 222560
+2025-06-12 23:43:10,131 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:10,311 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:11,315 INFO spawned: 'gunicorn' with pid 222581
+2025-06-12 23:43:12,317 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:12,383 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:13,387 INFO spawned: 'gunicorn' with pid 222604
+2025-06-12 23:43:14,389 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:14,484 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:15,488 INFO spawned: 'gunicorn' with pid 222624
+2025-06-12 23:43:16,491 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:16,649 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:43:17,653 INFO spawned: 'gunicorn' with pid 222653
+2025-06-12 23:43:18,655 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:18,761 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:19,765 INFO spawned: 'gunicorn' with pid 222674
+2025-06-12 23:43:20,827 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:20,827 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:21,830 INFO spawned: 'gunicorn' with pid 222695
+2025-06-12 23:43:22,831 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:22,936 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:23,939 INFO spawned: 'gunicorn' with pid 222715
+2025-06-12 23:43:24,941 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:25,028 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:26,031 INFO spawned: 'gunicorn' with pid 222736
+2025-06-12 23:43:27,033 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:27,122 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:28,125 INFO spawned: 'gunicorn' with pid 222756
+2025-06-12 23:43:29,248 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:29,249 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:30,252 INFO spawned: 'gunicorn' with pid 222778
+2025-06-12 23:43:31,254 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:31,314 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:32,317 INFO spawned: 'gunicorn' with pid 222799
+2025-06-12 23:43:33,319 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:33,477 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:34,481 INFO spawned: 'gunicorn' with pid 222819
+2025-06-12 23:43:35,483 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:35,567 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:36,571 INFO spawned: 'gunicorn' with pid 222841
+2025-06-12 23:43:37,607 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:37,608 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:38,611 INFO spawned: 'gunicorn' with pid 222861
+2025-06-12 23:43:39,635 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:39,635 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:40,638 INFO spawned: 'gunicorn' with pid 222893
+2025-06-12 23:43:41,659 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:41,659 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:42,662 INFO spawned: 'gunicorn' with pid 222914
+2025-06-12 23:43:43,676 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:43,676 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:44,679 INFO spawned: 'gunicorn' with pid 222939
+2025-06-12 23:43:45,682 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:45,698 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:43:46,701 INFO spawned: 'gunicorn' with pid 222963
+2025-06-12 23:43:47,703 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:47,812 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:48,816 INFO spawned: 'gunicorn' with pid 222984
+2025-06-12 23:43:49,818 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:49,991 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:50,995 INFO spawned: 'gunicorn' with pid 223005
+2025-06-12 23:43:51,997 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:52,058 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:53,061 INFO spawned: 'gunicorn' with pid 223025
+2025-06-12 23:43:54,063 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:54,109 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:43:55,113 INFO spawned: 'gunicorn' with pid 223046
+2025-06-12 23:43:56,115 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:56,190 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:57,194 INFO spawned: 'gunicorn' with pid 223068
+2025-06-12 23:43:58,195 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:43:58,340 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:43:59,343 INFO spawned: 'gunicorn' with pid 223088
+2025-06-12 23:44:00,344 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:00,454 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:01,458 INFO spawned: 'gunicorn' with pid 223109
+2025-06-12 23:44:02,459 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:02,719 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:03,722 INFO spawned: 'gunicorn' with pid 223137
+2025-06-12 23:44:04,724 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:04,817 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:05,821 INFO spawned: 'gunicorn' with pid 223157
+2025-06-12 23:44:06,823 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:07,075 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:08,079 INFO spawned: 'gunicorn' with pid 223179
+2025-06-12 23:44:09,081 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:09,222 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:10,225 INFO spawned: 'gunicorn' with pid 223200
+2025-06-12 23:44:11,224 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:11,267 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:12,270 INFO spawned: 'gunicorn' with pid 223224
+2025-06-12 23:44:13,272 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:13,414 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:14,417 INFO spawned: 'gunicorn' with pid 223244
+2025-06-12 23:44:15,445 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:15,445 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:16,449 INFO spawned: 'gunicorn' with pid 223265
+2025-06-12 23:44:17,451 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:17,763 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:18,767 INFO spawned: 'gunicorn' with pid 223294
+2025-06-12 23:44:19,837 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:19,838 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:20,841 INFO spawned: 'gunicorn' with pid 223314
+2025-06-12 23:44:21,782 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:44:22,786 INFO spawned: 'gunicorn' with pid 223335
+2025-06-12 23:44:23,787 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:23,926 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:24,930 INFO spawned: 'gunicorn' with pid 223355
+2025-06-12 23:44:25,932 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:26,054 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:27,057 INFO spawned: 'gunicorn' with pid 223376
+2025-06-12 23:44:28,059 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:28,153 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:29,157 INFO spawned: 'gunicorn' with pid 223398
+2025-06-12 23:44:30,175 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:30,175 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:31,178 INFO spawned: 'gunicorn' with pid 223419
+2025-06-12 23:44:32,179 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:32,315 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:33,319 INFO spawned: 'gunicorn' with pid 223439
+2025-06-12 23:44:34,389 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:34,390 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:35,393 INFO spawned: 'gunicorn' with pid 223461
+2025-06-12 23:44:36,395 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:36,510 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:37,513 INFO spawned: 'gunicorn' with pid 223483
+2025-06-12 23:44:38,515 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:38,625 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:39,629 INFO spawned: 'gunicorn' with pid 223503
+2025-06-12 23:44:40,631 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:40,729 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:44:41,739 INFO spawned: 'gunicorn' with pid 223536
+2025-06-12 23:44:42,741 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:42,897 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:44:43,900 INFO spawned: 'gunicorn' with pid 223557
+2025-06-12 23:44:44,902 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:45,064 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:44:46,069 INFO spawned: 'gunicorn' with pid 223583
+2025-06-12 23:44:47,075 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:47,305 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:44:48,309 INFO spawned: 'gunicorn' with pid 223604
+2025-06-12 23:44:49,311 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:49,362 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:44:50,365 INFO spawned: 'gunicorn' with pid 223624
+2025-06-12 23:44:51,367 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:51,469 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:44:52,472 INFO spawned: 'gunicorn' with pid 223645
+2025-06-12 23:44:53,474 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:53,733 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:44:54,737 INFO spawned: 'gunicorn' with pid 223674
+2025-06-12 23:44:55,739 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:55,910 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:56,913 INFO spawned: 'gunicorn' with pid 223696
+2025-06-12 23:44:57,915 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:44:58,017 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:44:59,020 INFO spawned: 'gunicorn' with pid 223716
+2025-06-12 23:45:00,022 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:00,223 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:01,226 INFO spawned: 'gunicorn' with pid 223753
+2025-06-12 23:45:02,229 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:02,585 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:03,589 INFO spawned: 'gunicorn' with pid 223795
+2025-06-12 23:45:04,595 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:04,902 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:05,905 INFO spawned: 'gunicorn' with pid 223824
+2025-06-12 23:45:06,907 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:07,073 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:08,077 INFO spawned: 'gunicorn' with pid 223845
+2025-06-12 23:45:09,079 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:09,330 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:10,333 INFO spawned: 'gunicorn' with pid 223866
+2025-06-12 23:45:11,364 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:11,364 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:12,368 INFO spawned: 'gunicorn' with pid 223890
+2025-06-12 23:45:13,370 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:13,628 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:14,632 INFO spawned: 'gunicorn' with pid 223910
+2025-06-12 23:45:15,633 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:15,756 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:16,760 INFO spawned: 'gunicorn' with pid 223939
+2025-06-12 23:45:17,761 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:17,902 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:45:18,905 INFO spawned: 'gunicorn' with pid 223960
+2025-06-12 23:45:19,907 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:20,048 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:21,051 INFO spawned: 'gunicorn' with pid 223981
+2025-06-12 23:45:22,111 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:22,111 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:23,115 INFO spawned: 'gunicorn' with pid 224001
+2025-06-12 23:45:24,117 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:24,270 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:25,273 INFO spawned: 'gunicorn' with pid 224021
+2025-06-12 23:45:26,275 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:26,572 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:27,576 INFO spawned: 'gunicorn' with pid 224044
+2025-06-12 23:45:28,578 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:28,642 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:29,647 INFO spawned: 'gunicorn' with pid 224066
+2025-06-12 23:45:30,649 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:30,757 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:31,761 INFO spawned: 'gunicorn' with pid 224095
+2025-06-12 23:45:32,762 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:33,024 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:34,028 INFO spawned: 'gunicorn' with pid 224115
+2025-06-12 23:45:35,030 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:35,097 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:45:36,101 INFO spawned: 'gunicorn' with pid 224149
+2025-06-12 23:45:37,103 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:37,210 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:45:38,213 INFO spawned: 'gunicorn' with pid 224170
+2025-06-12 23:45:39,223 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:39,392 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:45:40,395 INFO spawned: 'gunicorn' with pid 224194
+2025-06-12 23:45:41,395 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:41,448 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:42,452 INFO spawned: 'gunicorn' with pid 224215
+2025-06-12 23:45:43,454 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:43,551 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:44,554 INFO spawned: 'gunicorn' with pid 224239
+2025-06-12 23:45:45,555 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:45,653 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:46,657 INFO spawned: 'gunicorn' with pid 224262
+2025-06-12 23:45:47,680 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:47,680 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:48,684 INFO spawned: 'gunicorn' with pid 224283
+2025-06-12 23:45:49,686 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:49,765 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:50,771 INFO spawned: 'gunicorn' with pid 224305
+2025-06-12 23:45:51,820 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:51,821 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:45:52,825 INFO spawned: 'gunicorn' with pid 224332
+2025-06-12 23:45:53,827 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:54,033 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:45:55,037 INFO spawned: 'gunicorn' with pid 224353
+2025-06-12 23:45:56,038 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:56,152 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:57,156 INFO spawned: 'gunicorn' with pid 224375
+2025-06-12 23:45:58,156 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:45:58,205 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:45:59,209 INFO spawned: 'gunicorn' with pid 224395
+2025-06-12 23:46:00,210 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:00,288 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:01,292 INFO spawned: 'gunicorn' with pid 224420
+2025-06-12 23:46:02,294 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:02,437 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:03,441 INFO spawned: 'gunicorn' with pid 224443
+2025-06-12 23:46:04,443 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:04,505 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:05,509 INFO spawned: 'gunicorn' with pid 224463
+2025-06-12 23:46:06,511 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:06,629 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:07,633 INFO spawned: 'gunicorn' with pid 224485
+2025-06-12 23:46:08,654 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:08,654 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:09,658 INFO spawned: 'gunicorn' with pid 224506
+2025-06-12 23:46:10,659 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:10,729 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:11,733 INFO spawned: 'gunicorn' with pid 224529
+2025-06-12 23:46:12,702 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:46:13,706 INFO spawned: 'gunicorn' with pid 224550
+2025-06-12 23:46:14,724 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:14,724 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:15,728 INFO spawned: 'gunicorn' with pid 224570
+2025-06-12 23:46:16,730 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:16,836 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:17,839 INFO spawned: 'gunicorn' with pid 224600
+2025-06-12 23:46:18,841 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:18,930 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:19,934 INFO spawned: 'gunicorn' with pid 224622
+2025-06-12 23:46:20,935 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:21,034 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:22,037 INFO spawned: 'gunicorn' with pid 224643
+2025-06-12 23:46:23,039 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:23,192 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:24,196 INFO spawned: 'gunicorn' with pid 224663
+2025-06-12 23:46:25,181 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:46:26,185 INFO spawned: 'gunicorn' with pid 224684
+2025-06-12 23:46:27,188 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:27,219 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:46:28,222 INFO spawned: 'gunicorn' with pid 224704
+2025-06-12 23:46:29,224 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:29,354 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:30,358 INFO spawned: 'gunicorn' with pid 224726
+2025-06-12 23:46:31,360 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:31,578 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:32,582 INFO spawned: 'gunicorn' with pid 224747
+2025-06-12 23:46:33,583 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:33,712 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:34,716 INFO spawned: 'gunicorn' with pid 224769
+2025-06-12 23:46:35,718 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:35,839 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:46:36,842 INFO spawned: 'gunicorn' with pid 224799
+2025-06-12 23:46:37,844 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:38,099 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:39,111 INFO spawned: 'gunicorn' with pid 224819
+2025-06-12 23:46:40,113 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:40,540 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:46:41,544 INFO spawned: 'gunicorn' with pid 224844
+2025-06-12 23:46:42,546 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:42,846 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:46:43,849 INFO spawned: 'gunicorn' with pid 224873
+2025-06-12 23:46:44,851 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:44,939 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:45,942 INFO spawned: 'gunicorn' with pid 224898
+2025-06-12 23:46:46,945 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:47,032 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:46:48,036 INFO spawned: 'gunicorn' with pid 224919
+2025-06-12 23:46:49,038 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:49,097 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:50,101 INFO spawned: 'gunicorn' with pid 224940
+2025-06-12 23:46:51,103 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:51,243 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:52,247 INFO spawned: 'gunicorn' with pid 224961
+2025-06-12 23:46:53,248 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:53,517 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:54,520 INFO spawned: 'gunicorn' with pid 224981
+2025-06-12 23:46:55,522 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:55,743 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:46:56,747 INFO spawned: 'gunicorn' with pid 225004
+2025-06-12 23:46:57,752 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:57,897 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:46:58,900 INFO spawned: 'gunicorn' with pid 225032
+2025-06-12 23:46:59,902 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:46:59,908 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:00,912 INFO spawned: 'gunicorn' with pid 225052
+2025-06-12 23:47:01,914 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:02,272 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:03,276 INFO spawned: 'gunicorn' with pid 225074
+2025-06-12 23:47:04,279 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:04,525 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:05,528 INFO spawned: 'gunicorn' with pid 225094
+2025-06-12 23:47:06,530 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:06,657 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:07,661 INFO spawned: 'gunicorn' with pid 225116
+2025-06-12 23:47:08,667 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:08,837 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:09,841 INFO spawned: 'gunicorn' with pid 225139
+2025-06-12 23:47:10,843 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:10,907 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:11,911 INFO spawned: 'gunicorn' with pid 225170
+2025-06-12 23:47:12,913 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:12,979 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:13,982 INFO spawned: 'gunicorn' with pid 225191
+2025-06-12 23:47:14,984 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:15,115 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:16,119 INFO spawned: 'gunicorn' with pid 225212
+2025-06-12 23:47:17,121 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:17,262 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:18,266 INFO spawned: 'gunicorn' with pid 225233
+2025-06-12 23:47:19,267 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:19,286 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:20,289 INFO spawned: 'gunicorn' with pid 225253
+2025-06-12 23:47:21,291 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:21,318 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:22,324 INFO spawned: 'gunicorn' with pid 225274
+2025-06-12 23:47:23,326 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:23,418 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:24,422 INFO spawned: 'gunicorn' with pid 225294
+2025-06-12 23:47:25,424 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:25,455 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:26,459 INFO spawned: 'gunicorn' with pid 225315
+2025-06-12 23:47:27,461 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:27,643 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:28,646 INFO spawned: 'gunicorn' with pid 225337
+2025-06-12 23:47:29,648 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:29,808 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:30,811 INFO spawned: 'gunicorn' with pid 225357
+2025-06-12 23:47:31,814 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:32,037 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:33,040 INFO spawned: 'gunicorn' with pid 225386
+2025-06-12 23:47:34,042 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:34,148 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:35,151 INFO spawned: 'gunicorn' with pid 225407
+2025-06-12 23:47:36,153 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:36,340 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:37,344 INFO spawned: 'gunicorn' with pid 225428
+2025-06-12 23:47:38,345 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:38,464 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:39,468 INFO spawned: 'gunicorn' with pid 225450
+2025-06-12 23:47:40,470 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:40,754 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:41,757 INFO spawned: 'gunicorn' with pid 225476
+2025-06-12 23:47:42,760 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:43,077 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:44,080 INFO spawned: 'gunicorn' with pid 225506
+2025-06-12 23:47:45,084 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:45,295 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:46,299 INFO spawned: 'gunicorn' with pid 225532
+2025-06-12 23:47:47,302 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:47,310 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:47:48,313 INFO spawned: 'gunicorn' with pid 225553
+2025-06-12 23:47:49,315 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:49,589 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:50,592 INFO spawned: 'gunicorn' with pid 225573
+2025-06-12 23:47:51,593 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:51,658 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:52,661 INFO spawned: 'gunicorn' with pid 225594
+2025-06-12 23:47:53,663 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:53,750 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:54,753 INFO spawned: 'gunicorn' with pid 225615
+2025-06-12 23:47:55,828 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:55,828 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:56,831 INFO spawned: 'gunicorn' with pid 225637
+2025-06-12 23:47:57,834 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:47:58,230 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:47:59,234 INFO spawned: 'gunicorn' with pid 225668
+2025-06-12 23:48:00,238 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:01,513 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:48:02,517 INFO spawned: 'gunicorn' with pid 225699
+2025-06-12 23:48:03,519 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:03,727 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:04,730 INFO spawned: 'gunicorn' with pid 225719
+2025-06-12 23:48:05,732 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:05,814 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:06,817 INFO spawned: 'gunicorn' with pid 225741
+2025-06-12 23:48:07,819 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:08,047 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:09,051 INFO spawned: 'gunicorn' with pid 225770
+2025-06-12 23:48:10,053 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:10,323 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:11,327 INFO spawned: 'gunicorn' with pid 225799
+2025-06-12 23:48:12,330 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:12,622 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:48:13,626 INFO spawned: 'gunicorn' with pid 225821
+2025-06-12 23:48:14,625 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:14,796 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:15,801 INFO spawned: 'gunicorn' with pid 225841
+2025-06-12 23:48:16,803 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:17,101 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:18,104 INFO spawned: 'gunicorn' with pid 225870
+2025-06-12 23:48:19,104 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:19,147 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:20,151 INFO spawned: 'gunicorn' with pid 225890
+2025-06-12 23:48:21,155 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:21,640 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:48:22,643 INFO spawned: 'gunicorn' with pid 225950
+2025-06-12 23:48:23,645 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:23,935 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:24,939 INFO spawned: 'gunicorn' with pid 225980
+2025-06-12 23:48:25,944 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:26,331 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:27,334 INFO spawned: 'gunicorn' with pid 226019
+2025-06-12 23:48:28,336 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:28,609 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:29,614 INFO spawned: 'gunicorn' with pid 226049
+2025-06-12 23:48:30,616 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:31,179 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:32,183 INFO spawned: 'gunicorn' with pid 226100
+2025-06-12 23:48:33,254 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:33,254 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:34,257 INFO spawned: 'gunicorn' with pid 226120
+2025-06-12 23:48:35,277 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:35,277 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:36,281 INFO spawned: 'gunicorn' with pid 226142
+2025-06-12 23:48:37,283 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:37,432 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:48:38,436 INFO spawned: 'gunicorn' with pid 226166
+2025-06-12 23:48:39,438 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:39,514 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:40,517 INFO spawned: 'gunicorn' with pid 226190
+2025-06-12 23:48:41,533 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:41,533 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:42,536 INFO spawned: 'gunicorn' with pid 226211
+2025-06-12 23:48:43,576 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:43,576 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:44,583 INFO spawned: 'gunicorn' with pid 226239
+2025-06-12 23:48:45,590 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:45,654 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:46,658 INFO spawned: 'gunicorn' with pid 226262
+2025-06-12 23:48:47,659 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:47,778 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:48,781 INFO spawned: 'gunicorn' with pid 226295
+2025-06-12 23:48:49,783 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:49,917 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:48:50,920 INFO spawned: 'gunicorn' with pid 226382
+2025-06-12 23:48:51,935 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:52,488 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:53,492 INFO spawned: 'gunicorn' with pid 226438
+2025-06-12 23:48:54,497 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:54,837 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:55,848 INFO spawned: 'gunicorn' with pid 226508
+2025-06-12 23:48:56,852 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:48:57,827 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:48:58,835 INFO spawned: 'gunicorn' with pid 226558
+2025-06-12 23:48:59,837 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:01,556 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:02,560 INFO spawned: 'gunicorn' with pid 226645
+2025-06-12 23:49:03,561 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:04,437 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:05,441 INFO spawned: 'gunicorn' with pid 226697
+2025-06-12 23:49:06,444 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:06,987 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:07,995 INFO spawned: 'gunicorn' with pid 226736
+2025-06-12 23:49:08,997 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:09,611 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:10,615 INFO spawned: 'gunicorn' with pid 226791
+2025-06-12 23:49:11,617 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:12,395 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:12,399 INFO spawned: 'gunicorn' with pid 226819
+2025-06-12 23:49:13,401 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:14,105 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:15,109 INFO spawned: 'gunicorn' with pid 226859
+2025-06-12 23:49:16,114 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:16,426 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:17,429 INFO spawned: 'gunicorn' with pid 226885
+2025-06-12 23:49:18,431 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:18,523 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:19,527 INFO spawned: 'gunicorn' with pid 226906
+2025-06-12 23:49:20,499 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:21,503 INFO spawned: 'gunicorn' with pid 226931
+2025-06-12 23:49:22,515 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:22,772 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:23,776 INFO spawned: 'gunicorn' with pid 226951
+2025-06-12 23:49:24,778 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:24,833 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:25,837 INFO spawned: 'gunicorn' with pid 226975
+2025-06-12 23:49:26,839 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:26,903 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:27,907 INFO spawned: 'gunicorn' with pid 226996
+2025-06-12 23:49:28,962 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:28,962 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:49:29,965 INFO spawned: 'gunicorn' with pid 227018
+2025-06-12 23:49:30,967 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:31,140 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:32,144 INFO spawned: 'gunicorn' with pid 227047
+2025-06-12 23:49:33,146 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:33,323 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:49:34,326 INFO spawned: 'gunicorn' with pid 227108
+2025-06-12 23:49:35,329 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:35,672 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:36,675 INFO spawned: 'gunicorn' with pid 227155
+2025-06-12 23:49:37,683 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:37,825 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:49:38,829 INFO spawned: 'gunicorn' with pid 227181
+2025-06-12 23:49:39,831 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:39,928 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:40,932 INFO spawned: 'gunicorn' with pid 227218
+2025-06-12 23:49:42,061 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:42,061 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:43,065 INFO spawned: 'gunicorn' with pid 227252
+2025-06-12 23:49:44,067 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:44,194 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:45,197 INFO spawned: 'gunicorn' with pid 227300
+2025-06-12 23:49:46,199 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:46,307 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:47,310 INFO spawned: 'gunicorn' with pid 227334
+2025-06-12 23:49:48,369 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:48,369 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:49,373 INFO spawned: 'gunicorn' with pid 227363
+2025-06-12 23:49:50,375 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:50,463 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:51,467 INFO spawned: 'gunicorn' with pid 227392
+2025-06-12 23:49:52,469 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:52,614 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:53,617 INFO spawned: 'gunicorn' with pid 227418
+2025-06-12 23:49:54,619 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:54,705 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:55,709 INFO spawned: 'gunicorn' with pid 227454
+2025-06-12 23:49:56,729 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:56,729 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:49:57,733 INFO spawned: 'gunicorn' with pid 227485
+2025-06-12 23:49:58,734 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:49:58,814 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:49:59,817 INFO spawned: 'gunicorn' with pid 227513
+2025-06-12 23:50:00,819 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:00,917 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:01,921 INFO spawned: 'gunicorn' with pid 227547
+2025-06-12 23:50:02,921 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:02,967 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:03,971 INFO spawned: 'gunicorn' with pid 227579
+2025-06-12 23:50:04,975 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:05,165 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:50:06,169 INFO spawned: 'gunicorn' with pid 227764
+2025-06-12 23:50:07,170 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:07,381 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:08,385 INFO spawned: 'gunicorn' with pid 227803
+2025-06-12 23:50:09,387 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:09,589 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:10,593 INFO spawned: 'gunicorn' with pid 227914
+2025-06-12 23:50:11,595 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:11,696 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:12,699 INFO spawned: 'gunicorn' with pid 228056
+2025-06-12 23:50:13,701 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:13,835 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:14,838 INFO spawned: 'gunicorn' with pid 228143
+2025-06-12 23:50:15,840 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:16,036 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:17,039 INFO spawned: 'gunicorn' with pid 228167
+2025-06-12 23:50:18,027 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:50:19,031 INFO spawned: 'gunicorn' with pid 228188
+2025-06-12 23:50:20,033 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:20,514 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:21,518 INFO spawned: 'gunicorn' with pid 228229
+2025-06-12 23:50:22,523 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:22,843 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:23,847 INFO spawned: 'gunicorn' with pid 228249
+2025-06-12 23:50:24,849 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:24,922 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:50:25,925 INFO spawned: 'gunicorn' with pid 228281
+2025-06-12 23:50:26,929 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:27,010 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:28,020 INFO spawned: 'gunicorn' with pid 228304
+2025-06-12 23:50:29,022 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:29,988 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:30,992 INFO spawned: 'gunicorn' with pid 228377
+2025-06-12 23:50:31,994 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:32,802 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:33,817 INFO spawned: 'gunicorn' with pid 228460
+2025-06-12 23:50:34,819 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:36,211 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:37,217 INFO spawned: 'gunicorn' with pid 228516
+2025-06-12 23:50:38,229 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:38,840 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:39,856 INFO spawned: 'gunicorn' with pid 228543
+2025-06-12 23:50:40,861 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:41,848 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:41,851 INFO spawned: 'gunicorn' with pid 228569
+2025-06-12 23:50:42,854 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:45,042 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:50:46,054 INFO spawned: 'gunicorn' with pid 228617
+2025-06-12 23:50:47,055 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:48,483 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:50:49,489 INFO spawned: 'gunicorn' with pid 228662
+2025-06-12 23:50:50,507 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:53,412 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:50:54,420 INFO spawned: 'gunicorn' with pid 228717
+2025-06-12 23:50:55,423 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:50:57,475 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:50:58,479 INFO spawned: 'gunicorn' with pid 228757
+2025-06-12 23:50:59,490 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:01,147 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:02,160 INFO spawned: 'gunicorn' with pid 228786
+2025-06-12 23:51:03,173 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:05,467 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:51:06,480 INFO spawned: 'gunicorn' with pid 228834
+2025-06-12 23:51:07,483 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:07,842 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:08,845 INFO spawned: 'gunicorn' with pid 228856
+2025-06-12 23:51:09,851 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:10,205 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:11,211 INFO spawned: 'gunicorn' with pid 228877
+2025-06-12 23:51:12,213 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:13,567 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:14,572 INFO spawned: 'gunicorn' with pid 228972
+2025-06-12 23:51:15,574 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:15,903 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:51:16,907 INFO spawned: 'gunicorn' with pid 229004
+2025-06-12 23:51:17,910 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:18,278 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:19,281 INFO spawned: 'gunicorn' with pid 229226
+2025-06-12 23:51:20,283 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:20,443 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:21,446 INFO spawned: 'gunicorn' with pid 229268
+2025-06-12 23:51:22,451 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:22,759 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:23,763 INFO spawned: 'gunicorn' with pid 229344
+2025-06-12 23:51:24,767 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:24,955 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:25,967 INFO spawned: 'gunicorn' with pid 229375
+2025-06-12 23:51:26,971 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:27,238 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:28,241 INFO spawned: 'gunicorn' with pid 229411
+2025-06-12 23:51:29,247 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:30,557 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:51:31,560 INFO spawned: 'gunicorn' with pid 229693
+2025-06-12 23:51:32,562 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:32,629 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:51:33,632 INFO spawned: 'gunicorn' with pid 229722
+2025-06-12 23:51:34,635 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:35,034 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:51:36,038 INFO spawned: 'gunicorn' with pid 229748
+2025-06-12 23:51:37,042 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:37,283 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:51:38,286 INFO spawned: 'gunicorn' with pid 229769
+2025-06-12 23:51:39,405 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:39,405 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:51:40,409 INFO spawned: 'gunicorn' with pid 229801
+2025-06-12 23:51:41,415 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:42,096 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:43,103 INFO spawned: 'gunicorn' with pid 229822
+2025-06-12 23:51:44,105 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:44,406 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:45,409 INFO spawned: 'gunicorn' with pid 229854
+2025-06-12 23:51:46,411 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:46,701 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:47,705 INFO spawned: 'gunicorn' with pid 229877
+2025-06-12 23:51:48,707 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:49,000 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:50,005 INFO spawned: 'gunicorn' with pid 229898
+2025-06-12 23:51:51,011 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:51,082 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:52,085 INFO spawned: 'gunicorn' with pid 229923
+2025-06-12 23:51:53,086 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:53,207 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:51:54,212 INFO spawned: 'gunicorn' with pid 229944
+2025-06-12 23:51:55,214 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:55,477 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:56,484 INFO spawned: 'gunicorn' with pid 229976
+2025-06-12 23:51:57,487 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:51:57,910 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:51:58,913 INFO spawned: 'gunicorn' with pid 229996
+2025-06-12 23:51:59,915 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:00,105 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:52:01,109 INFO spawned: 'gunicorn' with pid 230016
+2025-06-12 23:52:02,111 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:02,156 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:03,159 INFO spawned: 'gunicorn' with pid 230037
+2025-06-12 23:52:04,161 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:04,283 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:05,287 INFO spawned: 'gunicorn' with pid 230057
+2025-06-12 23:52:06,291 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:06,796 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:52:07,800 INFO spawned: 'gunicorn' with pid 230087
+2025-06-12 23:52:08,802 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:08,866 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:09,871 INFO spawned: 'gunicorn' with pid 230114
+2025-06-12 23:52:10,875 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:12,304 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:13,307 INFO spawned: 'gunicorn' with pid 230148
+2025-06-12 23:52:14,309 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:14,467 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:15,470 INFO spawned: 'gunicorn' with pid 230181
+2025-06-12 23:52:16,471 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:16,614 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:52:17,617 INFO spawned: 'gunicorn' with pid 230204
+2025-06-12 23:52:18,619 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:18,743 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:19,747 INFO spawned: 'gunicorn' with pid 230228
+2025-06-12 23:52:20,749 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:20,865 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:21,869 INFO spawned: 'gunicorn' with pid 230249
+2025-06-12 23:52:22,871 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:22,983 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:23,986 INFO spawned: 'gunicorn' with pid 230269
+2025-06-12 23:52:24,988 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:25,041 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:26,045 INFO spawned: 'gunicorn' with pid 230289
+2025-06-12 23:52:27,047 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:27,136 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:28,140 INFO spawned: 'gunicorn' with pid 230310
+2025-06-12 23:52:29,142 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:29,365 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:30,369 INFO spawned: 'gunicorn' with pid 230332
+2025-06-12 23:52:31,371 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:31,613 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:32,617 INFO spawned: 'gunicorn' with pid 230361
+2025-06-12 23:52:33,619 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:33,748 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:34,752 INFO spawned: 'gunicorn' with pid 230381
+2025-06-12 23:52:35,754 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:35,871 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:36,874 INFO spawned: 'gunicorn' with pid 230403
+2025-06-12 23:52:37,876 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:38,112 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:39,116 INFO spawned: 'gunicorn' with pid 230423
+2025-06-12 23:52:40,118 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:40,276 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:52:41,280 INFO spawned: 'gunicorn' with pid 230448
+2025-06-12 23:52:42,282 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:42,516 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:52:43,521 INFO spawned: 'gunicorn' with pid 230477
+2025-06-12 23:52:44,527 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:44,750 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:45,753 INFO spawned: 'gunicorn' with pid 230506
+2025-06-12 23:52:46,755 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:47,542 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:48,545 INFO spawned: 'gunicorn' with pid 230537
+2025-06-12 23:52:49,547 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:49,790 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:50,793 INFO spawned: 'gunicorn' with pid 230557
+2025-06-12 23:52:51,795 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:51,944 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:52:52,948 INFO spawned: 'gunicorn' with pid 230579
+2025-06-12 23:52:53,950 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:54,182 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:55,186 INFO spawned: 'gunicorn' with pid 230601
+2025-06-12 23:52:56,189 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:56,533 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:52:57,537 INFO spawned: 'gunicorn' with pid 230631
+2025-06-12 23:52:58,539 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:52:58,608 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:52:59,612 INFO spawned: 'gunicorn' with pid 230651
+2025-06-12 23:53:00,614 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:01,067 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:53:02,071 INFO spawned: 'gunicorn' with pid 230676
+2025-06-12 23:53:03,074 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:03,152 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:53:04,156 INFO spawned: 'gunicorn' with pid 230696
+2025-06-12 23:53:05,158 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:05,187 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:53:06,191 INFO spawned: 'gunicorn' with pid 230720
+2025-06-12 23:53:07,195 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:08,053 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:09,057 INFO spawned: 'gunicorn' with pid 230753
+2025-06-12 23:53:10,059 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:10,155 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:11,159 INFO spawned: 'gunicorn' with pid 230773
+2025-06-12 23:53:12,264 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:12,265 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:13,268 INFO spawned: 'gunicorn' with pid 230795
+2025-06-12 23:53:14,271 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:14,579 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:15,582 INFO spawned: 'gunicorn' with pid 230824
+2025-06-12 23:53:16,591 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:16,688 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:17,691 INFO spawned: 'gunicorn' with pid 230845
+2025-06-12 23:53:18,723 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:18,723 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:19,727 INFO spawned: 'gunicorn' with pid 230865
+2025-06-12 23:53:20,714 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:21,717 INFO spawned: 'gunicorn' with pid 230886
+2025-06-12 23:53:22,719 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:22,811 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:23,818 INFO spawned: 'gunicorn' with pid 230906
+2025-06-12 23:53:24,826 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:25,506 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:26,510 INFO spawned: 'gunicorn' with pid 230931
+2025-06-12 23:53:27,511 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:27,687 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:28,690 INFO spawned: 'gunicorn' with pid 230961
+2025-06-12 23:53:29,692 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:29,806 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:53:30,810 INFO spawned: 'gunicorn' with pid 230985
+2025-06-12 23:53:31,832 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-12 23:53:31,833 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:32,836 INFO spawned: 'gunicorn' with pid 231006
+2025-06-12 23:53:33,634 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:34,638 INFO spawned: 'gunicorn' with pid 231026
+2025-06-12 23:53:35,508 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:53:37,513 INFO spawned: 'gunicorn' with pid 231068
+2025-06-12 23:53:38,382 WARN exited: gunicorn (exit status 3; not expected)
+2025-06-12 23:53:41,388 INFO spawned: 'gunicorn' with pid 231112
+2025-06-12 23:53:42,325 WARN exited: gunicorn (exit status 1; not expected)
+2025-06-12 23:53:43,326 INFO gave up: gunicorn entered FATAL state, too many start retries too quickly
