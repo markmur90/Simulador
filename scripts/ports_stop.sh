@@ -3,6 +3,7 @@
 AP_H2_DIR="/home/markmur88/api_bank_h2"
 AP_BK_DIR="/home/markmur88/api_bank_h2_BK"
 AP_HK_DIR="/home/markmur88/api_bank_heroku"
+AP_SM_DIR="/home/markmur88/Simulador"
 VENV_PATH="/home/markmur88/envAPP"
 SCRIPTS_DIR="$AP_H2_DIR/scripts"
 BACKU_DIR="$SCRIPTS_DIR/backup"
@@ -48,10 +49,10 @@ set -euo pipefail
 LOG_SISTEMA="$SCRIPTS_DIR/logs/sistema/$(basename "$0" .sh)_.log"
 mkdir -p "$(dirname $LOG_SISTEMA)"
 
-BASE_DIR="/home/markmur88/api_bank_h2/scripts/utils/simulator_bank"
+BASE_DIR="/home/markmur88/Simulador"
 TOR_DIR="$BASE_DIR/tor_data/hidden_service"
 TORRC="$BASE_DIR/config/torrc_simulador"
-SUPERVISORD_CONF="/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/config/supervisor_simulador.conf"
+SUPERVISORD_CONF="/home/markmur88/Simulador/config/supervisor_simulador.conf"
 
 
 

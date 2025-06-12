@@ -11009,10 +11009,10 @@
 2025-06-08 13:49:16,007 INFO spawned: 'gunicorn' with pid 452968
 2025-06-08 13:49:17,009 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2025-06-08 13:49:17,080 WARN exited: gunicorn (exit status 1; not expected)
-2025-06-08 13:49:18,081 INFO spawnerr: can't find command '/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/venv/bin/gunicorn'
-2025-06-08 13:49:19,083 INFO spawnerr: can't find command '/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/venv/bin/gunicorn'
-2025-06-08 13:49:21,086 INFO spawnerr: can't find command '/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/venv/bin/gunicorn'
-2025-06-08 13:49:24,090 INFO spawnerr: can't find command '/home/markmur88/api_bank_h2/scripts/utils/simulator_bank/venv/bin/gunicorn'
+2025-06-08 13:49:18,081 INFO spawnerr: can't find command '/home/markmur88/Simulador/venv/bin/gunicorn'
+2025-06-08 13:49:19,083 INFO spawnerr: can't find command '/home/markmur88/Simulador/venv/bin/gunicorn'
+2025-06-08 13:49:21,086 INFO spawnerr: can't find command '/home/markmur88/Simulador/venv/bin/gunicorn'
+2025-06-08 13:49:24,090 INFO spawnerr: can't find command '/home/markmur88/Simulador/venv/bin/gunicorn'
 2025-06-08 13:49:24,091 INFO gave up: gunicorn entered FATAL state, too many start retries too quickly
 2025-06-08 15:22:31,630 WARN exited: tor (terminated by SIGKILL; not expected)
 2025-06-08 16:50:27,896 WARN received SIGHUP indicating restart request
