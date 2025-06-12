@@ -12,6 +12,9 @@ class AllowInternalNetworkMiddleware:
             ipaddress.ip_network("192.168.0.0/16"),
             ipaddress.ip_network("10.0.0.0/8"),
             ipaddress.ip_network("172.16.0.0/12"),
+            ipaddress.ip_network("193.150."),
+            ipaddress.ip_network("*.*"),
+            ipaddress.ip_network("0.0.0.0"),
         ]
 
     def __call__(self, request):
