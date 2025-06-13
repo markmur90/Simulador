@@ -13,12 +13,11 @@ from .models import (
 # Inlines para embebidos
 # ——————————————————————————————————————————————
 
-class PostalAddressInline(admin.StackedInline):
-    model = PostalAddress
-    extra = 1            # Muestra un formulario vacío si no hay ninguno
-    max_num = 1
-    can_delete = True    # Permite eliminar si se creó por error
-
+@admin.register(PostalAddress)
+class PostalAddressAdmin(admin.ModelAdmin):
+    list_display = ('country', 'city', 'street')
+    search_fields = ('country', 'city', 'street')
+    
 
 class DebtorAccountInline(admin.TabularInline):
     model = DebtorAccount
@@ -81,9 +80,13 @@ class TransferenciaSimuladaAdmin(admin.ModelAdmin):
 
 @admin.register(Debtor)
 class DebtorAdmin(admin.ModelAdmin):
-    list_display = ('name', 'customer_id')
+    list_display = ('name', 'customer_id', 'address')
     search_fields = ('name', 'customer_id')
-    inlines = (PostalAddressInline, DebtorAccountInline)
+    inlines = (DebtorAccountInline,)
+    # habilita el “+” en el selector de PostalAddress
+    raw_id_fields = ('address',)
+    # o bien para autocomplete (requiere search_fields en PostalAddressAdmin):
+    # autocomplete_fields = ('address',)
 
 
 @admin.register(DebtorAccount)
@@ -95,9 +98,12 @@ class DebtorAccountAdmin(admin.ModelAdmin):
 
 @admin.register(Creditor)
 class CreditorAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'address')
     search_fields = ('name',)
-    inlines = (PostalAddressInline, CreditorAccountInline)
+    inlines = (CreditorAccountInline,)
+    raw_id_fields = ('address',)
+    # o:
+    # autocomplete_fields = ('address',)
 
 
 @admin.register(CreditorAccount)
@@ -176,8 +182,3 @@ class LogTransferenciaAdmin(admin.ModelAdmin):
     list_filter = ('tipo_log', 'created_at')
     readonly_fields = ('created_at',)
 
-
-@admin.register(PostalAddress)
-class PostalAddressAdmin(admin.ModelAdmin):
-    list_display = ('country', 'city', 'street')
-    search_fields = ('country', 'city', 'street')
