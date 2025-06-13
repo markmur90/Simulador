@@ -76,8 +76,6 @@ mypy-extensions==1.0.0
 netifaces==0.11.0
 nltk==3.9.1
 oauthlib==3.2.2
-openai==1.82.0
-openapi-client==1.1.7
 packaging==24.2
 paramiko==3.5.1
 pillow==11.2.1
