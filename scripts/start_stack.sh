@@ -20,8 +20,6 @@ echo ""
 
 bash /home/markmur88/Simulador/scripts/ports_stop.sh
 
-bash /home/markmur88/Simulador/scripts/start_stack.sh
-
 SUPERVISOR_CONF="/home/markmur88/Simulador/config/supervisor_simulador.conf"
 
 manage_supervised() {
@@ -63,7 +61,7 @@ echo ""
 echo "🛠️  Ejecutando migraciones y colectando estáticos…"
 cd "$SIM_DIR"
 source ~/envAPP/bin/activate
-pip3 install -r ~/Simulador/sumulador_banco/requirements.txt
+pip3 install -r ~/api_bank_h2/requirements.txt
 python manage.py makemigrations
 echo ""
 sleep 3
