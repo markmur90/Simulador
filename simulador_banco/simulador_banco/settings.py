@@ -38,9 +38,9 @@ FIELD_ENCRYPTION_KEY = get_env('FIELD_ENCRYPTION_KEY', required=True)
 SECRET_KEY = get_env('SECRET_KEY', required=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = get_env('DEBUG', '0') == '1'
+DEBUG = True
 
-ALLOWED_HOSTS = get_env('ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = ['localhost','127.0.0.1','0.0.0.0','80.78.30.242']
 
 
 # Application definition
