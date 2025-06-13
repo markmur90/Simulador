@@ -4,7 +4,7 @@ findtime = 600
 maxretry = 5
 backend = auto
 usedns = warn
-ignoreip = 127.0.0.1/8 80.78.30.242
+ignoreip = 127.0.0.1 80.78.30.242 0.0.0.0
 
 [http-get-dos]
 enabled = true

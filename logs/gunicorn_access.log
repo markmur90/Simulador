@@ -5,3 +5,7 @@
 127.0.0.1 - - [13/Jun/2025:20:01:53 +0000] "GET / HTTP/1.1" 404 9854 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 127.0.0.1 - - [13/Jun/2025:20:02:15 +0000] "GET /login HTTP/1.1" 301 0 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 127.0.0.1 - - [13/Jun/2025:20:02:15 +0000] "GET /login/ HTTP/1.1" 500 115893 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [13/Jun/2025:20:10:34 +0000] "GET /login/ HTTP/1.1" 500 115893 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [13/Jun/2025:20:11:11 +0000] "GET /login/ HTTP/1.1" 500 70019 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [13/Jun/2025:20:11:16 +0000] "GET / HTTP/1.1" 404 9854 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [13/Jun/2025:20:18:05 +0000] "GET / HTTP/1.1" 404 9854 "-" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
