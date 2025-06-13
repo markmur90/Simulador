@@ -18,6 +18,26 @@ echo ""
 sleep 3
 echo ""
 
+bash /home/markmur88/Simulador/scripts/ports_stop.sh
+
+bash /home/markmur88/Simulador/scripts/start_stack.sh
+
+SUPERVISOR_CONF="/home/markmur88/Simulador/config/supervisor_simulador.conf"
+
+manage_supervised() {
+    local svc="$1"
+    local status
+    status=$(supervisorctl -c "$SUPERVISOR_CONF" status "$svc" | awk '{print $2}')
+    if [[ "$status" == "RUNNING" ]]; then
+        echo "🔄 $svc ya está activo. Reiniciando..."
+        supervisorctl -c "$SUPERVISOR_CONF" restart "$svc"
+    else
+        echo "▶️ $svc no está activo. Iniciando..."
+        supervisorctl -c "$SUPERVISOR_CONF" start "$svc"
+    fi
+}
+
+
 # cerrar procesos en puertos Tor (9053/9054)
 for port in 9053 9054; do
     pid=$(lsof -ti tcp:$port 2>/dev/null || true)
@@ -43,7 +63,7 @@ echo ""
 echo "🛠️  Ejecutando migraciones y colectando estáticos…"
 cd "$SIM_DIR"
 source ~/envAPP/bin/activate
-
+pip3 install -r ~/Simulador/sumulador_banco/requirements.txt
 python manage.py makemigrations
 echo ""
 sleep 3
@@ -105,6 +125,8 @@ echo "🛡️  DJANGO_ALLOWED_HOSTS set to: $DJANGO_ALLOWED_HOSTS"
 echo ""
 sleep 3
 echo ""
+
+
 echo "🔄 Iniciando supervisord…"
 supervisord -c "$SUPERVISORD_CONF"
 sleep 3
