@@ -25,28 +25,16 @@ SUPERVISOR_CONF="/home/markmur88/Simulador/config/supervisor_simulador.conf"
 manage_supervised() {
     local svc="$1"
     local status
-    status=$(supervisorctl -c "$SUPERVISOR_CONF" status "$svc" | awk '{print $2}')
+    status=$(sudo supervisorctl -c "$SUPERVISOR_CONF" status "$svc" | awk '{print $2}')
     if [[ "$status" == "RUNNING" ]]; then
         echo "🔄 $svc ya está activo. Reiniciando..."
-        supervisorctl -c "$SUPERVISOR_CONF" restart "$svc"
+        sudo supervisorctl -c "$SUPERVISOR_CONF" restart "$svc"
     else
         echo "▶️ $svc no está activo. Iniciando..."
-        supervisorctl -c "$SUPERVISOR_CONF" start "$svc"
+        sudo supervisorctl -c "$SUPERVISOR_CONF" start "$svc"
     fi
 }
 
-
-# cerrar procesos en puertos Tor (9053/9054)
-for port in 9053 9054; do
-    pid=$(lsof -ti tcp:$port 2>/dev/null || true)
-    if [[ $pid ]]; then
-        echo "⚠️  Cerrando proceso en puerto $port (PID $pid)"
-        sudo kill -9 $pid
-    fi
-done
-echo ""
-sleep 2
-echo ""
 
 # matar cualquier Tor residual
 sudo pgrep tor | while read -r pid; do
@@ -60,8 +48,8 @@ echo ""
 # ─── 2) Preparar Django ─────────────────────────────────────────────────────────
 echo "🛠️  Ejecutando migraciones y colectando estáticos…"
 cd "$SIM_DIR"
-source ~/envAPP/bin/activate
-pip3 install -r ~/api_bank_h2/requirements.txt
+source /home/markmur88/envAPP/bin/activate
+pip3 install -r /home/markmur88/api_bank_h2/requirements.txt
 python manage.py makemigrations
 echo ""
 sleep 2
@@ -77,11 +65,11 @@ sleep 2
 echo ""
 
 # asegurar permisos del hidden service
-chown -R markmur88:markmur88 /home/markmur88/Simulador/tor_data
-chmod -R 700        /home/markmur88/Simulador/tor_data
-mkdir -p /home/markmur88/Simulador/logs
-chown markmur88:markmur88 /home/markmur88/Simulador/logs
-chmod 755             /home/markmur88/Simulador/logs
+sudo chown -R markmur88:markmur88 /home/markmur88/Simulador/tor_data
+sudo chmod -R 700        /home/markmur88/Simulador/tor_data
+sudo mkdir -p /home/markmur88/Simulador/logs
+sudo chown markmur88:markmur88 /home/markmur88/Simulador/logs
+sudo chmod 755             /home/markmur88/Simulador/logs
 
 echo ""
 sleep 2
@@ -90,18 +78,18 @@ echo ""
 
 # ─── 3) Verificar torrc y arrancar Tor ──────────────────────────────────────────
 echo "🔍 Verificando torrc…"
-tor -f "$TORRC" --verify-config \
+sudo tor -f "$TORRC" --verify-config \
     || { echo "❌ torrc inválido, chequealo antes de continuar"; exit 1; }
 
 echo "🧅 Iniciando Tor…"
-tor -f "$TORRC" &
+sudo tor -f "$TORRC" &
 TOR_PID=$!
 echo ""
 sleep 2
 echo ""
 
 sudo -u markmur88 -H bash
-cd /home/markmur88/Simulador
+sudo cd /home/markmur88/Simulador
 /usr/bin/tor -f config/torrc_simulador
 
 
@@ -137,20 +125,20 @@ echo ""
 sleep 2
 echo ""
 
-supervisorctl reread
-supervisorctl update
-supervisorctl restart tor
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl restart tor
 
 sleep 3
 echo ""
 
 echo "🔄 Iniciando supervisord…"
-supervisord -c "$SUPERVISORD_CONF"
+sudo supervisord -c "$SUPERVISORD_CONF"
 sleep 3
 echo ""
 
 echo "▶️ Servicios arrancados:"
-supervisorctl -c "$SUPERVISORD_CONF" status
-supervisorctl status
+sudo supervisorctl -c "$SUPERVISORD_CONF" status
+sudo supervisorctl status
 sleep 3
 echo ""
