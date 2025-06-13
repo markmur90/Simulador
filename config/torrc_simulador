@@ -1,6 +1,7 @@
 SocksPort 9053
 ControlPort 9054
-CookieAuthentication 1
+CookieAuthentication 0
+HashedControlPassword 16:8BE01BDC84D18AC7609141708BA00B24982DF36FF06E0502107DCCC2F9
 
 DataDirectory /home/markmur88/Simulador/tor_data
 HiddenServiceDir /home/markmur88/Simulador/tor_data/hidden_service

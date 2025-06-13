@@ -12989,3 +12989,43 @@
 2025-06-13 23:52:47,806 INFO spawned: 'tor' with pid 57197
 2025-06-13 23:52:47,835 WARN exited: tor (exit status 1; not expected)
 2025-06-13 23:52:48,836 INFO gave up: tor entered FATAL state, too many start retries too quickly
+2025-06-13 23:55:27,674 INFO waiting for gunicorn to die
+2025-06-13 23:55:28,018 INFO stopped: gunicorn (exit status 0)
+2025-06-13 23:55:52,744 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2025-06-13 23:55:52,757 INFO RPC interface 'supervisor' initialized
+2025-06-13 23:55:52,757 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2025-06-13 23:55:52,758 INFO RPC interface 'supervisor' initialized
+2025-06-13 23:55:52,758 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2025-06-13 23:55:52,761 INFO daemonizing the supervisord process
+2025-06-13 23:55:52,762 INFO supervisord started with pid 59834
+2025-06-13 23:55:53,421 INFO spawned: 'gunicorn' with pid 59844
+2025-06-13 23:55:53,423 INFO spawned: 'tor' with pid 59845
+2025-06-13 23:55:53,459 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:55:54,461 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-13 23:55:54,463 INFO spawned: 'tor' with pid 59860
+2025-06-13 23:55:54,488 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:55:56,493 INFO spawned: 'tor' with pid 59885
+2025-06-13 23:55:56,517 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:00,162 INFO spawned: 'tor' with pid 59911
+2025-06-13 23:56:00,188 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:01,189 INFO gave up: tor entered FATAL state, too many start retries too quickly
+2025-06-13 23:56:32,925 INFO spawned: 'tor' with pid 60247
+2025-06-13 23:56:32,961 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:33,965 INFO spawned: 'tor' with pid 60257
+2025-06-13 23:56:33,992 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:35,006 ERRO 127.0.0.1:54964 - - [13/Jun/2025:21:56:35 +0100] "GET /?message=ERROR%3A%20Process%20tor%3A%20spawn%20error HTTP/1.1" 200 3880
+2025-06-13 23:56:36,016 INFO spawned: 'tor' with pid 60275
+2025-06-13 23:56:36,076 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:39,571 INFO spawned: 'tor' with pid 60308
+2025-06-13 23:56:39,600 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:39,748 INFO gave up: tor entered FATAL state, too many start retries too quickly
+2025-06-13 23:56:42,042 INFO spawned: 'tor' with pid 60327
+2025-06-13 23:56:42,077 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:43,081 INFO spawned: 'tor' with pid 60336
+2025-06-13 23:56:43,108 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:44,122 ERRO 127.0.0.1:54964 - - [13/Jun/2025:21:56:44 +0100] "GET /?message=ERROR%3A%20Process%20tor%3A%20spawn%20error HTTP/1.1" 200 3880
+2025-06-13 23:56:45,126 INFO spawned: 'tor' with pid 60355
+2025-06-13 23:56:45,154 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:48,476 INFO spawned: 'tor' with pid 60388
+2025-06-13 23:56:48,518 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:56:49,520 INFO gave up: tor entered FATAL state, too many start retries too quickly
