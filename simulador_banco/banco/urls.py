@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('api/login/', login_api_simulador),
     path('api/challenge', views.api_challenge),
+    path('api/transferencias/entrantes/', views.api_transfer_incoming),
     path('api/send-transfer', views.api_send_transfer),
     path('api/status-transfer', views.api_status_transfer),
     path('frontend/transfer', views.transfer_simulator_frontend, name='transfer_simulator_frontend'),

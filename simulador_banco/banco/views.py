@@ -17,6 +17,8 @@ from .models import (
 )
 from django.utils.crypto import get_random_string
 import uuid
+from services.transfer_services import TransferService
+from django.core.exceptions import ValidationError
 
 @csrf_exempt
 def recibir_transferencia(request):
@@ -218,3 +220,25 @@ def api_status_transfer(request):
 
 def transfer_simulator_frontend(request):
     return render(request, 'banco/transfer_simulator_frontend.html')
+
+@csrf_exempt
+def api_transfer_incoming(request):
+    """Recibe transferencias de sistemas externos"""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    # Autenticación mediante JWT o sesión activa
+    if not hasattr(request, 'user_jwt') and not request.user.is_authenticated:
+        return JsonResponse({'error': 'Autenticación requerida'}, status=401)
+
+    try:
+        data = json.loads(request.body.decode())
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'JSON inválido'}, status=400)
+
+    try:
+        transfer = TransferService.ingest_transfer(data)
+    except ValidationError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+    return JsonResponse({'payment_id': transfer.payment_id, 'status': transfer.status})
