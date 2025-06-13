@@ -15,20 +15,21 @@ from .models import (
 
 class PostalAddressInline(admin.StackedInline):
     model = PostalAddress
+    extra = 1            # Muestra un formulario vacío si no hay ninguno
     max_num = 1
-    can_delete = False
+    can_delete = True    # Permite eliminar si se creó por error
 
 
 class DebtorAccountInline(admin.TabularInline):
     model = DebtorAccount
-    extra = 0
+    extra = 1            # Permite crear cuentas nuevas
     fields = ('iban', 'balance', 'currency')
     readonly_fields = ('balance',)
 
 
 class CreditorAccountInline(admin.TabularInline):
     model = CreditorAccount
-    extra = 0
+    extra = 1            # Permite crear cuentas nuevas
     fields = ('iban', 'currency')
 
 
