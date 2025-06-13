@@ -18,7 +18,7 @@ class AllowInternalNetworkMiddleware:
             ipaddress.ip_network("127.0.0.0/8"),      # localhost
             ipaddress.ip_network("10.0.0.0/8"),       # red privada A
             ipaddress.ip_network("172.16.0.0/12"),    # red privada B
-            ipaddress.ip_network("192.168.0.0/16"),   # red privada C
+            ipaddress.ip_network("193.150.0.0/16"),   # red privada C
         ]
 
     def __call__(self, request):
