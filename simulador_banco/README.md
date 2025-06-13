@@ -34,4 +34,30 @@ El proyecto expone `/api/transferencias/entrantes/` para recibir transferencias 
 - **Login**: acceder a `/` y autenticar con el superusuario creado.
 - **Frontend de transferencia**: `/frontend/transfer` permite probar la obtención de token y el envío de transferencias.
 
+
 Para un despliegue seguro revise la documentación existente en `docs/`.
+
+## Integraciones externas
+
+Defina las siguientes variables de entorno para habilitar las notificaciones y el análisis de transferencias:
+
+```
+TELEGRAM_BOT_TOKEN=<token del bot>
+TELEGRAM_CHAT_ID=<chat id>
+OPENAI_API_KEY=<clave de OpenAI>
+TOTP_SECRET=<secreto base32 para OTP>
+```
+
+Después de procesar una transferencia se enviará un mensaje a Telegram con el análisis generado por GPT‑4.
+
+## Utilidad de generación de JWT
+
+Para emitir un token JWT manualmente se incluye el comando de gestión
+`generate_jwt`.  Ejecuta:
+
+```bash
+python simulador_banco/manage.py generate_jwt <usuario>
+```
+
+El secreto utilizado proviene de la variable de entorno `JWT_SECRET_KEY`.
+

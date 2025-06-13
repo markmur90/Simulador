@@ -1,12 +1,14 @@
+from datetime import datetime, timedelta
+import json
 
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+import jwt
+from django.conf import settings
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-import json
+from django.shortcuts import redirect, render
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import (
     DebtorSimulado,
@@ -16,7 +18,6 @@ from .models import (
     OTPChallenge,
 )
 from django.utils.crypto import get_random_string
-import uuid
 from services.transfer_services import TransferService
 from django.core.exceptions import ValidationError
 
@@ -99,7 +100,8 @@ import json
 from datetime import datetime, timedelta
 from .models import OficialBancario
 
-SECRET_KEY = 'clave_secreta_bien_larga_123456'
+# Clave usada para firmar JWT desde vistas o comandos
+JWT_SECRET = getattr(settings, 'JWT_SECRET_KEY', settings.SECRET_KEY)
 ALGORITHM = 'HS256'
 
 @csrf_exempt
@@ -122,7 +124,7 @@ def generar_token(request):
         'usuario': username,
         'exp': datetime.utcnow() + timedelta(hours=2)
     }
-    token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+    token = jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
     return JsonResponse({'token': token})
 
 
@@ -190,7 +192,12 @@ def api_send_transfer(request):
     data = json.loads(request.body.decode())
     payment_id = data.get('payment_id')
     otp = data.get('otp')
+    totp_code = data.get('totp')
 
+    from .totp_utils import verify_totp
+    if not verify_totp(str(totp_code)):
+        return JsonResponse({'error': 'TOTP inválido'}, status=400)
+    
     try:
         challenge = OTPChallenge.objects.get(payment_id=payment_id, otp=otp, status='CREATED')
     except OTPChallenge.DoesNotExist:

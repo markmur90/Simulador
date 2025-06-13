@@ -154,3 +154,5 @@ python-dotenv>=1.0        # Manejo de variables de entorno
 django-crispy-forms>=2.0  # Mejora de formularios en templates
 PyJWT
 celery
+python-telegram-bot==20.6
+pyotp==2.9.0
