@@ -12,8 +12,9 @@ urlpatterns = [
     path('dashboard/', views.dashboard_view, name='dashboard'),
     path('transferencia/', views.transferencia_view, name='transferencia'),
     path('registro/', views.registro_view, name='registro'),
+    path('logout/', views.logout_view, name='logout'),
     path('api/token', views.generar_token),
-
+    
     path('api/login/', login_api_simulador),
     path('api/challenge', views.api_challenge),
     path('api/transferencias/entrantes/', views.api_transfer_incoming),

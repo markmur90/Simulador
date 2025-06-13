@@ -3,7 +3,7 @@ import json
 
 import jwt
 from django.conf import settings
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.http import JsonResponse
@@ -89,6 +89,14 @@ def registro_view(request):
     else:
         form = UserCreationForm()
     return render(request, "banco/registro.html", {"form": form})
+
+
+@login_required
+def logout_view(request):
+    """End the current user session and redirect to login."""
+    logout(request)
+    return redirect("login")
+
 
 
 
