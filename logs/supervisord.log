@@ -12971,3 +12971,21 @@
 2025-06-13 23:29:22,595 INFO gave up: tor entered FATAL state, too many start retries too quickly
 2025-06-13 23:31:19,928 INFO waiting for gunicorn to die
 2025-06-13 23:31:20,281 INFO stopped: gunicorn (exit status 0)
+2025-06-13 23:52:40,001 CRIT Supervisor is running as root.  Privileges were not dropped because no user is specified in the config file.  If you intend to run as root, you can set user=root in the config file to avoid this message.
+2025-06-13 23:52:40,014 INFO RPC interface 'supervisor' initialized
+2025-06-13 23:52:40,014 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2025-06-13 23:52:40,014 INFO RPC interface 'supervisor' initialized
+2025-06-13 23:52:40,014 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2025-06-13 23:52:40,017 INFO daemonizing the supervisord process
+2025-06-13 23:52:40,018 INFO supervisord started with pid 57119
+2025-06-13 23:52:40,657 INFO spawned: 'gunicorn' with pid 57121
+2025-06-13 23:52:40,659 INFO spawned: 'tor' with pid 57122
+2025-06-13 23:52:41,688 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-13 23:52:41,689 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:52:42,692 INFO spawned: 'tor' with pid 57146
+2025-06-13 23:52:42,718 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:52:44,722 INFO spawned: 'tor' with pid 57164
+2025-06-13 23:52:44,748 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:52:47,806 INFO spawned: 'tor' with pid 57197
+2025-06-13 23:52:47,835 WARN exited: tor (exit status 1; not expected)
+2025-06-13 23:52:48,836 INFO gave up: tor entered FATAL state, too many start retries too quickly

@@ -1,8 +1,8 @@
-SocksPort 9055
-ControlPort 9056
+SocksPort 9053
+ControlPort 9054
 CookieAuthentication 1
 
 DataDirectory /home/markmur88/Simulador/tor_data
 HiddenServiceDir /home/markmur88/Simulador/tor_data/hidden_service
 HiddenServiceVersion 3
-HiddenServicePort 80 127.0.0.1:9002
+HiddenServicePort 80 127.0.0.1:9001
