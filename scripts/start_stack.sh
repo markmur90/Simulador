@@ -1,72 +1,59 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# ─── Configuración ─────────────────────────────────────────────────────────────
-BASE_DIR="/home/markmur88/Simulador"
+# ─── Configuración ─────────────────────────────────────────────
+BASE_DIR="$HOME/Simulador"
 SIM_DIR="$BASE_DIR/simulador_banco"
-TOR_DIR="$BASE_DIR/tor_data/hidden_service"
+TOR_DATA="$BASE_DIR/tor_data/hidden_service"
 SUPERVISORD_CONF="$BASE_DIR/config/supervisor_simulador.conf"
 TORRC="$BASE_DIR/config/torrc_simulador"
-PUBLIC_IP="80.78.30.242"  # tu IP pública
+PUBLIC_IP="80.78.30.242"
 
-# ─── 1) Limpieza de procesos previos ────────────────────────────────────────────
-echo "🧹 Limpiando procesos previos…"
-pkill -f "supervisord.*$SUPERVISORD_CONF"      2>/dev/null || true
-pkill -f "gunicorn.*simulador_banco.wsgi"     2>/dev/null || true
-pkill -f "tor.*$TORRC"                         2>/dev/null || true
+LOG_DIR="$BASE_DIR/logs"
+REQS_PATH="$HOME/api_bank_h2/requirements.txt"
+VENV_ACT="$HOME/envAPP/bin/activate"
+
+# ─── 0) Pre-check de torrc ──────────────────────────────────────
+echo "🔍 Verificando torrc…"
+tor --verify-config -f "$TORRC" \
+  || { echo "❌ Error en torrc, corrígelo antes de continuar"; exit 1; }
+
 echo ""
 sleep 3
 echo ""
 
-bash /home/markmur88/Simulador/scripts/ports_stop.sh
+# ─── 1) Detener Tor del sistema ────────────────────────────────
+echo "🛑 Deteniendo Tor del sistema…"
+sudo systemctl is-active --quiet tor && sudo systemctl stop tor
+sudo systemctl disable tor || true
 
-SUPERVISOR_CONF="/home/markmur88/Simulador/config/supervisor_simulador.conf"
-
-manage_supervised() {
-    local svc="$1"
-    local status
-    status=$(supervisorctl -c "$SUPERVISOR_CONF" status "$svc" | awk '{print $2}')
-    if [[ "$status" == "RUNNING" ]]; then
-        echo "🔄 $svc ya está activo. Reiniciando..."
-        supervisorctl -c "$SUPERVISOR_CONF" restart "$svc"
-    else
-        echo "▶️ $svc no está activo. Iniciando..."
-        supervisorctl -c "$SUPERVISOR_CONF" start "$svc"
-    fi
-}
-
-
-# cerrar procesos en puertos Tor (9053/9054)
-for port in 9053 9054; do
-    pid=$(lsof -ti tcp:$port 2>/dev/null || true)
-    if [[ $pid ]]; then
-        echo "⚠️  Cerrando proceso en puerto $port (PID $pid)"
-        sudo kill -9 $pid
-    fi
-done
 echo ""
 sleep 3
 echo ""
 
-# matar cualquier Tor residual
-sudo pgrep tor | while read -r pid; do
-    echo "⚠️  Matando Tor PID $pid"
-    sudo kill -9 "$pid"
-done
+# ─── 2) Limpiar procesos previos ───────────────────────────────
+echo "🧹 Limpiando procesos anteriores…"
+pkill -f "supervisord.*$SUPERVISORD_CONF" 2>/dev/null || true
+pkill -f "gunicorn.*simulador_banco.wsgi" 2>/dev/null || true
+# matar cualquier tor residuo del usuario
+pgrep -u "$(whoami)" tor | xargs --no-run-if-empty kill -9 || true
+
 echo ""
 sleep 3
 echo ""
 
-# ─── 2) Preparar Django ─────────────────────────────────────────────────────────
-echo "🛠️  Ejecutando migraciones y colectando estáticos…"
+# ─── 3) Setup Django ──────────────────────────────────────────
+echo "🛠  Migraciones y estáticos…"
 cd "$SIM_DIR"
-source ~/envAPP/bin/activate
-pip3 install -r ~/api_bank_h2/requirements.txt
+source "$VENV_ACT"
+pip install -r "$REQS_PATH"
+echo ""
+sleep 3
+echo ""
 python manage.py makemigrations
 echo ""
 sleep 3
 echo ""
-
 python manage.py migrate
 echo ""
 sleep 3
@@ -76,61 +63,61 @@ echo ""
 sleep 3
 echo ""
 
-# asegurar permisos del hidden service
-chmod 700 "$BASE_DIR/tor_data/hidden_service"
-chown -R markmur88: "$BASE_DIR/tor_data"
-echo ""
-sleep 3
-echo ""
-# ─── 3) Verificar torrc y arrancar Tor ──────────────────────────────────────────
-echo "🔍 Verificando torrc…"
-tor -f "$TORRC" --verify-config \
-    || { echo "❌ torrc inválido, chequealo antes de continuar"; exit 1; }
+# ─── 4) Ajustar permisos Tor data & logs ──────────────────────
+echo "🔐 Permisos de tor_data y logs…"
+mkdir -p "$LOG_DIR" "$TOR_DATA"
+chown -R "$(whoami)" "$BASE_DIR/tor_data" "$LOG_DIR"
+chmod -R 700 "$BASE_DIR/tor_data"
+chmod -R 755 "$LOG_DIR"
 
-echo "🧅 Iniciando Tor…"
-tor -f "$TORRC" &
-TOR_PID=$!
 echo ""
 sleep 3
 echo ""
-# esperar generación del .onion
-echo -n "⌛ Esperando a que Tor genere el .onion… "
+
+# ─── 5) Supervisord: reread/update & arrancar servicios ───────
+echo "♻️  Recargando supervisord…"
+supervisorctl -c "$SUPERVISORD_CONF" reread
+supervisorctl -c "$SUPERVISORD_CONF" update
+
+echo ""
+sleep 3
+echo ""
+
+echo "▶️ Iniciando servicios con supervisord…"
+supervisorctl -c "$SUPERVISORD_CONF" start all \
+  || { echo "❌ No se pudieron iniciar todos los servicios"; exit 1; }
+
+echo ""
+sleep 3
+echo ""
+
+# ─── 6) Esperar a .onion y setear ALLOWED_HOSTS ─────────────
+echo -n "⌛ Generando .onion… "
 for i in {1..10}; do
-    if [ -f "$TOR_DIR/hostname" ]; then
-        echo "✅"
-        break
-    fi
-    sleep 1
+  if [[ -f "$TOR_DATA/hostname" ]]; then
+    echo "✅"
+    break
+  fi
+  sleep 1
 done
+ONION_ADDR=$(< "$TOR_DATA/hostname")
+echo "🧅 .onion: $ONION_ADDR"
+
 echo ""
 sleep 3
 echo ""
-if [ ! -f "$TOR_DIR/hostname" ]; then
-    echo "❌ No se generó el .onion en tiempo esperado."
-    exit 1
-fi
-echo ""
-sleep 3
-echo ""
-ONION_ADDR=$(cat "$TOR_DIR/hostname")
-echo "🧅 Servicio oculto disponible en: $ONION_ADDR"
-echo ""
-sleep 3
-echo ""
-# ─── 4) Inyectar ALLOWED_HOSTS y arrancar supervisord ───────────────────────────
+
 export DJANGO_ALLOWED_HOSTS="127.0.0.1,$PUBLIC_IP,$ONION_ADDR"
-echo "🛡️  DJANGO_ALLOWED_HOSTS set to: $DJANGO_ALLOWED_HOSTS"
+echo "🛡  DJANGO_ALLOWED_HOSTS=$DJANGO_ALLOWED_HOSTS"
+
 echo ""
 sleep 3
 echo ""
 
-
-echo "🔄 Iniciando supervisord…"
-supervisord -c "$SUPERVISORD_CONF"
-sleep 3
-
-echo "▶️ Servicios arrancados:"
+# ─── 7) Estado final ──────────────────────────────────────────
+echo ""
 supervisorctl -c "$SUPERVISORD_CONF" status
 
+echo ""
 sleep 3
 echo ""
