@@ -389,3 +389,12 @@ Jun 12 22:53:59.628 [notice] Opening Control listener on 127.0.0.1:9054
 Jun 12 22:53:59.628 [warn] Could not bind to 127.0.0.1:9054: Address already in use. Is Tor already running?
 Jun 12 22:53:59.628 [warn] Failed to parse/validate config: Failed to bind one of the listener ports.
 Jun 12 22:53:59.628 [err] Reading config failed--see warnings above.
+Jun 13 06:08:16.473 [notice] Tor 0.4.7.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.0.16, Zlib 1.2.13, Liblzma 5.4.1, Libzstd 1.5.4 and Glibc 2.36 as libc.
+Jun 13 06:08:16.473 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jun 13 06:08:16.473 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 13 06:08:16.485 [notice] Opening Socks listener on 127.0.0.1:9053
+Jun 13 06:08:16.485 [warn] Could not bind to 127.0.0.1:9053: Address already in use. Is Tor already running?
+Jun 13 06:08:16.486 [notice] Opening Control listener on 127.0.0.1:9054
+Jun 13 06:08:16.486 [warn] Could not bind to 127.0.0.1:9054: Address already in use. Is Tor already running?
+Jun 13 06:08:16.486 [warn] Failed to parse/validate config: Failed to bind one of the listener ports.
+Jun 13 06:08:16.486 [err] Reading config failed--see warnings above.
