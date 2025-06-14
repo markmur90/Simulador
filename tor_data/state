@@ -1,4 +1,4 @@
-# Tor state file last generated on 2025-06-14 02:44:25 local time
+# Tor state file last generated on 2025-06-14 02:44:56 local time
 # Other times below are in UTC
 # You *do not* need to edit this file.
 
@@ -119,8 +119,8 @@ CircuitBuildTimeBin 5075 1
 CircuitBuildTimeBin 5085 1
 CircuitBuildTimeBin 5125 1
 Dormant 0
-Guard in=default rsa_id=B1FE4BE9DD33376DADC22D271803097E1AE8B35E nickname=HandStanderd sampled_on=2025-05-29T17:49:21 sampled_idx=0 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-05T01:51:41 confirmed_idx=1 pb_use_attempts=98.265625 pb_use_successes=98.265625 pb_circ_attempts=191.500000 pb_circ_successes=187.125000 pb_successful_circuits_closed=186.625000 pb_collapsed_circuits=0.500000 pb_timeouts=0.625000
-Guard in=default rsa_id=CBFA5CE9FCF39B6FBB12CF0A0899608F16DC67A5 nickname=prsv sampled_on=2025-06-02T01:19:38 sampled_idx=1 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-08T00:44:12 confirmed_idx=0 pb_use_attempts=57.113281 pb_use_successes=57.113281 pb_circ_attempts=228.125000 pb_circ_successes=221.750000 pb_successful_circuits_closed=221.750000 pb_timeouts=5.250000
+Guard in=default rsa_id=B1FE4BE9DD33376DADC22D271803097E1AE8B35E nickname=HandStanderd sampled_on=2025-05-29T17:49:21 sampled_idx=0 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-05T01:51:41 confirmed_idx=1 pb_use_attempts=99.265625 pb_use_successes=99.265625 pb_circ_attempts=191.500000 pb_circ_successes=188.125000 pb_successful_circuits_closed=187.625000 pb_collapsed_circuits=0.500000 pb_timeouts=0.625000
+Guard in=default rsa_id=CBFA5CE9FCF39B6FBB12CF0A0899608F16DC67A5 nickname=prsv sampled_on=2025-06-02T01:19:38 sampled_idx=1 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-08T00:44:12 confirmed_idx=0 pb_use_attempts=59.113281 pb_use_successes=59.113281 pb_circ_attempts=228.125000 pb_circ_successes=223.750000 pb_successful_circuits_closed=223.750000 pb_timeouts=5.250000
 Guard in=default rsa_id=5BE7317D29F26E5A3D96F0E7F8653B870E657C6C nickname=Downunder2 sampled_on=2025-05-31T20:21:21 sampled_idx=2 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-02T09:41:59 confirmed_idx=2 pb_use_attempts=7.000000 pb_use_successes=7.000000 pb_circ_attempts=14.000000 pb_circ_successes=14.000000 pb_successful_circuits_closed=14.000000
 Guard in=default rsa_id=7DC499EA72BF553D3CBD1B149167EAA04FD37AA0 nickname=tetraegis sampled_on=2025-05-28T21:21:23 sampled_idx=3 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=8AB172C11996EC969EF5B42B7CB8ADDD07455AA4 nickname=MaverickPass sampled_on=2025-06-07T05:36:22 sampled_idx=4 sampled_by=0.4.8.16 listed=1
@@ -179,6 +179,6 @@ Guard in=default rsa_id=4B273B712FF7369F39043752AED79FE8F28EECA4 nickname=Quetza
 Guard in=default rsa_id=F318BE2B5B5BB72F3140FE37A337FC8F233C977C nickname=Pirkka1 sampled_on=2025-06-12T18:09:53 sampled_idx=57 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=049091E0582A6439D7AC7E157D32AB9319B8B78C nickname=Mlrage sampled_on=2025-06-09T04:05:15 sampled_idx=58 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=01E388EF92B569074D8FA86CC9D442E829F6E885 nickname=ThanasRelay0 sampled_on=2025-06-07T11:32:04 sampled_idx=59 sampled_by=0.4.8.16 listed=1
-LastWritten 2025-06-14 00:44:25
+LastWritten 2025-06-14 00:44:56
 TorVersion Tor 0.4.8.16
 TotalBuildTimes 237
