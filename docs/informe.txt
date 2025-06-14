@@ -1,0 +1,231 @@
+📋 Informe de Revisión del Proyecto Django
+1. Resumen Ejecutivo
+
+El proyecto es un simulador bancario creado con Django. Incluye autenticación vía JWT, manejo de transferencias y plantillas HTML para pruebas. La estructura general es funcional pero presenta serios problemas de seguridad, dependencias excesivas y configuraciones específicas de entorno que dificultan su despliegue y mantenimiento.
+
+Principales hallazgos:
+
+    Uso de configuraciones sensibles en archivos de ejemplo (.env.example) y referencias a rutas absolutas que exponen datos de infraestructura.
+
+    Mezcla de modelos y vistas incompletas con código duplicado o truncado.
+
+    Dependencias innecesarias en requirements.txt y ausencia de pruebas automatizadas.
+
+    Falta de documentación de instalación y despliegue consistente.
+
+    Presencia de archivos de datos y configuraciones de servidor (nginx, supervisor, tor) dentro del repositorio.
+
+2. Análisis Detallado
+1. 🧱 Arquitectura General
+
+    ✅ Separa la app principal (banco) dentro del proyecto simulador_banco.
+
+    ❗ Mezcla de modelos simples (TransferenciaSimulada) con modelos complejos (Debtor, Creditor, etc.) en el mismo archivo. Hay código comentado o incompleto.
+    Ejemplo de múltiples modelos en un mismo archivo y permisos sin modularización
+
+    ❗ Ausencia de pruebas y carpetas tests, dificultando escalabilidad.
+
+    🛠️ Recomendación: Dividir modelos en distintos módulos (accounts.py, payments.py), crear apps separadas para API y frontend, e incorporar una carpeta tests/.
+
+2. ⚙️ Configuración del Proyecto
+
+    ✅ Uso de django-environ/dotenv para cargar variables
+
+❗ DEBUG = True por defecto y ALLOWED_HOSTS incluye una IP fija
+
+❗ Middleware personalizado se referencia con ruta relativa incorrecta (middleware.jwt_auth) en MIDDLEWARE
+
+❗ Rutas absolutas de logs y configuraciones dentro de archivos de config/, dificultando la portabilidad
+
+    🛠️ Recomendación: mover variables sensibles a .env, cambiar DEBUG por variable de entorno, usar rutas relativas y añadir settings por entorno (development, production).
+
+3. 📦 Dependencias y Entorno
+
+    ❗ requirements.txt incluye más de 100 paquetes (Celery, Playwright, Selenium, etc.) cuando la app solo usa algunos
+
+    ❗ Ausencia de Pipfile/poetry o gestión de entornos virtuales automatizada.
+
+    🛠️ Recomendación: depurar requirements.txt a lo estrictamente necesario (Django, djangorestframework_simplejwt si se usa, etc.) y documentar el entorno virtual.
+
+4. 📁 Estructura de Directorios y Archivos
+
+    ✅ Existe .gitignore con exclusiones de carpetas comunes
+
+    ❗ No hay LICENSE ni README principal (solo en subcarpetas).
+    Documentación dispersa en docs/.
+
+    ❗ Se incluye db.sqlite3 y tor_data en el repositorio, lo que debería ignorarse.
+
+    🛠️ Recomendación: incluir README.md global con instrucciones claras, agregar licencia, excluir la base de datos y datos temporales del control de versiones.
+
+5. 🧾 Modelos de Datos
+
+    ✅ Uso de relaciones ForeignKey y validadores (por ejemplo, iban_validator)
+
+❗ Modelo TransferenciaSimulada simple convive con modelos avanzados; algunos campos están sin utilizar o repetidos.
+
+❗ Múltiples class Meta duplicados en Transfer (hay dos definiciones), lo que puede provocar conflictos
+
+    🛠️ Recomendación: limpiar modelos, separar la simulación del modelo real, y revisar migraciones.
+
+6. 📡 Vistas y URLs
+
+    ✅ Uso básico de vistas basadas en función y clases para CRUD GPT4.
+
+    ❗ Vistas presentan mezclas de lógica y validaciones manuales; falta de decoradores de autenticación en todas las rutas.
+
+    ❗ Endpoint /api/transfer_incoming permite datos arbitrarios y solo valida existencia de JWT, sin controlar permisos ni estructura completa.
+
+    🛠️ Recomendación: usar CBV para estandarizar, aplicar permisos (login_required, permission_required), y validar entrada con forms o serializers.
+
+7. 🎨 Plantillas
+
+    ✅ Plantilla base con fragmentos reutilizables (partials) y controles de expiración de sesión.
+
+    ❗ Archivos HTML duplicados y algunos mal nombrados (ej. create_dlientid.html).
+
+    ❗ Uso de estilos en línea extensos; falta de separación CSS.
+
+    🛠️ Recomendación: consolidar las plantillas en un sistema coherente, eliminar archivos obsoletos y mover CSS a archivos estáticos.
+
+8. 📩 Formularios
+
+    ✅ Uso de ModelForm para manejar modelos complejos
+
+    ❗ No se aplican validaciones personalizadas ni mensajes de error amigables.
+
+    🛠️ Añadir métodos clean_* en los formularios y aprovechar crispy-forms o django-bootstrap5 ya listados en dependencias.
+
+9. 🔐 Seguridad General
+
+    ❗ Claves en .env.example aparentan ser reales, con URLs de API productiva
+
+❗ Middleware de red interna comentado en settings, pero archivos de configuración Tor y Nginx contienen rutas y puertos específicos expuestos
+
+    ❗ Falta de protección CSRF en varias vistas @csrf_exempt (p.ej. api_send_transfer).
+
+    🛠️ Recomendación: eliminar datos sensibles de ejemplos, habilitar HTTPS (SECURE_HSTS_*), usar csrf_exempt solo cuando sea estrictamente necesario, y activar middleware de red interna en producción.
+
+10. 📈 Performance y Escalabilidad
+
+    ✅ Uso de Celery para procesar transferencias diferidas
+
+    ❗ No hay configuración de cache ni optimización de consultas (select_related, prefetch_related apenas se usa).
+
+    ❗ La lógica de negocio en TransferService es mínima y no contempla grandes volúmenes.
+
+    🛠️ Recomendación: añadir caching (Redis/Memcached) y optimizar consultas en vistas que listan datos.
+
+11. 🛠️ Scripts y Automatizaciones
+
+    ✅ Existen scripts Bash para gestión de servicios (supervisor, tor, gunicorn).
+
+    ❗ Rutas absolutas y variables de un usuario específico (/home/markmur88/…) que no funcionan en otros entornos.
+
+    🛠️ Recomendación: convertir estos scripts en genéricos, usar variables de entorno y documentar su uso.
+
+12. ✅ Testing
+
+    ❗ No existen tests unitarios ni de integración.
+
+    🛠️ Recomendación: añadir pytest/pytest-django (ya está en requirements) y comenzar con pruebas básicas de vistas y modelos.
+
+13. 📊 Monitoreo y Logging
+
+    ✅ Configuración mínima de logging a consola
+
+    ❗ No se definen formatos, niveles por módulo ni rotación de logs.
+
+    🛠️ Recomendación: estructurar LOGGING con handlers para archivo, rotación y niveles diferenciados. Integrar con servicios como Sentry para errores.
+
+14. 📄 Documentación
+
+    ✅ Existe documentación en docs/ con instrucciones rápidas de instalación
+
+    ❗ Falta guía de despliegue estructurada y README principal.
+
+    ❗ Muchos documentos son fragmentos de análisis o prompts que no aportan al desarrollador.
+
+    🛠️ Recomendación: centralizar documentación, explicar configuración de entornos, despliegue con Docker y uso de scripts.
+
+15. 🧪 Uso Opcional de Tecnologías
+
+    ✅ Se contempla Celery y Telegram para notificaciones.
+
+    ❗ No se utiliza Django REST Framework aunque se menciona en dependencias, ni se justifica su inclusión.
+
+    🛠️ Reducir dependencias no usadas (Playwright, Selenium, Flask…) o integrar DRF de forma coherente para la API.
+
+16. 🌐 Despliegue y Operaciones
+
+    ✅ Archivos de configuración de Nginx, Supervisor y Tor permiten un despliegue completo.
+
+    ❗ Esos archivos contienen rutas y credenciales estáticas; no hay Dockerfile ni instrucciones portables.
+
+    🛠️ Recomendación: crear imágenes Docker, parametrizar rutas y documentar paso a paso la puesta en producción.
+
+17. 📬 Emails y Notificaciones
+
+    ❗ No hay configuración de email en settings ni plantilla de correo. Solo notificación por Telegram en tasks.py.
+
+    🛠️ Añadir configuración EMAIL_BACKEND y plantillas de correo para eventos críticos (creación de usuario, cambios de contraseña, etc.)
+
+18. 🧼 Limpieza y Buenas Prácticas Generales
+
+    ❗ Múltiples líneas finales truncadas en archivos (p. ej. gunicorn.conf.py, tasks.py, forms.py), y mezclas de comentarios innecesarios. Presencia de archivos grandes sin usar.
+
+    ❗ No se sigue PEP8 en todo el código; faltan type hints.
+
+    🛠️ Usar herramientas como flake8, isort, black y habilitar CI.
+
+19. 💡 Mejoras Sugeridas
+
+    Refactorizar la estructura de apps para separar claramente simulador, API y administración.
+
+    Simplificar requirements.txt y eliminar dependencias obsoletas.
+
+    Incorporar Docker para entornos reproducibles.
+
+    Implementar un flujo de CI/CD (GitHub Actions) con pruebas y linting.
+
+    Implementar autenticación más segura (expiración de JWT, refresh tokens).
+
+    Documentar todo el stack de supervisión y servicios (nginx, tor, supervisor).
+
+20. 🧭 Roadmap Futuro
+
+    Actualizar a la última versión estable de Django de forma controlada.
+
+    Dividir el proyecto en microservicios si se planea escalar (API separada del simulador).
+
+    Añadir soporte para DRF y versionado de API.
+
+    Automatizar backups de base de datos y media.
+
+    Considerar migración de SQLite a PostgreSQL para producción.
+
+3. Priorización de Acciones
+Prioridad	Acción	Tiempo Estimado	Impacto
+Alta	Depurar requirements.txt y remover paquetes innecesarios	1-2 días	Seguridad, mantenibilidad
+Alta	Configurar variables de entorno correctamente y eliminar datos sensibles	1 día	Seguridad
+Alta	Agregar pruebas básicas con pytest y CI	2-3 días	Calidad del código
+Media	Refactorizar modelos y vistas, separando responsabilidades	4-5 días	Escalabilidad
+Media	Documentar adecuadamente (README principal, guía de despliegue)	1-2 días	Onboarding
+Media	Dockerizar el proyecto para despliegue reproducible	3 días	Portabilidad
+Baja	Implementar monitoreo y logging avanzado	2 días	Mantenimiento
+Baja	Agregar soporte de correo electrónico y notificaciones	2 días	Usabilidad
+4. Recursos Adicionales
+
+    Django Deployment Checklist
+
+    12 Factor App for Django
+
+    Dockerizing Django
+
+    pytest-django documentation
+
+    Plantillas de configuración segura: django-environ
+
+5. Conclusiones
+
+El proyecto provee un punto de partida para un simulador bancario con varias funcionalidades, pero requiere una limpieza profunda para ser seguro y mantenible. Es necesario eliminar datos sensibles, estandarizar configuraciones, depurar dependencias y agregar pruebas automatizadas. Una estructura modular y documentación clara permitirán escalarlo de forma segura y eficiente. Con las mejoras propuestas, el equipo podrá evolucionar hacia un sistema robusto y listo para producción.

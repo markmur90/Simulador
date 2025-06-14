@@ -38,7 +38,7 @@ FIELD_ENCRYPTION_KEY = get_env('FIELD_ENCRYPTION_KEY', required=True)
 SECRET_KEY = get_env('SECRET_KEY', required=True)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = get_env('DEBUG', '0') == '1'
 
 ALLOWED_HOSTS = ['localhost','127.0.0.1','0.0.0.0','80.78.30.242']
 
@@ -57,7 +57,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'middleware.jwt_auth.JWTAuthenticationMiddleware',
+    'simulador_banco.middleware.jwt_auth.JWTAuthenticationMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

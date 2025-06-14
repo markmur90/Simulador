@@ -22,3 +22,12 @@ celerybeat-schedule
 .vscode/
 node_modules/
 npm-debug.log
+npm-debug.log
+# Project files
+*.sqlite3
+db.sqlite3
+.env
+.env.*
+logs/
+tor_data/
+chmod_log.txt

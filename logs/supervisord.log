@@ -13231,3 +13231,6 @@
 2025-06-14 03:12:53,985 INFO spawned: 'tor' with pid 3957356
 2025-06-14 03:12:55,805 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2025-06-14 03:13:04,786 INFO success: tor entered RUNNING state, process has stayed up for > than 10 seconds (startsecs)
+2025-06-14 03:19:05,269 INFO waiting for gunicorn, tor to die
+2025-06-14 03:19:05,347 INFO stopped: tor (exit status 0)
+2025-06-14 03:19:05,991 INFO stopped: gunicorn (exit status 0)

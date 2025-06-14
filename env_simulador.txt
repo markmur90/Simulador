@@ -1,0 +1,14 @@
+FIELD_ENCRYPTION_KEY=g9KXzW3k9PzKvBjzW8O6C6X-MxT5eJiQAQBFYRfucvI=
+SECRET_KEY=L3hesOa21ZGRsk0TsVvKMI6kWuv8d-ZAGIfP87i4Hv0
+JWT_SECRET_KEY=your-jwt-secret
+TOKEN_URL=https://80.78.30.242:9181/gw/oidc/token
+AUTHORIZE_URL=https://80.78.30.242:9181/gw/oidc/authorize
+OTP_URL=https://80.78.30.242:9181/gw/dbapi/others/onetimepasswords/v2/single
+AUTH_URL=https://80.78.30.242:9181/gw/dbapi/others/transactionAuthorization/v1/challenges
+API_URL=https://80.78.30.242:9181/gw/dbapi/paymentInitiation/payments/v1/sepaCreditTransfer
+SIMULATOR_NOTIFY_URL=http://localhost/notify
+API_URL=https://80.78.30.242:9181/gw/dbapi/paymentInitiation/payments/v1/sepaCreditTransfer
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_CHAT_ID=
+OPENAI_API_KEY=
+TOTP_SECRET=
