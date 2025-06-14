@@ -155,7 +155,7 @@ for i in {1..20}; do
   sleep 1
 done
 echo ""
-sleep 5
+sleep 15
 
 
 # supervisorctl -c "$SUPERVISOR_CONF" reread
