@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set +e
 
 # ─── Configuración ─────────────────────────────────────────────────────────────
 BASE_DIR="/home/markmur88/Simulador"
@@ -90,14 +90,12 @@ echo "🧅 Iniciando Tor…"
 tor -f "$TORRC" &
 TOR_PID=$!
 echo ""
-sleep 10
+sleep 3
 echo ""
 
-sudo -u markmur88 -H bash
-cd /home/markmur88/Simulador
-/usr/bin/tor -f config/torrc_simulador
+sudo -u markmur88 -H bash -c "cd /home/markmur88/Simulador && /usr/bin/tor -f config/torrc_simulador &"
 
-sleep 10
+sleep 3
 
 # esperar generación del .onion
 echo -n "⌛ Esperando a que Tor genere el .onion… "
@@ -131,12 +129,9 @@ echo ""
 sleep 5
 echo ""
 
-supervisorctl reread
-supervisorctl update
-supervisorctl restart tor
-
-sleep 3
-echo ""
+supervisorctl -c "$SUPERVISOR_CONF" reread
+supervisorctl -c "$SUPERVISOR_CONF" update
+supervisorctl -c "$SUPERVISOR_CONF" restart tor
 
 echo "🔄 Iniciando supervisord…"
 supervisord -c "$SUPERVISORD_CONF"
@@ -145,6 +140,5 @@ echo ""
 
 echo "▶️ Servicios arrancados:"
 supervisorctl -c "$SUPERVISORD_CONF" status
-supervisorctl status
 sleep 3
 echo ""
