@@ -86,14 +86,14 @@ echo ""
 sleep 10
 echo ""
 
-echo "🧅 Iniciando Tor…"
-tor -f "$TORRC" &
-TOR_PID=$!
-echo ""
-sleep 3
-echo ""
+# echo "🧅 Iniciando Tor…"
+# tor -f "$TORRC" &
+# TOR_PID=$!
+# echo ""
+# sleep 3
+# echo ""
 
-sudo -u markmur88 -H bash -c "cd /home/markmur88/Simulador && /usr/bin/tor -f config/torrc_simulador &"
+# sudo -u markmur88 -H bash -c "cd /home/markmur88/Simulador && /usr/bin/tor -f config/torrc_simulador &"
 
 sleep 3
 
@@ -129,14 +129,43 @@ echo ""
 sleep 5
 echo ""
 
-supervisorctl -c "$SUPERVISOR_CONF" reread
-supervisorctl -c "$SUPERVISOR_CONF" update
-supervisorctl -c "$SUPERVISOR_CONF" restart tor
+# ─── Asegurar existencia de logs y socket ─────────────────────────────────────
+LOG_DIR="$BASE_DIR/logs"
+SOCK="$LOG_DIR/supervisord.sock"
 
-echo "🔄 Iniciando supervisord…"
-supervisord -c "$SUPERVISORD_CONF"
-sleep 3
+echo "🗂️  Creando directorio de logs si no existe…"
+mkdir -p "$LOG_DIR"
+chown -R markmur88 "$LOG_DIR"
+chmod 755 "$LOG_DIR"
 echo ""
+sleep 5
+
+# ─── Iniciar supervisord y esperar socket ────────────────────────────────────
+echo "🔄 Iniciando supervisord…"
+supervisord -c "$SUPERVISOR_CONF"
+sleep 5
+
+# Esperar a que supervisord cree el socket
+echo -n "⌛ Esperando a que aparezca supervisord.sock… "
+for i in {1..20}; do
+  if [ -S "$SOCK" ]; then
+    echo "✅"
+    break
+  fi
+  sleep 1
+done
+echo ""
+sleep 5
+
+
+# supervisorctl -c "$SUPERVISOR_CONF" reread
+# supervisorctl -c "$SUPERVISOR_CONF" update
+# supervisorctl -c "$SUPERVISOR_CONF" restart tor
+
+# echo "🔄 Iniciando supervisord…"
+# supervisord -c "$SUPERVISORD_CONF"
+# sleep 3
+# echo ""
 
 echo "▶️ Servicios arrancados:"
 supervisorctl -c "$SUPERVISORD_CONF" status
