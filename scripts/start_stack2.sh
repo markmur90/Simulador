@@ -35,6 +35,7 @@ manage_supervised() {
     fi
 }
 
+sudo chown -R markmur88:markmur88 /home/markmur88/Simulador/tor_data/hidden_service
 
 # matar cualquier Tor residual
 sudo pgrep tor | while read -r pid; do
@@ -65,80 +66,85 @@ sleep 2
 echo ""
 
 # asegurar permisos del hidden service
-sudo chown -R markmur88:markmur88 /home/markmur88/Simulador/tor_data
-sudo chmod -R 700        /home/markmur88/Simulador/tor_data
-sudo mkdir -p /home/markmur88/Simulador/logs
-sudo chown markmur88:markmur88 /home/markmur88/Simulador/logs
-sudo chmod 755             /home/markmur88/Simulador/logs
+# sudo chown -R markmur88:markmur88 /home/markmur88/Simulador/tor_data
+# sudo chmod -R 700        /home/markmur88/Simulador/tor_data
+# sudo mkdir -p /home/markmur88/Simulador/logs
+# sudo chown markmur88:markmur88 /home/markmur88/Simulador/logs
+# sudo chmod 755             /home/markmur88/Simulador/logs
 
-echo ""
-sleep 2
-echo ""
+# echo ""
+# sleep 2
+# echo ""
 
 
 # ─── 3) Verificar torrc y arrancar Tor ──────────────────────────────────────────
 echo "🔍 Verificando torrc…"
-sudo tor -f "$TORRC" --verify-config \
+tor -f "$TORRC" --verify-config \
     || { echo "❌ torrc inválido, chequealo antes de continuar"; exit 1; }
 
+echo ""
+sleep 10
+echo ""
+
 echo "🧅 Iniciando Tor…"
-sudo tor -f "$TORRC" &
+tor -f "$TORRC" &
 TOR_PID=$!
 echo ""
-sleep 2
+sleep 10
 echo ""
 
 sudo -u markmur88 -H bash
-sudo cd /home/markmur88/Simulador
+cd /home/markmur88/Simulador
 /usr/bin/tor -f config/torrc_simulador
 
+sleep 10
 
 # esperar generación del .onion
 echo -n "⌛ Esperando a que Tor genere el .onion… "
-for i in {1..10}; do
+for i in {1..20}; do
     if [ -f "$TOR_DIR/hostname" ]; then
         echo "✅"
         break
     fi
-    sleep 1
+    sleep 5
 done
 echo ""
-sleep 2
+sleep 5
 echo ""
 
-if [ ! -f "$TOR_DIR/hostname" ]; then
-    echo "❌ No se generó el .onion en tiempo esperado."
-    exit 1
-fi
-echo ""
-sleep 2
-echo ""
+# if [ ! -f "$TOR_DIR/hostname" ]; then
+#     echo "❌ No se generó el .onion en tiempo esperado."
+#     exit 0
+# fi
+# echo ""
+# sleep 5
+# echo ""
 ONION_ADDR=$(cat "$TOR_DIR/hostname")
 echo "🧅 Servicio oculto disponible en: $ONION_ADDR"
 echo ""
-sleep 2
+sleep 5
 echo ""
 # ─── 4) Inyectar ALLOWED_HOSTS y arrancar supervisord ───────────────────────────
 export DJANGO_ALLOWED_HOSTS="127.0.0.1,$PUBLIC_IP,$ONION_ADDR"
 echo "🛡️  DJANGO_ALLOWED_HOSTS set to: $DJANGO_ALLOWED_HOSTS"
 echo ""
-sleep 2
+sleep 5
 echo ""
 
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl restart tor
+supervisorctl reread
+supervisorctl update
+supervisorctl restart tor
 
 sleep 3
 echo ""
 
 echo "🔄 Iniciando supervisord…"
-sudo supervisord -c "$SUPERVISORD_CONF"
+supervisord -c "$SUPERVISORD_CONF"
 sleep 3
 echo ""
 
 echo "▶️ Servicios arrancados:"
-sudo supervisorctl -c "$SUPERVISORD_CONF" status
-sudo supervisorctl status
+supervisorctl -c "$SUPERVISORD_CONF" status
+supervisorctl status
 sleep 3
 echo ""

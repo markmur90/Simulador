@@ -60,14 +60,14 @@ def login_view(request):
         if user:
             login(request, user)
             return redirect("dashboard")
-        return render(request, "banco/login.html", {"error": "Credenciales inválidas"})
-    return render(request, "banco/login.html")
+        return render(request, "login.html", {"error": "Credenciales inválidas"})
+    return render(request, "login.html")
 
 
 @login_required
 def dashboard_view(request):
     saldo = 10000  # Simulado por ahora
-    return render(request, "banco/dashboard.html", {"saldo": saldo})
+    return render(request, "dashboard.html", {"saldo": saldo})
 
 
 @login_required
@@ -77,7 +77,7 @@ def transferencia_view(request):
         monto = float(request.POST["monto"])
         # Aquí guardaríamos la transferencia
         return redirect("dashboard")
-    return render(request, "banco/transferencia.html")
+    return render(request, "transferencia.html")
 
 
 def registro_view(request):
@@ -88,7 +88,7 @@ def registro_view(request):
             return redirect("login")
     else:
         form = UserCreationForm()
-    return render(request, "banco/registro.html", {"form": form})
+    return render(request, "registro.html", {"form": form})
 
 
 @login_required
