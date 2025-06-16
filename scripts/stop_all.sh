@@ -27,7 +27,7 @@ echo ""
 sleep 3
 
 # Extra: matar lo que escuche en 9053 o 9054
-for port in 9053 9054; do
+for port in 9051 9052 9053 9054 9181 9100 9002; do
     pid=$(lsof -ti tcp:$port 2>/dev/null || true)
     if [[ $pid ]]; then
         echo "⚠️  Cerrando proceso en puerto $port (PID $pid)"

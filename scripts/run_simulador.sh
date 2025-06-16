@@ -5,7 +5,7 @@ SUPERVISOR_CONF="/home/markmur88/Simulador/config/supervisor_simulador.conf"
 SOCK_FILE="/home/markmur88/Simulador/logs/supervisord.sock"
 PID_FILE="/home/markmur88/Simulador/logs/supervisord.pid"
 LOG_DIR="/home/markmur88/Simulador/logs"
-VENV_PATH="/home/markmur88/envAPP"
+VENV_PATH="/home/markmur88/envSIM"
 
 # Variables de entorno
 APP_DIR="/home/markmur88/Simulador"

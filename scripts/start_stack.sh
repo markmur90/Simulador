@@ -11,7 +11,7 @@ PUBLIC_IP="80.78.30.242"
 
 LOG_DIR="$BASE_DIR/logs"
 REQS_PATH="$HOME/api_bank_h2/requirements.txt"
-VENV_ACT="$HOME/envAPP/bin/activate"
+VENV_ACT="$HOME/envSIM/bin/activate"
 
 
 

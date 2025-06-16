@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-VENV_PATH="/home/markmur88/envAPP"
+VENV_PATH="/home/markmur88/envSIM"
 
 echo "🔁 Parando todas las instancias de supervisord..."
 

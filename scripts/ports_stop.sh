@@ -4,7 +4,7 @@ AP_H2_DIR="/home/markmur88/api_bank_h2"
 AP_BK_DIR="/home/markmur88/api_bank_h2_BK"
 AP_HK_DIR="/home/markmur88/api_bank_heroku"
 AP_SM_DIR="/home/markmur88/Simulador"
-VENV_PATH="/home/markmur88/envAPP"
+VENV_PATH="/home/markmur88/envSIM"
 SCRIPTS_DIR="$AP_H2_DIR/scripts"
 BACKU_DIR="$SCRIPTS_DIR/backup"
 CERTS_DIR="$SCRIPTS_DIR/certs"
@@ -60,7 +60,7 @@ SUPERVISORD_CONF="/home/markmur88/Simulador/config/supervisor_simulador.conf"
 
 
 PUERTOS_OCUPADOS=0
-PUERTOS=(9181 9053 9054 9002)
+PUERTOS=(9051 9052 9053 9054 9181 9100 9002)
 
 echo -e "\033[7;34m🔎 Verificando puertos en uso...\033[0m" | tee -a $LOG_SISTEMA
 echo "" | tee -a $LOG_SISTEMA

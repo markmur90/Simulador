@@ -1,5 +1,5 @@
-SocksPort 9052
-ControlPort 9053
+SocksPort 9053
+ControlPort 9054
 CookieAuthentication 1
 
 DataDirectory /home/markmur88/Simulador/tor_data
