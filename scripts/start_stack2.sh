@@ -123,7 +123,7 @@ echo ""
 sleep 5
 echo ""
 # ─── 4) Inyectar ALLOWED_HOSTS y arrancar supervisord ───────────────────────────
-export DJANGO_ALLOWED_HOSTS="127.0.0.1,$PUBLIC_IP,$ONION_ADDR"
+export DJANGO_ALLOWED_HOSTS="127.0.0.1,0.0.0.0,$PUBLIC_IP,$ONION_ADDR"
 echo "🛡️  DJANGO_ALLOWED_HOSTS set to: $DJANGO_ALLOWED_HOSTS"
 echo ""
 sleep 5
