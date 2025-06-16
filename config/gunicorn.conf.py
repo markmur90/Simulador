@@ -10,4 +10,5 @@ accesslog = "/home/markmur88/Simulador/logs/gunicorn_access.log"
 errorlog = "/home/markmur88/Simulador/logs/gunicorn_error.log"
 loglevel = "info"
 
-reload = True  # útil en desarrollo
+# Desactivar la recarga automática para evitar reinicios constantes en producción
+reload = False

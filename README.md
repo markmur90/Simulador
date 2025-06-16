@@ -158,3 +158,7 @@ chmod +x deploy.sh
 - **Backups**: Usa `duplicity` o `rsync` para copias diarias
 - **Monitoreo**: Considerá Prometheus + Grafana o Uptime Kuma
 - **SSL Auto-Renew**: Probá con `certbot renew --dry-run`
+- **Gunicorn**: Instala dependencias con `pip install -r simulador_banco/requirements.txt`
+  y desactiva la opción `reload` en `config/gunicorn.conf.py` para evitar reinicios
+  continuos en producción
+  
