@@ -10,3 +10,4 @@ pytest-django
 dotenv
 PyJWT
 requests
+gunicorn
