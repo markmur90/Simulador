@@ -48,9 +48,11 @@ echo ""
 
 # ─── 2) Preparar Django ─────────────────────────────────────────────────────────
 echo "🛠️  Ejecutando migraciones y colectando estáticos…"
+cd "$HOME"
+python -m venv envSIM
 cd "$SIM_DIR"
-source /home/markmur88/envAPP/bin/activate
-pip3 install -r /home/markmur88/api_bank_h2/requirements.txt
+source /home/markmur88/envSIM/bin/activate
+pip install -r requirements.txt
 python manage.py makemigrations
 echo ""
 sleep 2
