@@ -1,4 +1,5 @@
-{% load static bootstrap5 %}
+{% load static %}
+{% load django_bootstrap5 %}
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -50,12 +51,17 @@
     </style>
   </head>
   <body>
-    {% include 'banco/partials/header.html' %} {% if user.is_authenticated %}
-    <nav id="navbar">{% include 'banco/partials/navGeneral.html' %}</nav>
+    {% include 'banco/partials/header.html' %}
+    {% if user.is_authenticated %}
+      <nav id="navbar">
+        {% include 'banco/partials/navGeneral.html' %}
+      </nav>
     {% endif %}
 
     <main id="main-content">
-      <div class="contenido">{% block content %}{% endblock %}</div>
+      <div class="contenido">
+        {% block content %}{% endblock %}
+      </div>
     </main>
 
     {% include 'banco/partials/footer.html' %}
@@ -104,7 +110,6 @@
           const overlay = document.getElementById('session-expired-overlay');
           if (overlay) overlay.style.display = 'flex';
 
-          // Elementos a bloquear
           const nav = document.getElementById('navbar');
           const main = document.getElementById('main-content');
 
@@ -113,22 +118,17 @@
               el.style.pointerEvents = 'none';
               el.style.opacity = '0.5';
               el.setAttribute('aria-hidden', 'true');
-
-              // Bloquea inputs y enlaces dentro del nav
-              const elements = el.querySelectorAll(
-                'a, button, select, input, form',
-              );
+              const elements = el.querySelectorAll('a, button, select, input, form');
               elements.forEach((sub) => {
                 sub.disabled = true;
                 sub.setAttribute('tabindex', '-1');
                 sub.setAttribute('aria-disabled', 'true');
-                sub.removeAttribute('href'); // evita navegación de <a>
-                sub.onclick = (e) => e.preventDefault(); // para asegurarnos
+                sub.removeAttribute('href');
+                sub.onclick = (e) => e.preventDefault();
               });
             }
           });
 
-          // Limpieza de storage
           try {
             localStorage.clear();
             sessionStorage.clear();
@@ -136,11 +136,9 @@
             console.warn('No se pudo limpiar el storage del navegador:', e);
           }
 
-          // Bloquea interacciones globales
           window.addEventListener('keydown', (e) => e.preventDefault(), true);
           window.addEventListener('click', (e) => e.preventDefault(), true);
 
-          // Redirección
           setTimeout(function () {
             window.location.href = "{% url 'login' %}";
           }, 3000);
