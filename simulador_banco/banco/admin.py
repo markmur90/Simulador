@@ -38,7 +38,7 @@ class CreditorAccountInline(admin.TabularInline):
 class OficialBancarioAdmin(admin.ModelAdmin):
     list_display = ('username',)
     search_fields = ('username',)
-    exclude = ('password_hash',)
+    # exclude = ('password_hash',)
 
 
 @admin.register(OTPChallenge)

@@ -488,3 +488,43 @@ Jun 17 03:34:44.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake fin
 Jun 17 03:34:44.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
 Jun 17 03:34:45.000 [notice] Bootstrapped 100% (done): Done
 Jun 17 03:35:21.000 [notice] Catching signal TERM, exiting cleanly.
+Jun 17 05:32:35.561 [notice] Tor 0.4.8.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.5.0, Zlib 1.3.1, Liblzma 5.8.1, Libzstd 1.5.7 and Glibc 2.41 as libc.
+Jun 17 05:32:35.561 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jun 17 05:32:35.561 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 17 05:32:35.565 [notice] Opening Socks listener on 127.0.0.1:9053
+Jun 17 05:32:35.565 [notice] Opened Socks listener connection (ready) on 127.0.0.1:9053
+Jun 17 05:32:35.565 [notice] Opening Control listener on 127.0.0.1:9054
+Jun 17 05:32:35.565 [notice] Opened Control listener connection (ready) on 127.0.0.1:9054
+Jun 17 05:32:35.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
+Jun 17 05:32:36.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
+Jun 17 05:32:36.000 [notice] Bootstrapped 0% (starting): Starting
+Jun 17 05:32:37.000 [notice] Starting with guard context "default"
+Jun 17 05:32:38.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
+Jun 17 05:32:39.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
+Jun 17 05:32:39.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
+Jun 17 05:32:40.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
+Jun 17 05:32:40.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
+Jun 17 05:32:40.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Jun 17 05:32:40.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Jun 17 05:32:41.000 [notice] Bootstrapped 100% (done): Done
+Jun 17 05:37:08.000 [notice] Catching signal TERM, exiting cleanly.
+Jun 17 05:38:21.154 [notice] Tor 0.4.8.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.5.0, Zlib 1.3.1, Liblzma 5.8.1, Libzstd 1.5.7 and Glibc 2.41 as libc.
+Jun 17 05:38:21.154 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jun 17 05:38:21.154 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 17 05:38:21.158 [notice] Opening Socks listener on 127.0.0.1:9053
+Jun 17 05:38:21.158 [notice] Opened Socks listener connection (ready) on 127.0.0.1:9053
+Jun 17 05:38:21.158 [notice] Opening Control listener on 127.0.0.1:9054
+Jun 17 05:38:21.158 [notice] Opened Control listener connection (ready) on 127.0.0.1:9054
+Jun 17 05:38:21.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
+Jun 17 05:38:21.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
+Jun 17 05:38:22.000 [notice] Bootstrapped 0% (starting): Starting
+Jun 17 05:38:23.000 [notice] Starting with guard context "default"
+Jun 17 05:38:24.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
+Jun 17 05:38:24.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
+Jun 17 05:38:24.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
+Jun 17 05:38:25.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
+Jun 17 05:38:25.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
+Jun 17 05:38:25.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Jun 17 05:38:25.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Jun 17 05:38:25.000 [notice] Bootstrapped 100% (done): Done
+Jun 17 05:40:43.000 [notice] Catching signal TERM, exiting cleanly.

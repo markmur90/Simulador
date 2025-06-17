@@ -252272,3 +252272,226 @@ ModuleNotFoundError: No module named 'simulador_banco.middleware'
 [2025-06-17 01:35:21 +0000] [3933373] [INFO] Worker exiting (pid: 3933373)
 [2025-06-17 01:35:21 +0000] [3933375] [INFO] Worker exiting (pid: 3933375)
 [2025-06-17 03:35:21 +0200] [3933371] [INFO] Shutting down: Master
+[2025-06-17 05:32:35 +0200] [4016229] [INFO] Starting gunicorn 23.0.0
+[2025-06-17 05:32:35 +0200] [4016229] [INFO] Listening at: http://0.0.0.0:9181 (4016229)
+[2025-06-17 05:32:35 +0200] [4016229] [INFO] Using worker: sync
+[2025-06-17 05:32:35 +0200] [4016231] [INFO] Booting worker with pid: 4016231
+[2025-06-17 05:32:35 +0200] [4016232] [INFO] Booting worker with pid: 4016232
+[2025-06-17 05:32:35 +0200] [4016233] [INFO] Booting worker with pid: 4016233
+Not Found: /favicon.ico
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /favicon.ico
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /favicon.ico
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /favicon.ico
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+[2025-06-17 05:37:08 +0200] [4016229] [INFO] Handling signal: term
+[2025-06-17 03:37:08 +0000] [4016233] [INFO] Worker exiting (pid: 4016233)
+[2025-06-17 03:37:08 +0000] [4016232] [INFO] Worker exiting (pid: 4016232)
+[2025-06-17 03:37:08 +0000] [4016231] [INFO] Worker exiting (pid: 4016231)
+[2025-06-17 05:37:09 +0200] [4016229] [INFO] Shutting down: Master
+[2025-06-17 05:38:21 +0200] [4019686] [INFO] Starting gunicorn 23.0.0
+[2025-06-17 05:38:21 +0200] [4019686] [INFO] Listening at: http://0.0.0.0:9181 (4019686)
+[2025-06-17 05:38:21 +0200] [4019686] [INFO] Using worker: sync
+[2025-06-17 05:38:21 +0200] [4019688] [INFO] Booting worker with pid: 4019688
+[2025-06-17 05:38:21 +0200] [4019689] [INFO] Booting worker with pid: 4019689
+[2025-06-17 05:38:21 +0200] [4019690] [INFO] Booting worker with pid: 4019690
+Not Found: /static/admin/css/base.css
+Not Found: /static/admin/css/dark_mode.css
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/js/theme.js
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/css/login.css
+Not Found: /favicon.ico
+Not Found: /static/admin/css/base.css
+Not Found: /static/admin/css/dark_mode.css
+Not Found: /static/admin/js/theme.js
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/css/dashboard.css
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/css/dark_mode.css
+Not Found: /static/admin/css/base.css
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/js/theme.js
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/css/changelists.css
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/filters.js
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/img/search.svg
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/js/filters.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/img/search.svg
+Not Found: /static/admin/css/base.css
+Not Found: /static/admin/css/dark_mode.css
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/js/theme.js
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/css/forms.css
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/change_form.js
+Not Found: /static/admin/js/prepopulate_init.js
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/js/change_form.js
+Not Found: /static/admin/js/prepopulate_init.js
+Not Found: /static/admin/js/theme.js
+Not Found: /static/admin/css/dark_mode.css
+Not Found: /static/admin/css/base.css
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/css/changelists.css
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/filters.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/img/search.svg
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/js/filters.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/img/search.svg
+Not Found: /static/admin/css/base.css
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/js/theme.js
+Not Found: /static/admin/css/dark_mode.css
+Not Found: /static/admin/css/changelists.css
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/js/filters.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/img/search.svg
+Not Found: /static/admin/img/icon-yes.svg
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/css/changelists.css
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/js/filters.js
+Not Found: /static/admin/img/search.svg
+Not Found: /static/admin/img/icon-yes.svg
+Not Found: /favicon.ico
+Not Found: /static/admin/css/base.css
+Not Found: /static/admin/css/changelists.css
+Not Found: /static/admin/js/theme.js
+Not Found: /static/admin/css/dark_mode.css
+Not Found: /static/admin/js/nav_sidebar.js
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/css/nav_sidebar.css
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/filters.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/img/search.svg
+Not Found: /static/admin/css/changelists.css
+Not Found: /static/admin/js/vendor/jquery/jquery.js
+Not Found: /static/admin/js/jquery.init.js
+Not Found: /static/admin/js/core.js
+Not Found: /static/admin/js/admin/RelatedObjectLookups.js
+Not Found: /static/admin/js/actions.js
+Not Found: /static/admin/js/urlify.js
+Not Found: /static/admin/js/prepopulate.js
+Not Found: /static/admin/js/vendor/xregexp/xregexp.js
+Not Found: /static/admin/css/responsive.css
+Not Found: /static/admin/js/filters.js
+Not Found: /static/admin/img/search.svg
+Not Found: /static/images/background.png
+[2025-06-17 05:40:43 +0200] [4019686] [INFO] Handling signal: term
+[2025-06-17 03:40:43 +0000] [4019690] [INFO] Worker exiting (pid: 4019690)
+[2025-06-17 03:40:43 +0000] [4019689] [INFO] Worker exiting (pid: 4019689)
+[2025-06-17 03:40:43 +0000] [4019688] [INFO] Worker exiting (pid: 4019688)
+[2025-06-17 05:40:44 +0200] [4019686] [INFO] Shutting down: Master
