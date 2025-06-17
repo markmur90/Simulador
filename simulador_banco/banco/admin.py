@@ -1,11 +1,9 @@
 from django.contrib import admin
 from .models import (
-    OficialBancario, OTPChallenge,
-    DebtorSimulado, CreditorSimulado, TransferenciaSimulada,
+    ClientID, CreditorAgent, Kid, OficialBancario, OTPChallenge,
+    DebtorSimulado, CreditorSimulado, PaymentIdentification, TransferenciaSimulada,
     Debtor, DebtorAccount,
-    Creditor, CreditorAccount,
-    CreditorAgent, PaymentIdentification,
-    ClientID, Kid, Transfer,
+    Creditor, CreditorAccount, Transfer,
     LogTransferencia, PostalAddress,
 )
 

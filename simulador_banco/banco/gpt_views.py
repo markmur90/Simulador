@@ -3,8 +3,8 @@ from django.urls import reverse_lazy
 from django.views import generic
 
 from .models import (
-    Debtor, DebtorAccount, Creditor, CreditorAccount,
-    CreditorAgent, ClientID, Kid, Transfer
+    ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
+    Transfer
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,

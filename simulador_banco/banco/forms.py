@@ -1,7 +1,6 @@
 from django import forms
 from .models import (
-    Debtor, DebtorAccount, Creditor, CreditorAccount,
-    CreditorAgent, ClientID, Kid, PaymentIdentification,
+    ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid, PaymentIdentification,
     Transfer, PostalAddress
 )
 

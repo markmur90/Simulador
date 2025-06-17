@@ -7,47 +7,57 @@ from django.conf import settings
 import requests
 import openai
 from telegram import Bot
+import asyncio
 
 def analyze_transfer(transfer: Transfer) -> str:
-    """Use OpenAI to analyze a transfer."""
-    try:
-        openai.api_key = settings.OPENAI_API_KEY
-    except AttributeError:
+    """Usa OpenAI para analizar una transferencia de forma síncrona."""
+    api_key = getattr(settings, "OPENAI_API_KEY", None)
+    if not api_key:
         return "Sin análisis disponible"
+    openai.api_key = api_key
 
     prompt = (
         f"Analiza la transferencia de {transfer.debtor.name} "
         f"por {transfer.instructed_amount} {transfer.currency} "
         f"hacia {transfer.creditor.name}."
     )
-    try:
-        resp = openai.ChatCompletion.create(
-            model="gpt-4", messages=[{"role": "user", "content": prompt}]
+
+    # Envolver la llamada asíncrona en asyncio.run para que no haga falta await en Celery
+    async def _do_chat():
+        return await openai.ChatCompletion.acreate(
+            model="gpt-4",
+            messages=[{"role": "user", "content": prompt}]
         )
+
+    try:
+        resp = asyncio.run(_do_chat())
         return resp.choices[0].message.content.strip()
     except Exception:
         return "Sin análisis disponible"
 
 
 def send_telegram_notification(message: str) -> None:
-    """Send a Telegram message if credentials are present."""
+    """Envía un mensaje por Telegram si están configuradas las credenciales."""
     token = getattr(settings, "TELEGRAM_BOT_TOKEN", None)
     chat_id = getattr(settings, "TELEGRAM_CHAT_ID", None)
-    if not token or not chat_id:
+    if not (token and chat_id):
         return
     try:
         Bot(token=token).send_message(chat_id=chat_id, text=message)
     except Exception:
+        # Podríamos loguear el error para auditoría
         pass
-    
+
 
 @shared_task
 def process_transfer_task(transfer_id: int):
     """
     A los 5 minutos, procesa la transferencia:
-     - resta el monto del DebtorAccount.balance
-     - actualiza status a 'ACSC'
-     - notifica a la API externa
+     1) Verifica fondos
+     2) Descuenta el monto del DebtorAccount.balance
+     3) Actualiza status a 'ACSC' o 'RJCT'
+     4) Notifica a la API externa
+     5) Realiza análisis con OpenAI y notifica por Telegram
     """
     try:
         transfer = Transfer.objects.select_related('debtor_account').get(id=transfer_id)
@@ -57,8 +67,9 @@ def process_transfer_task(transfer_id: int):
     if transfer.status != 'PDNG':
         return
 
+    # Bloque atómico para evitar race conditions
     with transaction.atomic():
-        acct = DebtorAccount.objects.select_for_update().get(id=transfer.debtor_account_id)
+        acct = DebtorAccount.objects.select_for_update().get(id=transfer.debtor_account.id)
 
         # 1) Verificar fondos
         if acct.balance < transfer.instructed_amount:
@@ -70,23 +81,27 @@ def process_transfer_task(transfer_id: int):
         acct.balance -= transfer.instructed_amount
         acct.save(update_fields=['balance'])
 
+        # 3) Marcar como ejecutada
         transfer.status = 'ACSC'
         transfer.save(update_fields=['status'])
 
-    # 3) Notificar a la API externa
+    # 4) Notificar a la API externa
     payload = {
         "payment_id": transfer.payment_id,
         "status": transfer.status,
         "debtor_account": acct.iban,
         "amount": str(transfer.instructed_amount),
     }
-    # URL configurada en settings.SIMULATOR_NOTIFY_URL
-    requests.post(
-        settings.SIMULATOR_NOTIFY_URL,
-        json=payload,
-        timeout=5
-    )
+    try:
+        requests.post(
+            settings.SIMULATOR_NOTIFY_URL,
+            json=payload,
+            timeout=5
+        )
+    except requests.RequestException:
+        # Podríamos reintentar o loguear el fallo
+        pass
 
-    # 4) Análisis y notificación externa
+    # 5) Análisis y notificación
     analysis = analyze_transfer(transfer)
     send_telegram_notification(f"Transferencia {transfer.payment_id}: {analysis}")

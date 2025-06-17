@@ -64,23 +64,21 @@ Copyright (c) 2025 TuEmpresa
 Permission is hereby granted, free of charge, to any person obtaining a copy...
 """
 
-import re
 from django.db import models
+from django.contrib.auth.hashers import make_password, check_password
 from django.core.validators import RegexValidator, MinValueValidator
+from django.utils import timezone
 from django.conf import settings
 from cryptography.fernet import Fernet
 from django.utils.encoding import force_bytes, force_str
+import uuid
+from decimal import Decimal
 
 # ------------------------------------------------------------------------------
-# UTILIDADES DE CIFRADO
+# UTILIDADES DE CIFRADO (sin cambios)
 # ------------------------------------------------------------------------------
 class EncryptedCharField(models.Field):
-    """
-    CharField que cifra/desifra automáticamente su valor usando Fernet (AES-128 en CBC+HMAC).
-    Requiere definir FIELD_ENCRYPTION_KEY en settings.py como una Fernet key de 32 url-safe bytes.
-    """
     description = "CharField cifrado con AES256+HMAC"
-
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('max_length', 255)
         super().__init__(*args, **kwargs)
@@ -88,71 +86,58 @@ class EncryptedCharField(models.Field):
         if not key:
             raise RuntimeError("Define FIELD_ENCRYPTION_KEY en settings.py")
         self.fernet = Fernet(key)
-
     def get_prep_value(self, value):
         if value is None:
             return None
         token = self.fernet.encrypt(force_bytes(value))
         return token.decode()
-
     def from_db_value(self, value, expression, connection):
         if value is None:
             return None
         return force_str(self.fernet.decrypt(force_bytes(value)))
-
     def db_type(self, connection):
         return 'text'
 
-
 # ------------------------------------------------------------------------------
-# VALIDADORES
+# VALIDADORES (sin cambios)
 # ------------------------------------------------------------------------------
 country_validator = RegexValidator(
     regex=r'^[A-Z]{2}$',
     message='Código de país ISO 3166-1 alpha-2, e.g. “DE”, “ES”'
 )
-
 iban_validator = RegexValidator(
     regex=r'^[A-Z]{2}[0-9A-Z]{13,32}$',
     message='IBAN inválido'
 )
-
 currency_validator = RegexValidator(
     regex=r'^[A-Z]{3}$',
     message='Código de moneda ISO 4217, e.g. “EUR”, “USD”'
 )
 
-
 # ------------------------------------------------------------------------------
 # CLASES ABSTRACTAS
 # ------------------------------------------------------------------------------
 class PostalAddress(models.Model):
-    """Dirección postal genérica."""
     country = models.CharField(max_length=2, validators=[country_validator])
     street = models.CharField(max_length=70)
     city = models.CharField(max_length=70)
-
     class Meta:
         db_table = 'sim_postal_address'
-        
 
 class Party(models.Model):
-    """Entidad genérica (deudor o acreedor)."""
     name = models.CharField(max_length=70, unique=True)
     address = models.OneToOneField(
-        PostalAddress, on_delete=models.CASCADE,
+        PostalAddress,
+        on_delete=models.CASCADE,
         related_name="%(class)ss_address"
     )
-
     class Meta:
         abstract = True
 
     def __str__(self):
         return self.name
 
-
 class Account(models.Model):
-    """Cuenta genérica con IBAN y moneda."""
     iban = EncryptedCharField(
         max_length=34, unique=True,
         validators=[iban_validator],
@@ -162,39 +147,37 @@ class Account(models.Model):
         max_length=3, default='EUR',
         validators=[currency_validator]
     )
-
     class Meta:
         abstract = True
 
     def __str__(self):
         return self.iban
 
-
 # ------------------------------------------------------------------------------
-# MODELOS CONCRETOS
+# MODELOS CONCRETOS (Meta hereda de la clase padre)
 # ------------------------------------------------------------------------------
 class Debtor(Party):
     customer_id = models.CharField(max_length=35, unique=True)
 
-    class Meta:
+    class Meta(Party.Meta):
         db_table = 'sim_debtor'
-
 
 class DebtorAccount(Account):
     debtor = models.ForeignKey(
         Debtor, on_delete=models.CASCADE,
         related_name='accounts'
     )
-    balance = models.DecimalField(max_digits=18, decimal_places=2, default=0)
-    
-    class Meta:
+    balance = models.DecimalField(
+        max_digits=18, decimal_places=2,
+        default=Decimal('0.00'),
+    )
+
+    class Meta(Account.Meta):
         db_table = 'sim_debtor_account'
 
-
 class Creditor(Party):
-    class Meta:
+    class Meta(Party.Meta):
         db_table = 'sim_creditor'
-
 
 class CreditorAccount(Account):
     creditor = models.ForeignKey(
@@ -202,7 +185,7 @@ class CreditorAccount(Account):
         related_name='accounts'
     )
 
-    class Meta:
+    class Meta(Account.Meta):
         db_table = 'sim_creditor_account'
 
 
@@ -254,33 +237,22 @@ class Kid(models.Model):
 
 
 class Transfer(models.Model):
-    """Transacción financiera entre deudor y acreedor."""
+    # campos...
     payment_id = models.CharField(max_length=36, unique=True, db_index=True)
-    client = models.ForeignKey(
-        ClientID, on_delete=models.SET_NULL,
-        related_name='transfers', blank=True, null=True
-    )
-    kid = models.ForeignKey(
-        Kid, on_delete=models.SET_NULL,
-        related_name='transfers', blank=True, null=True
-    )
+    # relaciones...
     debtor = models.ForeignKey(Debtor, on_delete=models.PROTECT, related_name='transfers')
-    debtor_account = models.ForeignKey(DebtorAccount, on_delete=models.PROTECT)
     creditor = models.ForeignKey(Creditor, on_delete=models.PROTECT, related_name='transfers')
+    debtor_account = models.ForeignKey(DebtorAccount, on_delete=models.PROTECT)
     creditor_account = models.ForeignKey(CreditorAccount, on_delete=models.PROTECT)
-    creditor_agent = models.ForeignKey(CreditorAgent, on_delete=models.PROTECT)
+    creditor_agent = models.ForeignKey('CreditorAgent', on_delete=models.PROTECT)
     instructed_amount = models.DecimalField(
         max_digits=18, decimal_places=2,
         validators=[MinValueValidator(0.01)]
     )
-    currency = models.CharField(
-        max_length=3, default='EUR', validators=[currency_validator]
-    )
+    currency = models.CharField(max_length=3, default='EUR', validators=[currency_validator])
     purpose_code = models.CharField(max_length=4, default='GDSV')
     requested_execution_date = models.DateField()
-    remittance_information_unstructured = models.CharField(
-        max_length=140, blank=True, null=True
-    )
+    remittance_information_unstructured = models.CharField(max_length=140, blank=True, null=True)
     status = models.CharField(
         max_length=10,
         choices=[
@@ -290,25 +262,26 @@ class Transfer(models.Model):
         ],
         default='CREA', db_index=True
     )
-    payment_identification = models.ForeignKey(
-        PaymentIdentification, on_delete=models.CASCADE
-    )
+    payment_identification = models.ForeignKey('PaymentIdentification', on_delete=models.CASCADE)
     auth_id = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'sim_transfer'
+        ordering = ['-created_at']
+
     def to_schema_data(self):
         return {
             "purposeCode": self.purpose_code or "GDSV",
-            "requestedExecutionDate": self.requested_execution_date.strftime(
-                '%Y-%m-%d'),
+            "requestedExecutionDate": self.requested_execution_date.strftime('%Y-%m-%d'),
             "debtor": {
                 "debtorName": self.debtor.name,
                 "debtorPostalAddress": {
-                    "country": self.debtor.postal_address_country,
+                    "country": self.debtor.address.country,
                     "addressLine": {
-                        "streetAndHouseNumber": self.debtor.postal_address_street,
-                        "zipCodeAndCity": self.debtor.postal_address_city,
+                        "streetAndHouseNumber": self.debtor.address.street,
+                        "zipCodeAndCity": self.debtor.address.city,
                     }
                 }
             },
@@ -325,16 +298,15 @@ class Transfer(models.Model):
                 "currency": self.currency,
             },
             "creditorAgent": {
-                "financialInstitutionId":
-                    self.creditor_agent.financial_institution_id or "",
+                "financialInstitutionId": self.creditor_agent.financial_institution_id or "",
             },
             "creditor": {
                 "creditorName": self.creditor.name,
                 "creditorPostalAddress": {
-                    "country": self.creditor.postal_address_country,
+                    "country": self.creditor.address.country,
                     "addressLine": {
-                        "streetAndHouseNumber": self.creditor.postal_address_street,
-                        "zipCodeAndCity": self.creditor.postal_address_city,
+                        "streetAndHouseNumber": self.creditor.address.street,
+                        "zipCodeAndCity": self.creditor.address.city,
                     }
                 }
             },
@@ -342,8 +314,7 @@ class Transfer(models.Model):
                 "iban": self.creditor_account.iban,
                 "currency": self.creditor_account.currency,
             },
-            "remittanceInformationUnstructured":
-                self.remittance_information_unstructured or ""
+            "remittanceInformationUnstructured": self.remittance_information_unstructured or ""
         }
 
     def get_status_color(self):
@@ -353,16 +324,6 @@ class Transfer(models.Model):
             'RJCT': 'danger',
             'CANC': 'secondary'
         }.get(self.status, 'dark')
-
-    class Meta:
-        ordering = ['created_at']
-
-    def __str__(self):
-        return self.payment_id
-    
-    class Meta:
-        db_table = 'sim_transfer'
-        ordering = ['-created_at']
 
     def __str__(self):
         return self.payment_id

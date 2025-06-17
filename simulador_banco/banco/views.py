@@ -167,7 +167,7 @@ def crear_transferencia(request):
     t = TransferenciaSimulada(oficial=oficial, monto=monto, destino=destino)
     t.save()
 
-    return JsonResponse({'estado': 'ok', 'id': t.id})
+    return JsonResponse({'estado': 'ok', 'payment_id': t.payment_id})
 
 @csrf_exempt
 def api_challenge(request):

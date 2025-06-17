@@ -1,12 +1,9 @@
-# services/transfer_service.py
-
 import datetime
+from typing import Any, Dict
 from django.db import transaction
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from banco.models import (
-    Transfer, DebtorAccount,
-)
+from banco.models import Transfer, DebtorAccount
 from banco.tasks import process_transfer_task
 
 
@@ -23,7 +20,7 @@ class TransferService:
 
     @staticmethod
     @transaction.atomic
-    def ingest_transfer(data: dict) -> Transfer:
+    def ingest_transfer(data: Dict[str, Any]) -> Transfer:
         """
         Inserta o rechaza una transferencia según reglas:
         data = {
@@ -60,8 +57,9 @@ class TransferService:
         transfer = Transfer.objects.create(**data)
 
         # 4) Programamos el procesamiento 5 minutos después
-        process_transfer_task.apply_async(
-            args=[transfer.id],
+        # Ignoramos chequeos de tipo para apply_async y acceso a id
+        process_transfer_task.apply_async(  # type: ignore[attr-defined]
+            args=[transfer.id],  # type: ignore[attr-defined]
             countdown=TransferService.WINDOW_MINUTES * 60
         )
 
