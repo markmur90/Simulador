@@ -20,16 +20,20 @@ loglevel=info
 pidfile=/home/markmur88/Simulador/logs/supervisord.pid
 
 [program:gunicorn]
-command=/home/markmur88/envAPP/bin/gunicorn -c /home/markmur88/Simulador/config/gunicorn.conf.py simulador_banco.wsgi:application
+command=/home/markmur88/envSIM/bin/gunicorn -c /home/markmur88/Simulador/config/gunicorn.conf.py simulador_banco.wsgi:application
 directory=/home/markmur88/Simulador
-autostart=true
-autorestart=true
+user=markmur88
 stdout_logfile=/home/markmur88/Simulador/logs/gunicorn.log
 stderr_logfile=/home/markmur88/Simulador/logs/gunicorn_error.log
+autostart=true
+autorestart=true
 
 [program:tor]
-command=tor -f /home/markmur88/Simulador/config/torrc_simulador
+command=/usr/bin/tor -f /home/markmur88/Simulador/config/torrc_simulador
+directory=/home/markmur88/Simulador
+user=markmur88
+stdout_logfile=/home/markmur88/Simulador/logs/tor_stdout.log
+stderr_logfile=/home/markmur88/Simulador/logs/tor_stderr.log
 autostart=true
-autorestart=false
-stdout_logfile=/home/markmur88/Simulador/logs/tor.log
-stderr_logfile=/home/markmur88/Simulador/logs/tor_error.log
+autorestart=true
+startsecs=10
