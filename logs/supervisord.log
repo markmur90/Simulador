@@ -13816,3 +13816,16 @@
 2025-06-17 02:52:04,012 INFO waiting for gunicorn, tor to die
 2025-06-17 02:52:04,238 INFO stopped: tor (exit status 0)
 2025-06-17 02:52:04,837 WARN stopped: gunicorn (exit status 1)
+2025-06-17 03:34:39,618 INFO RPC interface 'supervisor' initialized
+2025-06-17 03:34:39,619 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2025-06-17 03:34:39,619 INFO RPC interface 'supervisor' initialized
+2025-06-17 03:34:39,619 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2025-06-17 03:34:39,621 INFO daemonizing the supervisord process
+2025-06-17 03:34:39,623 INFO supervisord started with pid 3933361
+2025-06-17 03:34:40,626 INFO spawned: 'gunicorn' with pid 3933371
+2025-06-17 03:34:40,629 INFO spawned: 'tor' with pid 3933372
+2025-06-17 03:34:41,682 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 03:34:41,682 INFO success: tor entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-17 03:35:21,035 INFO waiting for gunicorn, tor to die
+2025-06-17 03:35:21,102 INFO stopped: tor (exit status 0)
+2025-06-17 03:35:21,436 INFO stopped: gunicorn (exit status 0)
