@@ -6,7 +6,18 @@ from .models import (
 )
 
 
-class DebtorForm(forms.ModelForm):
+class BootstrapModelForm(forms.ModelForm):
+    """Base form que aplica clases de Bootstrap a los campos."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.CheckboxInput):
+                classes = field.widget.attrs.get("class", "")
+                field.widget.attrs["class"] = (classes + " form-control").strip()
+
+
+class DebtorForm(BootstrapModelForm):
     mobile_phone_number = forms.CharField(max_length=20, required=False)
     postal_address_country = forms.CharField(max_length=2)
     postal_address_street = forms.CharField(max_length=70)
@@ -46,13 +57,13 @@ class DebtorForm(forms.ModelForm):
         return debtor
 
 
-class DebtorAccountForm(forms.ModelForm):
+class DebtorAccountForm(BootstrapModelForm):
     class Meta:
         model = DebtorAccount
         fields = ['debtor', 'iban', 'currency']
 
 
-class CreditorForm(forms.ModelForm):
+class CreditorForm(BootstrapModelForm):
     postal_address_country = forms.CharField(max_length=2)
     postal_address_street = forms.CharField(max_length=70)
     postal_address_city = forms.CharField(max_length=70)
@@ -87,37 +98,37 @@ class CreditorForm(forms.ModelForm):
         return creditor
 
 
-class CreditorAccountForm(forms.ModelForm):
+class CreditorAccountForm(BootstrapModelForm):
     class Meta:
         model = CreditorAccount
         fields = ['creditor', 'iban', 'currency']
 
 
-class CreditorAgentForm(forms.ModelForm):
+class CreditorAgentForm(BootstrapModelForm):
     class Meta:
         model = CreditorAgent
         fields = ['bic', 'financial_institution_id', 'other_information']
 
 
-class ClientIDForm(forms.ModelForm):
+class ClientIDForm(BootstrapModelForm):
     class Meta:
         model = ClientID
         fields = ['codigo', 'client_id']
 
 
-class KidForm(forms.ModelForm):
+class KidForm(BootstrapModelForm):
     class Meta:
         model = Kid
         fields = ['codigo', 'kid']
 
 
-class PaymentIdentificationForm(forms.ModelForm):
+class PaymentIdentificationForm(BootstrapModelForm):
     class Meta:
         model = PaymentIdentification
         fields = ['end_to_end_id', 'instruction_id']
 
 
-class TransferForm(forms.ModelForm):
+class TransferForm(BootstrapModelForm):
     class Meta:
         model = Transfer
         exclude = ['created_at', 'updated_at', 'auth_id']
