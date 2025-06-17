@@ -9,23 +9,12 @@
     {% bootstrap_css %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <style>
-      /* FONDO GLOBAL: opción A = color sólido por defecto,
-         opción B = degradado, opción C = imagen */
       body {
-        /* OPCIÓN A: color base
-        background-color: #f0f2f5;*/
-
-        /* OPCIÓN B: degradado */
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        
-
-        /* OPCIÓN C: imagen de fondo
-        background-image: url('{% static "images/fondo-dashboard.jpg" %}');
+        background-image: url('{% static "images/background.png" %}');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
-        */
-        
+        background-attachment: fixed;
         display: flex;
         flex-direction: column;
         min-height: 100vh;
@@ -37,33 +26,24 @@
           background-attachment: scroll;
         }
       }
-
-      /* CONTENEDOR CENTRAL: aquí puedes usar color/transparencia, degradado o imagen */
+      main {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
       .contenido {
         width: 100%;
         max-width: 1200px;
         height: 100%;
         max-height: 800px;
+        background-color: rgba(255, 255, 255, 0.9);
         border-radius: 1rem;
         padding: 2rem;
         margin: 0;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         overflow-y: auto;
-
-        /* OPCIÓN A: color semitransparente (tu configuración actual) 
-        background-color: rgba(255, 255, 255, 0.9);*/
-
-        /* OPCIÓN B: degradado */
-        background: linear-gradient(to right, rgba(255,255,255,0.8), rgba(240,240,240,0.8));
-        
-
-        /* OPCIÓN C: imagen 
-        background-image: url('{% static "images/fondo-contenido.png" %}');
-        background-size: cover;
-        background-position: center;
-        */
       }
-
       footer {
         background-color: #f8f9fa;
         color: #6c757d;
