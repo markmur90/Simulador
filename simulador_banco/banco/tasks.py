@@ -1,13 +1,16 @@
-# tasks.py (usando Celery)
+"""Tareas asincrónicas de la aplicación Banco."""
 
-from celery import shared_task
-from django.db import transaction
-from banco.models import Transfer, DebtorAccount
-from django.conf import settings
-import requests
-import openai
-from telegram import Bot
 import asyncio
+import requests
+from telegram import Bot
+
+import openai
+from celery import shared_task
+from django.conf import settings
+from django.db import transaction
+
+from banco.models import DebtorAccount, Transfer
+
 
 def analyze_transfer(transfer: Transfer) -> str:
     """Usa OpenAI para analizar una transferencia de forma síncrona."""
@@ -22,7 +25,8 @@ def analyze_transfer(transfer: Transfer) -> str:
         f"hacia {transfer.creditor.name}."
     )
 
-    # Envolver la llamada asíncrona en asyncio.run para que no haga falta await en Celery
+    # Envolver la llamada asíncrona en ``asyncio.run`` para no usar
+    # ``await`` directamente dentro del worker de Celery
     async def _do_chat():
         return await openai.ChatCompletion.acreate(
             model="gpt-4",
@@ -60,7 +64,10 @@ def process_transfer_task(transfer_id: int):
      5) Realiza análisis con OpenAI y notifica por Telegram
     """
     try:
-        transfer = Transfer.objects.select_related('debtor_account').get(id=transfer_id)
+        transfer = (
+            Transfer.objects.select_related('debtor_account')
+            .get(id=transfer_id)
+        )
     except Transfer.DoesNotExist:
         return
 
@@ -69,7 +76,10 @@ def process_transfer_task(transfer_id: int):
 
     # Bloque atómico para evitar race conditions
     with transaction.atomic():
-        acct = DebtorAccount.objects.select_for_update().get(id=transfer.debtor_account.id)
+        acct = (
+            DebtorAccount.objects.select_for_update()
+            .get(id=transfer.debtor_account.id)
+        )
 
         # 1) Verificar fondos
         if acct.balance < transfer.instructed_amount:
@@ -104,4 +114,6 @@ def process_transfer_task(transfer_id: int):
 
     # 5) Análisis y notificación
     analysis = analyze_transfer(transfer)
-    send_telegram_notification(f"Transferencia {transfer.payment_id}: {analysis}")
+    send_telegram_notification(
+        f"Transferencia {transfer.payment_id}: {analysis}"
+    )
