@@ -11,3 +11,4 @@ dotenv
 PyJWT
 requests
 gunicorn
+django-bootstrap5==25.1
