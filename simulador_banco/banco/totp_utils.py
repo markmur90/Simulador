@@ -1,14 +1,16 @@
 import os
 import pyotp
 import qrcode
+from django.conf import settings
 
 
 def get_totp_secret() -> str:
     """Return the TOTP secret stored in env or create one."""
-    secret = os.environ.get("TOTP_SECRET")
+    secret = getattr(settings, "TOTP_SECRET", None)
+
     if not secret:
         secret = pyotp.random_base32()
-        os.environ["TOTP_SECRET"] = secret
+        settings["TOTP_SECRET"] = secret
     return secret
 
 def verify_totp(code: str) -> bool:
