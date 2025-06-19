@@ -1,4 +1,4 @@
-# Tor state file last generated on 2025-06-18 01:30:07 local time
+# Tor state file last generated on 2025-06-19 19:20:37 local time
 # Other times below are in UTC
 # You *do not* need to edit this file.
 
@@ -8,104 +8,106 @@ CircuitBuildTimeBin 665 1
 CircuitBuildTimeBin 705 1
 CircuitBuildTimeBin 735 1
 CircuitBuildTimeBin 755 1
-CircuitBuildTimeBin 765 3
+CircuitBuildTimeBin 765 4
 CircuitBuildTimeBin 775 1
-CircuitBuildTimeBin 785 1
+CircuitBuildTimeBin 785 2
 CircuitBuildTimeBin 815 2
+CircuitBuildTimeBin 825 3
 CircuitBuildTimeBin 835 1
-CircuitBuildTimeBin 845 2
-CircuitBuildTimeBin 855 1
+CircuitBuildTimeBin 845 3
+CircuitBuildTimeBin 855 2
 CircuitBuildTimeBin 865 3
 CircuitBuildTimeBin 885 3
-CircuitBuildTimeBin 895 1
-CircuitBuildTimeBin 905 2
+CircuitBuildTimeBin 895 2
+CircuitBuildTimeBin 905 3
 CircuitBuildTimeBin 915 3
-CircuitBuildTimeBin 925 2
+CircuitBuildTimeBin 925 3
 CircuitBuildTimeBin 935 2
 CircuitBuildTimeBin 945 2
 CircuitBuildTimeBin 955 2
-CircuitBuildTimeBin 965 2
-CircuitBuildTimeBin 975 4
+CircuitBuildTimeBin 965 3
+CircuitBuildTimeBin 975 5
 CircuitBuildTimeBin 985 7
 CircuitBuildTimeBin 995 4
-CircuitBuildTimeBin 1005 1
+CircuitBuildTimeBin 1005 2
 CircuitBuildTimeBin 1015 1
-CircuitBuildTimeBin 1025 5
+CircuitBuildTimeBin 1025 6
 CircuitBuildTimeBin 1035 4
 CircuitBuildTimeBin 1045 5
-CircuitBuildTimeBin 1055 2
+CircuitBuildTimeBin 1055 3
 CircuitBuildTimeBin 1065 3
-CircuitBuildTimeBin 1075 8
+CircuitBuildTimeBin 1075 9
 CircuitBuildTimeBin 1085 8
 CircuitBuildTimeBin 1095 7
-CircuitBuildTimeBin 1105 5
-CircuitBuildTimeBin 1115 10
-CircuitBuildTimeBin 1125 10
-CircuitBuildTimeBin 1135 5
+CircuitBuildTimeBin 1105 7
+CircuitBuildTimeBin 1115 12
+CircuitBuildTimeBin 1125 13
+CircuitBuildTimeBin 1135 6
 CircuitBuildTimeBin 1145 7
-CircuitBuildTimeBin 1155 5
-CircuitBuildTimeBin 1165 8
-CircuitBuildTimeBin 1175 12
-CircuitBuildTimeBin 1185 5
+CircuitBuildTimeBin 1155 7
+CircuitBuildTimeBin 1165 10
+CircuitBuildTimeBin 1175 15
+CircuitBuildTimeBin 1185 6
 CircuitBuildTimeBin 1195 11
-CircuitBuildTimeBin 1205 7
-CircuitBuildTimeBin 1215 3
-CircuitBuildTimeBin 1225 17
-CircuitBuildTimeBin 1235 9
-CircuitBuildTimeBin 1245 6
-CircuitBuildTimeBin 1255 8
-CircuitBuildTimeBin 1265 9
+CircuitBuildTimeBin 1205 9
+CircuitBuildTimeBin 1215 7
+CircuitBuildTimeBin 1225 18
+CircuitBuildTimeBin 1235 11
+CircuitBuildTimeBin 1245 7
+CircuitBuildTimeBin 1255 9
+CircuitBuildTimeBin 1265 11
 CircuitBuildTimeBin 1275 8
-CircuitBuildTimeBin 1285 9
+CircuitBuildTimeBin 1285 10
 CircuitBuildTimeBin 1295 7
-CircuitBuildTimeBin 1305 4
-CircuitBuildTimeBin 1315 9
-CircuitBuildTimeBin 1325 9
-CircuitBuildTimeBin 1335 10
-CircuitBuildTimeBin 1345 4
-CircuitBuildTimeBin 1355 1
-CircuitBuildTimeBin 1365 13
-CircuitBuildTimeBin 1375 11
-CircuitBuildTimeBin 1385 6
+CircuitBuildTimeBin 1305 5
+CircuitBuildTimeBin 1315 10
+CircuitBuildTimeBin 1325 11
+CircuitBuildTimeBin 1335 11
+CircuitBuildTimeBin 1345 8
+CircuitBuildTimeBin 1355 4
+CircuitBuildTimeBin 1365 15
+CircuitBuildTimeBin 1375 13
+CircuitBuildTimeBin 1385 7
 CircuitBuildTimeBin 1395 8
 CircuitBuildTimeBin 1405 8
-CircuitBuildTimeBin 1415 9
+CircuitBuildTimeBin 1415 10
 CircuitBuildTimeBin 1425 13
-CircuitBuildTimeBin 1435 17
-CircuitBuildTimeBin 1445 7
+CircuitBuildTimeBin 1435 18
+CircuitBuildTimeBin 1445 8
 CircuitBuildTimeBin 1455 7
-CircuitBuildTimeBin 1465 10
-CircuitBuildTimeBin 1475 16
-CircuitBuildTimeBin 1485 6
-CircuitBuildTimeBin 1505 2
+CircuitBuildTimeBin 1465 11
+CircuitBuildTimeBin 1475 17
+CircuitBuildTimeBin 1485 8
+CircuitBuildTimeBin 1495 1
+CircuitBuildTimeBin 1505 4
 CircuitBuildTimeBin 1515 7
 CircuitBuildTimeBin 1525 7
-CircuitBuildTimeBin 1535 8
+CircuitBuildTimeBin 1535 9
 CircuitBuildTimeBin 1545 1
 CircuitBuildTimeBin 1555 7
-CircuitBuildTimeBin 1565 6
+CircuitBuildTimeBin 1565 7
 CircuitBuildTimeBin 1575 1
-CircuitBuildTimeBin 1585 2
-CircuitBuildTimeBin 1595 4
-CircuitBuildTimeBin 1605 8
+CircuitBuildTimeBin 1585 3
+CircuitBuildTimeBin 1595 5
+CircuitBuildTimeBin 1605 9
 CircuitBuildTimeBin 1615 7
 CircuitBuildTimeBin 1625 3
 CircuitBuildTimeBin 1635 4
 CircuitBuildTimeBin 1645 5
-CircuitBuildTimeBin 1655 6
+CircuitBuildTimeBin 1655 7
 CircuitBuildTimeBin 1665 2
 CircuitBuildTimeBin 1675 1
 CircuitBuildTimeBin 1685 4
 CircuitBuildTimeBin 1695 2
 CircuitBuildTimeBin 1705 3
 CircuitBuildTimeBin 1715 1
-CircuitBuildTimeBin 1725 6
-CircuitBuildTimeBin 1735 2
-CircuitBuildTimeBin 1745 1
+CircuitBuildTimeBin 1725 7
+CircuitBuildTimeBin 1735 3
+CircuitBuildTimeBin 1745 2
 CircuitBuildTimeBin 1755 5
 CircuitBuildTimeBin 1765 1
 CircuitBuildTimeBin 1775 1
-CircuitBuildTimeBin 1785 2
+CircuitBuildTimeBin 1785 3
 CircuitBuildTimeBin 1795 4
 CircuitBuildTimeBin 1805 1
 CircuitBuildTimeBin 1815 1
@@ -114,28 +116,30 @@ CircuitBuildTimeBin 1835 1
 CircuitBuildTimeBin 1845 2
 CircuitBuildTimeBin 1855 3
 CircuitBuildTimeBin 1865 4
-CircuitBuildTimeBin 1875 3
+CircuitBuildTimeBin 1875 4
 CircuitBuildTimeBin 1895 2
 CircuitBuildTimeBin 1905 2
-CircuitBuildTimeBin 1915 1
+CircuitBuildTimeBin 1915 2
 CircuitBuildTimeBin 1925 1
-CircuitBuildTimeBin 1935 2
+CircuitBuildTimeBin 1935 3
 CircuitBuildTimeBin 1945 2
 CircuitBuildTimeBin 1955 1
 CircuitBuildTimeBin 2005 1
 CircuitBuildTimeBin 2065 1
 CircuitBuildTimeBin 2115 1
 CircuitBuildTimeBin 2135 1
-CircuitBuildTimeBin 2145 1
+CircuitBuildTimeBin 2145 2
 CircuitBuildTimeBin 2155 1
 CircuitBuildTimeBin 2165 1
 CircuitBuildTimeBin 2175 1
 CircuitBuildTimeBin 2195 1
 CircuitBuildTimeBin 2245 1
 CircuitBuildTimeBin 2275 2
+CircuitBuildTimeBin 2305 1
 CircuitBuildTimeBin 2365 1
+CircuitBuildTimeBin 2495 1
 CircuitBuildTimeBin 2665 1
-CircuitBuildTimeBin 2675 1
+CircuitBuildTimeBin 2675 2
 CircuitBuildTimeBin 2815 2
 CircuitBuildTimeBin 2835 1
 CircuitBuildTimeBin 2845 1
@@ -144,9 +148,14 @@ CircuitBuildTimeBin 2895 1
 CircuitBuildTimeBin 2915 1
 CircuitBuildTimeBin 3105 1
 CircuitBuildTimeBin 3205 1
+CircuitBuildTimeBin 3385 1
 CircuitBuildTimeBin 3415 1
 CircuitBuildTimeBin 3465 1
+CircuitBuildTimeBin 3715 1
 CircuitBuildTimeBin 3745 1
+CircuitBuildTimeBin 3805 1
+CircuitBuildTimeBin 3895 1
+CircuitBuildTimeBin 4135 1
 CircuitBuildTimeBin 4155 1
 CircuitBuildTimeBin 4165 1
 CircuitBuildTimeBin 4175 1
@@ -163,11 +172,16 @@ CircuitBuildTimeBin 5075 1
 CircuitBuildTimeBin 5085 1
 CircuitBuildTimeBin 5125 1
 CircuitBuildTimeBin 6185 1
+CircuitBuildTimeBin 36595 1
+CircuitBuildTimeBin 38755 1
+CircuitBuildTimeBin 38765 1
+CircuitBuildTimeBin 40565 1
+CircuitBuildTimeBin 40745 1
 CircuitBuildAbandonedCount 6
 Dormant 0
-Guard in=default rsa_id=B1FE4BE9DD33376DADC22D271803097E1AE8B35E nickname=HandStanderd sampled_on=2025-05-29T17:49:21 sampled_idx=0 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-05T01:51:41 confirmed_idx=1 pb_use_attempts=75.158203 pb_use_successes=75.158203 pb_circ_attempts=214.750000 pb_circ_successes=209.562500 pb_successful_circuits_closed=209.312500 pb_collapsed_circuits=0.250000 pb_timeouts=2.312500
-Guard in=default rsa_id=CBFA5CE9FCF39B6FBB12CF0A0899608F16DC67A5 nickname=prsv sampled_on=2025-06-02T01:19:38 sampled_idx=1 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-08T00:44:12 confirmed_idx=0 pb_use_attempts=57.028320 pb_use_successes=57.028320 pb_circ_attempts=230.562500 pb_circ_successes=225.875000 pb_successful_circuits_closed=225.875000 pb_timeouts=3.625000
-Guard in=default rsa_id=5BE7317D29F26E5A3D96F0E7F8653B870E657C6C nickname=Downunder2 sampled_on=2025-05-31T20:21:21 sampled_idx=2 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-02T09:41:59 confirmed_idx=2 pb_use_attempts=7.000000 pb_use_successes=7.000000 pb_circ_attempts=14.000000 pb_circ_successes=14.000000 pb_successful_circuits_closed=14.000000
+Guard in=default rsa_id=B1FE4BE9DD33376DADC22D271803097E1AE8B35E nickname=HandStanderd sampled_on=2025-05-29T17:49:21 sampled_idx=0 sampled_by=0.4.8.16 unlisted_since=2025-06-19T05:04:36 listed=0 confirmed_on=2025-06-05T01:51:41 confirmed_idx=1 pb_use_attempts=75.158203 pb_use_successes=75.158203 pb_circ_attempts=221.750000 pb_circ_successes=216.562500 pb_successful_circuits_closed=216.312500 pb_collapsed_circuits=0.250000 pb_timeouts=2.312500
+Guard in=default rsa_id=CBFA5CE9FCF39B6FBB12CF0A0899608F16DC67A5 nickname=prsv sampled_on=2025-06-02T01:19:38 sampled_idx=1 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-08T00:44:12 confirmed_idx=0 pb_use_attempts=84.028320 pb_use_successes=84.028320 pb_circ_attempts=274.562500 pb_circ_successes=268.875000 pb_successful_circuits_closed=268.875000 pb_timeouts=3.625000
+Guard in=default rsa_id=5BE7317D29F26E5A3D96F0E7F8653B870E657C6C nickname=Downunder2 sampled_on=2025-05-31T20:21:21 sampled_idx=2 sampled_by=0.4.8.16 listed=1 confirmed_on=2025-06-02T09:41:59 confirmed_idx=2 pb_use_attempts=24.000000 pb_use_successes=24.000000 pb_circ_attempts=35.000000 pb_circ_successes=35.000000 pb_successful_circuits_closed=35.000000
 Guard in=default rsa_id=7DC499EA72BF553D3CBD1B149167EAA04FD37AA0 nickname=tetraegis sampled_on=2025-05-28T21:21:23 sampled_idx=3 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=8AB172C11996EC969EF5B42B7CB8ADDD07455AA4 nickname=MaverickPass sampled_on=2025-06-07T05:36:22 sampled_idx=4 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=8D0E575C7C5E6B8075891121368244C283CBC65A nickname=Novastation sampled_on=2025-06-01T08:22:55 sampled_idx=5 sampled_by=0.4.8.16 listed=1
@@ -188,7 +202,7 @@ Guard in=default rsa_id=6694B1008936127A01ABD046255D56CA148B00F1 nickname=vinces
 Guard in=default rsa_id=DF6F7908E7FDEEE5DE6DD9C92F7C9DFB20B0CE2A nickname=TorchWood sampled_on=2025-06-02T03:42:43 sampled_idx=20 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=6E4915E9D86E607D68D99B98A9A63F60E5882D57 nickname=torrelay583481 sampled_on=2025-06-05T13:14:02 sampled_idx=21 sampled_by=0.4.7.16 listed=1
 Guard in=default rsa_id=772D509772071D3082BAAF1C781C8F917013F3CB nickname=torrx sampled_on=2025-06-04T14:59:28 sampled_idx=22 sampled_by=0.4.7.16 listed=1
-Guard in=default rsa_id=1BF9BC388DB65EF98826BBB5E9CA0444E966F3EF nickname=Famy sampled_on=2025-06-11T13:42:29 sampled_idx=23 sampled_by=0.4.7.16 listed=1
+Guard in=default rsa_id=1BF9BC388DB65EF98826BBB5E9CA0444E966F3EF nickname=Famy sampled_on=2025-06-11T13:42:29 sampled_idx=23 sampled_by=0.4.7.16 unlisted_since=2025-06-17T10:03:47 listed=0
 Guard in=default rsa_id=94629572C5FE987B006677296276F8AFD804E7D9 nickname=Unnamed sampled_on=2025-06-07T15:14:11 sampled_idx=24 sampled_by=0.4.7.16 listed=1 confirmed_on=2025-06-11T20:01:35 confirmed_idx=3
 Guard in=default rsa_id=494E5000BA79F0078DFA05E610911C2AC525572F nickname=StuRav sampled_on=2025-06-01T22:06:44 sampled_idx=25 sampled_by=0.4.7.16 listed=1
 Guard in=default rsa_id=8EE44717FA55705C12086F3ECD1F8D9C8676FD05 nickname=ForPrivacyNET sampled_on=2025-06-02T15:38:16 sampled_idx=26 sampled_by=0.4.7.16 listed=1
@@ -225,7 +239,6 @@ Guard in=default rsa_id=4B273B712FF7369F39043752AED79FE8F28EECA4 nickname=Quetza
 Guard in=default rsa_id=F318BE2B5B5BB72F3140FE37A337FC8F233C977C nickname=Pirkka1 sampled_on=2025-06-12T18:09:53 sampled_idx=57 sampled_by=0.4.8.16 unlisted_since=2025-06-10T11:21:04 listed=0
 Guard in=default rsa_id=049091E0582A6439D7AC7E157D32AB9319B8B78C nickname=Mlrage sampled_on=2025-06-09T04:05:15 sampled_idx=58 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=01E388EF92B569074D8FA86CC9D442E829F6E885 nickname=ThanasRelay0 sampled_on=2025-06-07T11:32:04 sampled_idx=59 sampled_by=0.4.8.16 listed=1
-LastWritten 2025-06-17 23:30:07
-MinutesSinceUserActivity 1
+LastWritten 2025-06-19 17:20:37
 TorVersion Tor 0.4.8.16
-TotalBuildTimes 619
+TotalBuildTimes 719
