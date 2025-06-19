@@ -403,3 +403,4 @@
 127.0.0.1 - - [19/Jun/2025:17:22:08 +0000] "GET /static/admin/css/login.css HTTP/1.1" 404 10199 "http://0.0.0.0:9181/admin/login/?next=/admin/" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 127.0.0.1 - - [19/Jun/2025:17:22:10 +0000] "GET /static/admin/css/dark_mode.css HTTP/1.1" 404 10211 "http://0.0.0.0:9181/admin/login/?next=/admin/" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
 127.0.0.1 - - [19/Jun/2025:17:22:10 +0000] "GET /static/img/mi-logo.png HTTP/1.1" 404 10187 "http://0.0.0.0:9181/admin/login/?next=/admin/" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
+127.0.0.1 - - [19/Jun/2025:18:12:28 +0000] "GET /admin/ HTTP/1.1" 500 197605 "http://0.0.0.0:9181/admin/login/?next=/admin/" "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0"
