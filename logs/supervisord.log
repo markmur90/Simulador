@@ -14081,3 +14081,6 @@
 2025-06-19 19:39:24,689 WARN exited: gunicorn (exit status 1; not expected)
 2025-06-19 19:39:25,693 INFO spawned: 'gunicorn' with pid 88734
 2025-06-19 19:39:26,695 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-19 20:23:43,474 INFO waiting for gunicorn, tor to die
+2025-06-19 20:23:43,546 INFO stopped: tor (exit status 0)
+2025-06-19 20:23:44,209 INFO stopped: gunicorn (exit status 0)

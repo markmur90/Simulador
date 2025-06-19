@@ -267562,3 +267562,8 @@ Traceback (most recent call last):
     return super().execute(query, params)
            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
 django.db.utils.OperationalError: no such table: django_session
+[2025-06-19 20:23:43 +0200] [88734] [INFO] Handling signal: term
+[2025-06-19 18:23:43 +0000] [92680] [INFO] Worker exiting (pid: 92680)
+[2025-06-19 18:23:43 +0000] [92681] [INFO] Worker exiting (pid: 92681)
+[2025-06-19 18:23:43 +0000] [92679] [INFO] Worker exiting (pid: 92679)
+[2025-06-19 20:23:44 +0200] [88734] [INFO] Shutting down: Master
