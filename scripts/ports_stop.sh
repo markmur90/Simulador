@@ -5,7 +5,7 @@ AP_BK_DIR="/home/markmur88/api_bank_h2_BK"
 AP_HK_DIR="/home/markmur88/api_bank_heroku"
 AP_SM_DIR="/home/markmur88/Simulador"
 VENV_PATH="/home/markmur88/envSIM"
-SCRIPTS_DIR="$AP_H2_DIR/scripts"
+SCRIPTS_DIR="/home/markmur88/scripts"
 BACKU_DIR="$SCRIPTS_DIR/backup"
 CERTS_DIR="$SCRIPTS_DIR/certs"
 DP_DJ_DIR="$SCRIPTS_DIR/deploy/django"
@@ -30,7 +30,7 @@ BASE_DIR="$AP_H2_DIR"
 set -euo pipefail
 
 SCRIPT_NAME="$(basename "$0")"
-LOG_FILE="$SCRIPTS_DIR/logs/01_full_deploy/full_deploy.log"
+LOG_FILE="/home/markmur88/scripts/.logs/01_full_deploy/full_deploy.log"
 
 mkdir -p "$(dirname "$LOG_FILE")"
 
@@ -46,7 +46,7 @@ trap 'echo -e "\n❌ Error en línea $LINENO: \"$BASH_COMMAND\"\nAbortando ejecu
 set -euo pipefail
 
 
-LOG_SISTEMA="$SCRIPTS_DIR/logs/sistema/$(basename "$0" .sh)_.log"
+LOG_SISTEMA="$SCRIPTS_DIR/.logs/sistema/$(basename "$0" .sh)_.log"
 mkdir -p "$(dirname $LOG_SISTEMA)"
 
 BASE_DIR="/home/markmur88/Simulador"
