@@ -14098,3 +14098,13 @@
 2025-06-20 02:28:22,691 INFO waiting for gunicorn, tor to die
 2025-06-20 02:28:22,764 INFO exited: gunicorn (exit status 0; expected)
 2025-06-20 02:28:22,766 INFO stopped: tor (exit status 0)
+2025-06-20 02:29:29,082 INFO RPC interface 'supervisor' initialized
+2025-06-20 02:29:29,082 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2025-06-20 02:29:29,083 INFO RPC interface 'supervisor' initialized
+2025-06-20 02:29:29,083 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2025-06-20 02:29:29,086 INFO daemonizing the supervisord process
+2025-06-20 02:29:29,088 INFO supervisord started with pid 69437
+2025-06-20 02:29:30,092 INFO spawned: 'gunicorn' with pid 69447
+2025-06-20 02:29:30,097 INFO spawned: 'tor' with pid 69448
+2025-06-20 02:29:32,087 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-20 02:29:32,087 INFO success: tor entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

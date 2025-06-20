@@ -267592,3 +267592,18 @@ Not Found: /static/images/background.png
 [2025-06-20 02:28:22 +0200] [61680] [ERROR] Worker (pid:68591) was sent SIGTERM!
 [2025-06-20 02:28:22 +0200] [61680] [ERROR] Worker (pid:68590) was sent SIGTERM!
 [2025-06-20 02:28:22 +0200] [61680] [INFO] Shutting down: Master
+[2025-06-20 02:29:31 +0200] [69447] [INFO] Starting gunicorn 23.0.0
+[2025-06-20 02:29:31 +0200] [69447] [INFO] Listening at: http://0.0.0.0:9181 (69447)
+[2025-06-20 02:29:31 +0200] [69447] [INFO] Using worker: sync
+[2025-06-20 02:29:31 +0200] [69460] [INFO] Booting worker with pid: 69460
+[2025-06-20 02:29:31 +0200] [69461] [INFO] Booting worker with pid: 69461
+[2025-06-20 02:29:31 +0200] [69470] [INFO] Booting worker with pid: 69470
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
