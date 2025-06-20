@@ -267567,3 +267567,28 @@ django.db.utils.OperationalError: no such table: django_session
 [2025-06-19 18:23:43 +0000] [92681] [INFO] Worker exiting (pid: 92681)
 [2025-06-19 18:23:43 +0000] [92679] [INFO] Worker exiting (pid: 92679)
 [2025-06-19 20:23:44 +0200] [88734] [INFO] Shutting down: Master
+[2025-06-20 02:17:16 +0200] [61680] [INFO] Starting gunicorn 23.0.0
+[2025-06-20 02:17:16 +0200] [61680] [INFO] Listening at: http://0.0.0.0:9181 (61680)
+[2025-06-20 02:17:16 +0200] [61680] [INFO] Using worker: sync
+[2025-06-20 02:17:16 +0200] [61690] [INFO] Booting worker with pid: 61690
+[2025-06-20 02:17:16 +0200] [61691] [INFO] Booting worker with pid: 61691
+[2025-06-20 02:17:16 +0200] [61692] [INFO] Booting worker with pid: 61692
+Not Found: /static/images/background.png
+Not Found: /static/images/background.png
+[2025-06-20 00:28:14 +0000] [61692] [INFO] Worker reloading: /home/markmur88/Simulador/simulador_banco/banco/models.py modified
+[2025-06-20 00:28:14 +0000] [61692] [INFO] Worker exiting (pid: 61692)
+[2025-06-20 00:28:14 +0000] [61691] [INFO] Worker reloading: /home/markmur88/Simulador/simulador_banco/banco/models.py modified
+[2025-06-20 00:28:14 +0000] [61691] [INFO] Worker exiting (pid: 61691)
+[2025-06-20 00:28:14 +0000] [61690] [INFO] Worker reloading: /home/markmur88/Simulador/simulador_banco/banco/models.py modified
+[2025-06-20 00:28:14 +0000] [61690] [INFO] Worker exiting (pid: 61690)
+[2025-06-20 02:28:15 +0200] [68590] [INFO] Booting worker with pid: 68590
+[2025-06-20 02:28:15 +0200] [68591] [INFO] Booting worker with pid: 68591
+[2025-06-20 02:28:15 +0200] [68592] [INFO] Booting worker with pid: 68592
+[2025-06-20 00:28:22 +0000] [68591] [INFO] Worker exiting (pid: 68591)
+[2025-06-20 00:28:22 +0000] [68590] [INFO] Worker exiting (pid: 68590)
+[2025-06-20 00:28:22 +0000] [68592] [INFO] Worker exiting (pid: 68592)
+[2025-06-20 02:28:22 +0200] [61680] [INFO] Handling signal: term
+[2025-06-20 02:28:22 +0200] [61680] [ERROR] Worker (pid:68592) was sent SIGTERM!
+[2025-06-20 02:28:22 +0200] [61680] [ERROR] Worker (pid:68591) was sent SIGTERM!
+[2025-06-20 02:28:22 +0200] [61680] [ERROR] Worker (pid:68590) was sent SIGTERM!
+[2025-06-20 02:28:22 +0200] [61680] [INFO] Shutting down: Master

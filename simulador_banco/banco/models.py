@@ -14,6 +14,9 @@ class OficialBancario(models.Model):
     def check_password(self, raw_password):
         return check_password(raw_password, self.password_hash)
 
+    def __str__(self):
+        return self.username
+
 class OTPChallenge(models.Model):
     payment_id = models.CharField(max_length=100)
     challenge_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -123,6 +126,8 @@ class PostalAddress(models.Model):
     city = models.CharField(max_length=70)
     class Meta:
         db_table = 'sim_postal_address'
+    def __str__(self):
+        return f"{self.country} {self.street} {self.city}"
 
 class Party(models.Model):
     name = models.CharField(max_length=70, unique=True)
@@ -230,7 +235,7 @@ class Kid(models.Model):
     kid = models.CharField(max_length=60, unique=True)
 
     def __str__(self):
-        return f"{self.codigo} – {self.kid}"
+        return f"{self.codigo} - {self.kid}"
 
     class Meta:
         db_table = 'sim_kid'
