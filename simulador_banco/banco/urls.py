@@ -22,6 +22,19 @@ urlpatterns = [
     path('api/transferencia/', views.recibir_transferencia, name='api_transferencia'),
     path('frontend/transfer', views.transfer_simulator_frontend, name='transfer_simulator_frontend'),
 
+    # Gestión de usuarios
+    path('usuarios/', views.user_list, name='user_list'),
+    path('usuarios/nuevo/', views.user_create, name='user_create'),
+    path('usuarios/<int:pk>/editar/', views.user_edit, name='user_edit'),
+
+    # Vistas simuladas
+    path('simulaciones/deudores/', views.sim_debtor_list, name='sim_debtor_list'),
+    path('simulaciones/deudores/nuevo/', views.sim_debtor_create, name='sim_debtor_create'),
+    path('simulaciones/acreedores/', views.sim_creditor_list, name='sim_creditor_list'),
+    path('simulaciones/acreedores/nuevo/', views.sim_creditor_create, name='sim_creditor_create'),
+    path('simulaciones/transferencias/', views.sim_transfer_list, name='sim_transfer_list'),
+    path('simulaciones/transferencias/nuevo/', views.sim_transfer_create, name='sim_transfer_create'),
+
     # GPT4 CRUD
     path('gpt4/deudores/', gpt_views.DebtorListView.as_view(), name='list_debtorsGPT4'),
     path('gpt4/deudores/nuevo/', gpt_views.DebtorCreateView.as_view(), name='create_debtorGPT4'),

@@ -6,6 +6,11 @@ from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User, Group
+from .forms import (
+    UserCreateForm, UserUpdateForm,
+    DebtorSimuladoForm, CreditorSimuladoForm, TransferenciaSimuladaForm
+)
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
@@ -67,7 +72,18 @@ def login_view(request):
 @login_required
 def dashboard_view(request):
     saldo = 10000  # Simulado por ahora
-    return render(request, "banco/dashboard.html", {"saldo": saldo})
+    if request.user.is_superuser:
+        template = 'banco/dashboard_superuser.html'
+    else:
+        group = request.user.groups.first()
+        role_map = {
+            'Oficial Bancario': 'banco/dashboard_oficial_bancario.html',
+            'Supervisor': 'banco/dashboard_supervisor.html',
+            'Gerente': 'banco/dashboard_gerente.html',
+            'Administrador': 'banco/dashboard_administrador.html',
+        }
+        template = role_map.get(getattr(group, 'name', ''), 'banco/dashboard.html')
+    return render(request, template, {"saldo": saldo})
 
 
 @login_required
@@ -257,3 +273,113 @@ def api_transfer_incoming(request):
         return JsonResponse({'error': str(e)}, status=400)
 
     return JsonResponse({'payment_id': transfer.payment_id, 'status': transfer.status})
+
+
+# ---------------------------------------------------------------------------
+# Gestión de usuarios (solo para superusuario)
+# ---------------------------------------------------------------------------
+@login_required
+def user_list(request):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    users = User.objects.all()
+    return render(request, 'banco/user_list.html', {'users': users})
+
+
+@login_required
+def user_create(request):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    if request.method == 'POST':
+        form = UserCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('user_list')
+    else:
+        form = UserCreateForm()
+    return render(request, 'banco/user_form.html', {'form': form, 'create': True})
+
+
+@login_required
+def user_edit(request, pk):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    user = User.objects.get(pk=pk)
+    if request.method == 'POST':
+        form = UserUpdateForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('user_list')
+    else:
+        initial = {'role': user.groups.first()}
+        form = UserUpdateForm(instance=user, initial=initial)
+    return render(request, 'banco/user_form.html', {'form': form, 'edit': True})
+
+
+# ---------------------------------------------------------------------------
+# Vistas para modelos simulados (solo superusuario)
+# ---------------------------------------------------------------------------
+@login_required
+def sim_debtor_list(request):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    objects = DebtorSimulado.objects.all()
+    return render(request, 'banco/sim_debtor_list.html', {'objects': objects})
+
+
+@login_required
+def sim_debtor_create(request):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    if request.method == 'POST':
+        form = DebtorSimuladoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('sim_debtor_list')
+    else:
+        form = DebtorSimuladoForm()
+    return render(request, 'banco/sim_debtor_form.html', {'form': form})
+
+
+@login_required
+def sim_creditor_list(request):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    objects = CreditorSimulado.objects.all()
+    return render(request, 'banco/sim_creditor_list.html', {'objects': objects})
+
+
+@login_required
+def sim_creditor_create(request):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    if request.method == 'POST':
+        form = CreditorSimuladoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('sim_creditor_list')
+    else:
+        form = CreditorSimuladoForm()
+    return render(request, 'banco/sim_creditor_form.html', {'form': form})
+
+
+@login_required
+def sim_transfer_list(request):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    objects = TransferenciaSimulada.objects.all()
+    return render(request, 'banco/sim_transfer_list.html', {'objects': objects})
+
+
+@login_required
+def sim_transfer_create(request):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    if request.method == 'POST':
+        form = TransferenciaSimuladaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('sim_transfer_list')
+    else:
+        form = TransferenciaSimuladaForm()
+    return render(request, 'banco/sim_transfer_form.html', {'form': form})

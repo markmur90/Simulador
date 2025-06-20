@@ -1,9 +1,11 @@
 from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User, Group
 from .models import (
-    ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid, PaymentIdentification,
-    Transfer, PostalAddress
+    ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount,
+    Kid, PaymentIdentification, Transfer, PostalAddress,
+    DebtorSimulado, CreditorSimulado, TransferenciaSimulada
 )
-
 
 class BootstrapModelForm(forms.ModelForm):
     """Base form que aplica clases de Bootstrap a los campos."""
@@ -131,3 +133,55 @@ class TransferForm(BootstrapModelForm):
     class Meta:
         model = Transfer
         exclude = ['created_at', 'updated_at', 'auth_id']
+
+
+class DebtorSimuladoForm(BootstrapModelForm):
+    class Meta:
+        model = DebtorSimulado
+        fields = ['nombre']
+
+
+class CreditorSimuladoForm(BootstrapModelForm):
+    class Meta:
+        model = CreditorSimulado
+        fields = ['nombre']
+
+
+class TransferenciaSimuladaForm(BootstrapModelForm):
+    class Meta:
+        model = TransferenciaSimulada
+        fields = ['payment_id', 'debtor', 'creditor', 'monto', 'oficial', 'destino']
+
+
+class UserCreateForm(UserCreationForm):
+    role = forms.ModelChoiceField(queryset=Group.objects.all(), label='Rol')
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('username', 'role')
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        role = self.cleaned_data['role']
+        if commit:
+            user.groups.set([role])
+        else:
+            self.saved_role = role
+        return user
+
+
+class UserUpdateForm(forms.ModelForm):
+    role = forms.ModelChoiceField(queryset=Group.objects.all(), label='Rol')
+
+    class Meta:
+        model = User
+        fields = ('username', 'is_active', 'role')
+
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        role = self.cleaned_data['role']
+        if commit:
+            user.groups.set([role])
+        else:
+            self.saved_role = role
+        return user
