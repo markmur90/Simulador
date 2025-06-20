@@ -267607,3 +267607,8 @@ Not Found: /static/images/background.png
 Not Found: /static/images/background.png
 Not Found: /static/images/background.png
 Not Found: /static/images/background.png
+[2025-06-20 02:33:20 +0200] [69447] [INFO] Handling signal: term
+[2025-06-20 00:33:20 +0000] [69470] [INFO] Worker exiting (pid: 69470)
+[2025-06-20 00:33:20 +0000] [69460] [INFO] Worker exiting (pid: 69460)
+[2025-06-20 00:33:20 +0000] [69461] [INFO] Worker exiting (pid: 69461)
+[2025-06-20 02:33:20 +0200] [69447] [INFO] Shutting down: Master
