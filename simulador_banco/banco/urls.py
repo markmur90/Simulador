@@ -33,10 +33,19 @@ urlpatterns = [
     # Vistas simuladas
     path('simulaciones/deudores/', views.sim_debtor_list, name='sim_debtor_list'),
     path('simulaciones/deudores/nuevo/', views.sim_debtor_create, name='sim_debtor_create'),
+    path('simulaciones/deudores/<int:pk>/movimiento/', views.sim_debtor_movimiento, name='sim_debtor_movimiento'),
+    path('simulaciones/deudores/<int:pk>/estado/', views.sim_debtor_estado, name='sim_debtor_estado'),
+    path('simulaciones/deudores/<int:pk>/estado/pdf/', views.sim_debtor_estado_pdf, name='sim_debtor_estado_pdf'),
     path('simulaciones/acreedores/', views.sim_creditor_list, name='sim_creditor_list'),
     path('simulaciones/acreedores/nuevo/', views.sim_creditor_create, name='sim_creditor_create'),
     path('simulaciones/transferencias/', views.sim_transfer_list, name='sim_transfer_list'),
     path('simulaciones/transferencias/nuevo/', views.sim_transfer_create, name='sim_transfer_create'),
+
+    # Movimientos y estados
+    path('simulaciones/deudores/<int:debtor_id>/deposito/', views.movimiento_create, {'tipo': 'DEPOSITO'}, name='deposito_deudor'),
+    path('simulaciones/deudores/<int:debtor_id>/pago/', views.movimiento_create, {'tipo': 'PAGO'}, name='pago_deudor'),
+    path('simulaciones/deudores/<int:debtor_id>/estado/', views.estado_deudor, name='estado_deudor'),
+    path('simulaciones/deudores/<int:debtor_id>/estado/pdf/', views.estado_deudor_pdf, name='estado_deudor_pdf'),
 
     # GPT4 CRUD
     path('gpt4/deudores/', gpt_views.DebtorListView.as_view(), name='list_debtorsGPT4'),

@@ -8,10 +8,11 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group, User
 from .forms import (
-    UserCreateForm, UserUpdateForm,
-    DebtorSimuladoForm, CreditorSimuladoForm, TransferenciaSimuladaForm
+    MovimientoForm, UserCreateForm, UserUpdateForm,
+    DebtorSimuladoForm, CreditorSimuladoForm, TransferenciaSimuladaForm,
+    MovimientoDebtorForm
 )
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse, FileResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
@@ -19,6 +20,7 @@ from .models import (
     DebtorSimulado,
     CreditorSimulado,
     TransferenciaSimulada,
+    MovimientoDeudor,
     OficialBancario,
     OTPChallenge,
 )
@@ -26,6 +28,8 @@ from .forms import UserCreateWithRoleForm
 from django.utils.crypto import get_random_string
 from services.transfer_services import TransferService
 from django.core.exceptions import ValidationError
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
 
 @csrf_exempt
 def recibir_transferencia(request):
@@ -432,3 +436,150 @@ def update_user_role(request, user_id):
         messages.success(request, f"El rol de «{user.username}» se actualizó correctamente.")
     return redirect("user_management")
 
+
+@login_required
+def movimiento_create(request, debtor_id, tipo):
+    """Registra un depósito o pago para un deudor."""
+    debtor = get_object_or_404(DebtorSimulado, pk=debtor_id)
+    if request.method == "POST":
+        form = MovimientoForm(request.POST)
+        if form.is_valid():
+            movimiento = form.save(commit=False)
+            movimiento.debtor = debtor
+            movimiento.tipo = tipo
+            movimiento.save()
+            return redirect('estado_deudor', debtor_id=debtor.id)
+    else:
+        form = MovimientoForm(initial={'tipo': tipo})
+    return render(request, 'banco/movimiento_form.html', {
+        'form': form,
+        'debtor': debtor,
+        'tipo': tipo,
+    })
+
+
+@login_required
+def estado_deudor(request, debtor_id):
+    """Muestra el estado de cuenta de un deudor."""
+    debtor = get_object_or_404(DebtorSimulado, pk=debtor_id)
+    movimientos = debtor.movimientos.order_by('-fecha')
+    start = request.GET.get('inicio')
+    end = request.GET.get('fin')
+    if start:
+        movimientos = movimientos.filter(fecha__date__gte=start)
+    if end:
+        movimientos = movimientos.filter(fecha__date__lte=end)
+    return render(request, 'banco/estado_deudor.html', {
+        'debtor': debtor,
+        'movimientos': movimientos,
+    })
+
+
+@login_required
+def estado_deudor_pdf(request, debtor_id):
+    """Exporta el estado de cuenta en PDF."""
+    debtor = get_object_or_404(DebtorSimulado, pk=debtor_id)
+    movimientos = debtor.movimientos.order_by('fecha')
+    start = request.GET.get('inicio')
+    end = request.GET.get('fin')
+    if start:
+        movimientos = movimientos.filter(fecha__date__gte=start)
+    if end:
+        movimientos = movimientos.filter(fecha__date__lte=end)
+
+    from io import BytesIO
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+
+    buffer = BytesIO()
+    p = canvas.Canvas(buffer, pagesize=letter)
+    p.drawString(100, 750, f"Estado de cuenta de {debtor.nombre}")
+    y = 720
+    for mov in movimientos:
+        p.drawString(80, y, f"{mov.fecha.strftime('%Y-%m-%d %H:%M')} - {mov.tipo} - {mov.monto}")
+        y -= 20
+        if y < 50:
+            p.showPage()
+            y = 750
+    p.drawString(80, y-20, f"Saldo actual: {debtor.saldo}")
+    p.showPage()
+    p.save()
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename='estado.pdf')
+
+
+@login_required
+def sim_debtor_movimiento(request, pk):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    debtor = get_object_or_404(DebtorSimulado, pk=pk)
+    if request.method == 'POST':
+        form = MovimientoDebtorForm(request.POST)
+        if form.is_valid():
+            movimiento = form.save(commit=False)
+            movimiento.debtor = debtor
+            movimiento.save()
+            return redirect('sim_debtor_estado', pk=pk)
+    else:
+        form = MovimientoDebtorForm()
+    return render(request, 'banco/movimiento_form.html', {'form': form, 'debtor': debtor})
+
+
+@login_required
+def sim_debtor_estado(request, pk):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    debtor = get_object_or_404(DebtorSimulado, pk=pk)
+    movimientos = debtor.movimientos.all().order_by('-fecha')
+
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    tipo = request.GET.get('tipo')
+
+    if start:
+        movimientos = movimientos.filter(fecha__date__gte=start)
+    if end:
+        movimientos = movimientos.filter(fecha__date__lte=end)
+    if tipo in [MovimientoDeudor.DEPOSITO, MovimientoDeudor.PAGO]:
+        movimientos = movimientos.filter(tipo=tipo)
+
+    return render(request, 'banco/estado_cuenta.html', {
+        'debtor': debtor,
+        'movimientos': movimientos,
+    })
+
+
+@login_required
+def sim_debtor_estado_pdf(request, pk):
+    if not request.user.is_superuser:
+        return redirect('dashboard')
+    debtor = get_object_or_404(DebtorSimulado, pk=pk)
+    movimientos = debtor.movimientos.all().order_by('fecha')
+
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    tipo = request.GET.get('tipo')
+
+    if start:
+        movimientos = movimientos.filter(fecha__date__gte=start)
+    if end:
+        movimientos = movimientos.filter(fecha__date__lte=end)
+    if tipo in [MovimientoDeudor.DEPOSITO, MovimientoDeudor.PAGO]:
+        movimientos = movimientos.filter(tipo=tipo)
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename=estado_{debtor.id}.pdf'
+
+    p = canvas.Canvas(response, pagesize=letter)
+    y = 750
+    p.drawString(50, y, f"Estado de cuenta de {debtor.nombre}")
+    y -= 30
+    for m in movimientos:
+        p.drawString(50, y, f"{m.fecha.strftime('%Y-%m-%d')} - {m.get_tipo_display()} - {m.monto}")
+        y -= 20
+        if y < 50:
+            p.showPage()
+            y = 750
+    p.showPage()
+    p.save()
+    return response

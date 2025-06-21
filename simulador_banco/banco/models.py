@@ -29,7 +29,9 @@ class OTPChallenge(models.Model):
     
 class DebtorSimulado(models.Model):
     nombre = models.CharField(max_length=100)
-
+    movimientos = models.CharField(max_length=100)
+    saldo = models.DecimalField(max_digits=12, decimal_places=2)
+    
     def __str__(self):
         return self.nombre
 
@@ -56,7 +58,40 @@ class TransferenciaSimulada(models.Model):
 
     def __str__(self):
         return self.payment_id
-    
+
+
+class MovimientoDeudor(models.Model):
+    """Movimientos de saldo para deudores simulados."""
+
+    DEPOSITO = 'DEPOSITO'
+    PAGO = 'PAGO'
+    TIPO_CHOICES = [
+        (DEPOSITO, 'Depósito'),
+        (PAGO, 'Pago'),
+    ]
+
+    debtor = models.ForeignKey(
+        DebtorSimulado,
+        on_delete=models.CASCADE,
+        related_name='movimientos'
+    )
+    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
+    monto = models.DecimalField(max_digits=12, decimal_places=2)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if self.tipo == self.DEPOSITO:
+                self.debtor.saldo += self.monto
+            else:
+                self.debtor.saldo -= self.monto
+            self.debtor.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.debtor} {self.tipo} {self.monto}"
+
+
 # models.py
 
 """
