@@ -119,8 +119,7 @@ class TransferUpdateView(LoginRequiredMixin, generic.UpdateView):
     slug_field = 'payment_id'
     slug_url_kwarg = 'payment_id'
     template_name = 'api/GPT4/edit_transfer.html'
-    succe
-ss_url = reverse_lazy('list_transferGPT4')
+    success_url = reverse_lazy('list_transferGPT4')
 
 
 class ClientIDListView(LoginRequiredMixin, generic.ListView):
