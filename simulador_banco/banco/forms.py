@@ -156,7 +156,7 @@ class TransferenciaSimuladaForm(BootstrapModelForm):
 class UserCreateForm(UserCreationForm):
     role = forms.ModelChoiceField(queryset=Group.objects.all(), label='Rol')
 
-    class Meta(UserCreationForm.Meta):
+    class Meta():
         model = User
         fields = ('username', 'role')
 
@@ -185,3 +185,12 @@ class UserUpdateForm(forms.ModelForm):
         else:
             self.saved_role = role
         return user
+
+
+class UserCreateWithRoleForm(UserCreationForm):
+    """Formulario para crear usuarios asignando un rol (Group)."""
+    role = forms.ModelChoiceField(queryset=Group.objects.all(), label="Rol")
+
+    class Meta:
+        model = User
+        fields = ("username",)

@@ -12,6 +12,8 @@ urlpatterns = [
     path('transferencia/', views.transferencia_view, name='transferencia'),
     path('registro/', views.registro_view, name='registro'),
     path('logout/', views.logout_view, name='logout'),
+    path('usuarios/', views.user_management, name='user_management'),
+    path('usuarios/<int:user_id>/toggle/', views.toggle_user_active, name='toggle_user'),    
     path('api/token', views.generar_token),
     
     path('api/login/', login_api_simulador),

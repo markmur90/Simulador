@@ -11,8 +11,10 @@
         <li class="nav-item"><a class="nav-link" href="{% url 'list_transferGPT4' %}">Transferencias</a></li>
         {% if user.is_superuser %}
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="adminMenu" data-bs-toggle="dropdown" aria-expanded="false">Crear</a>
+          <a class="nav-link dropdown-toggle" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administración</a>
           <ul class="dropdown-menu" aria-labelledby="adminMenu">
+            <li><a class="dropdown-item" href="{% url 'user_management' %}">Usuarios</a></li>
+            <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{% url 'create_kidGPT4' %}">Kid</a></li>
             <li><a class="dropdown-item" href="{% url 'create_clientidGPT4' %}">ClientID</a></li>
             <li><a class="dropdown-item" href="{% url 'create_debtor_accountGPT4' %}">DebtorAccount</a></li>

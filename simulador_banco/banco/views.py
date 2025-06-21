@@ -4,15 +4,15 @@ import json
 import jwt
 from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group, User
 from .forms import (
     UserCreateForm, UserUpdateForm,
     DebtorSimuladoForm, CreditorSimuladoForm, TransferenciaSimuladaForm
 )
 from django.http import JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import (
@@ -22,6 +22,7 @@ from .models import (
     OficialBancario,
     OTPChallenge,
 )
+from .forms import UserCreateWithRoleForm
 from django.utils.crypto import get_random_string
 from services.transfer_services import TransferService
 from django.core.exceptions import ValidationError
@@ -72,17 +73,16 @@ def login_view(request):
 @login_required
 def dashboard_view(request):
     saldo = 10000  # Simulado por ahora
-    if request.user.is_superuser:
-        template = 'banco/dashboard_superuser.html'
-    else:
-        group = request.user.groups.first()
-        role_map = {
-            'Oficial Bancario': 'banco/dashboard_oficial_bancario.html',
-            'Supervisor': 'banco/dashboard_supervisor.html',
-            'Gerente': 'banco/dashboard_gerente.html',
-            'Administrador': 'banco/dashboard_administrador.html',
-        }
-        template = role_map.get(getattr(group, 'name', ''), 'banco/dashboard.html')
+    user = request.user
+    template = "banco/dashboard_oficial.html"
+    if user.is_superuser:
+        template = "banco/dashboard_superuser.html"
+    elif user.groups.filter(name="Supervisor").exists():
+        template = "banco/dashboard_supervisor.html"
+    elif user.groups.filter(name="Gerente").exists():
+        template = "banco/dashboard_gerente.html"
+    elif user.groups.filter(name="Administrador").exists():
+        template = "banco/dashboard_administrador.html"
     return render(request, template, {"saldo": saldo})
 
 
@@ -114,6 +114,31 @@ def logout_view(request):
     return redirect("login")
 
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def user_management(request):
+    """Permite al superusuario crear y gestionar usuarios."""
+    users = User.objects.all()
+    if request.method == "POST":
+        form = UserCreateWithRoleForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            group = form.cleaned_data["role"]
+            user.groups.add(group)
+            return redirect("user_management")
+    else:
+        form = UserCreateWithRoleForm()
+    return render(request, "banco/user_management.html", {"form": form, "users": users})
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def toggle_user_active(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if user != request.user:
+        user.is_active = not user.is_active
+        user.save()
+    return redirect("user_management")
 
 
 # banco/views.py
