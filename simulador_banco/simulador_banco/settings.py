@@ -70,7 +70,7 @@ MIDDLEWARE = [
 
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-ROOT_URLCONF = 'simulador_banco.urls'
+ROOT_URLCONF = 'simulador_banco.simulador_banco.urls'
 
 TEMPLATES = [
     {
