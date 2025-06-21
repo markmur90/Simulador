@@ -3,9 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount,
-    Kid, PaymentIdentification, Transfer, PostalAddress,
-    DebtorSimulado, CreditorSimulado, TransferenciaSimulada,
-    MovimientoDebtor
+    Kid, MovimientoDeudor, PaymentIdentification, Transfer, PostalAddress, AccountMovement
 )
 
 class BootstrapModelForm(forms.ModelForm):
@@ -62,7 +60,7 @@ class DebtorForm(BootstrapModelForm):
 class DebtorAccountForm(BootstrapModelForm):
     class Meta:
         model = DebtorAccount
-        fields = ['debtor', 'iban', 'monto', 'currency']
+        fields = ['debtor', 'iban', 'balance', 'currency']
 
 
 class CreditorForm(BootstrapModelForm):
@@ -142,27 +140,15 @@ class DebtorSimuladoForm(BootstrapModelForm):
         fields = ['nombre', 'saldo']
 
 
-class MovimientoDebtorForm(BootstrapModelForm):
+class AccountMovementForm(BootstrapModelForm):
     class Meta:
-        model = MovimientoDebtor
+        model = MovimientoDeudor
         fields = ['tipo', 'monto']
 
 
 class CreditorSimuladoForm(BootstrapModelForm):
     class Meta:
-        model = CreditorSimulado
-        fields = ['nombre']
-
-
-class TransferenciaSimuladaForm(BootstrapModelForm):
-    class Meta:
-        model = TransferenciaSimulada
-        fields = ['payment_id', 'debtor', 'creditor', 'monto', 'oficial', 'destino']
-
-
-class MovimientoForm(BootstrapModelForm):
-    class Meta:
-        model = MovimientoDeudor
+        model = AccountMovement
         fields = ['tipo', 'monto']
 
 

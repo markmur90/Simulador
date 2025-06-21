@@ -22,14 +22,6 @@
             <li><a class="dropdown-item" href="{% url 'create_creditorGPT4' %}">Creditor</a></li>
           </ul>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="simMenu" data-bs-toggle="dropdown" aria-expanded="false">Simulaciones</a>
-          <ul class="dropdown-menu" aria-labelledby="simMenu">
-            <li><a class="dropdown-item" href="{% url 'sim_transfer_list' %}">TransferenciaSimulada</a></li>
-            <li><a class="dropdown-item" href="{% url 'sim_creditor_list' %}">CreditorSimulado</a></li>
-            <li><a class="dropdown-item" href="{% url 'sim_debtor_list' %}">DebtorSimulado</a></li>
-          </ul>
-        </li>
         {% endif %}
       </ul>
       <span class="navbar-text me-2">{{ user.username }}</span>

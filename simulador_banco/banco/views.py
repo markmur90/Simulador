@@ -8,19 +8,15 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import Group, User
 from .forms import (
-    MovimientoForm, UserCreateForm, UserUpdateForm,
-    DebtorSimuladoForm, CreditorSimuladoForm, TransferenciaSimuladaForm,
-    MovimientoDebtorForm
+    AccountMovementForm, UserCreateForm, UserUpdateForm
 )
 from django.http import JsonResponse, HttpResponse, FileResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
 from .models import (
-    DebtorSimulado,
-    CreditorSimulado,
-    TransferenciaSimulada,
-    MovimientoDeudor,
+    DebtorAccount,
+    AccountMovement,
     OficialBancario,
     OTPChallenge,
 )
@@ -33,34 +29,7 @@ from reportlab.lib.pagesizes import letter
 
 @csrf_exempt
 def recibir_transferencia(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            campos = ["paymentIdentification", "debtor", "creditor", "instructedAmount"]
-            if not all(field in data for field in campos):
-                return JsonResponse({"estado": "RJCT", "mensaje": "Campos faltantes"}, status=400)
-
-            debtor_name = data["debtor"].get("name")
-            creditor_name = data["creditor"].get("name")
-            monto = float(data["instructedAmount"].get("amount"))
-
-            debtor, _ = DebtorSimulado.objects.get_or_create(nombre=debtor_name)
-            creditor, _ = CreditorSimulado.objects.get_or_create(nombre=creditor_name)
-
-            TransferenciaSimulada.objects.create(
-                payment_id=data["paymentIdentification"],
-                debtor=debtor,
-                creditor=creditor,
-                monto=monto
-            )
-
-            return JsonResponse({"estado": "ACSC", "mensaje": "Transferencia aceptada"}, status=200)
-
-        except Exception as e:
-            return JsonResponse({"estado": "ERRO", "mensaje": str(e)}, status=500)
-
-    return JsonResponse({"mensaje": "Solo POST permitido"}, status=405)
-
+    return JsonResponse({"error": "Funcionalidad deshabilitada"}, status=501)
 
 def login_view(request):
     if request.method == "POST":
@@ -169,7 +138,7 @@ def generar_token(request):
 # banco/views.py
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from .models import TransferenciaSimulada, OficialBancario  # o el modelo que uses
+from .models import OficialBancario  # o el modelo que uses
 import json
 
 @csrf_exempt
@@ -191,11 +160,8 @@ def crear_transferencia(request):
     if not monto or not destino:
         return JsonResponse({'error': 'Faltan datos'}, status=400)
 
-    # Crear y guardar transferencia
-    t = TransferenciaSimulada(oficial=oficial, monto=monto, destino=destino)
-    t.save()
-
-    return JsonResponse({'estado': 'ok', 'payment_id': t.payment_id})
+    # Lógica simulada eliminada
+    return JsonResponse({'estado': 'ok', 'payment_id': 'SIMULATED'})
 
 @csrf_exempt
 def api_challenge(request):
@@ -242,23 +208,12 @@ def api_send_transfer(request):
     challenge.status = 'USED'
     challenge.save()
 
-    TransferenciaSimulada.objects.get_or_create(
-        payment_id=payment_id,
-        defaults={'debtor': DebtorSimulado.objects.first(),
-                 'creditor': CreditorSimulado.objects.first(),
-                 'monto': 0}
-    )
-
-    return JsonResponse({'transactionStatus': 'ACSC', 'authId': str(challenge.challenge_id)})
-
 
 def api_status_transfer(request):
     payment_id = request.GET.get('payment_id')
     if not payment_id:
         return JsonResponse({'error': 'payment_id requerido'}, status=400)
-    exists = TransferenciaSimulada.objects.filter(payment_id=payment_id).exists()
-    status = 'ACSC' if exists else 'RJCT'
-    return JsonResponse({'payment_id': payment_id, 'status': status})
+    return JsonResponse({'payment_id': payment_id, 'status': 'RJCT'})
 
 
 def transfer_simulator_frontend(request):
@@ -328,75 +283,6 @@ def user_edit(request, pk):
     return render(request, 'banco/user_form.html', {'form': form, 'edit': True})
 
 
-# ---------------------------------------------------------------------------
-# Vistas para modelos simulados (solo superusuario)
-# ---------------------------------------------------------------------------
-@login_required
-def sim_debtor_list(request):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    objects = DebtorSimulado.objects.all()
-    return render(request, 'banco/sim_debtor_list.html', {'objects': objects})
-
-
-@login_required
-def sim_debtor_create(request):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    if request.method == 'POST':
-        form = DebtorSimuladoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('sim_debtor_list')
-    else:
-        form = DebtorSimuladoForm()
-    return render(request, 'banco/sim_debtor_form.html', {'form': form})
-
-
-@login_required
-def sim_creditor_list(request):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    objects = CreditorSimulado.objects.all()
-    return render(request, 'banco/sim_creditor_list.html', {'objects': objects})
-
-
-@login_required
-def sim_creditor_create(request):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    if request.method == 'POST':
-        form = CreditorSimuladoForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('sim_creditor_list')
-    else:
-        form = CreditorSimuladoForm()
-    return render(request, 'banco/sim_creditor_form.html', {'form': form})
-
-
-@login_required
-def sim_transfer_list(request):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    objects = TransferenciaSimulada.objects.all()
-    return render(request, 'banco/sim_transfer_list.html', {'objects': objects})
-
-
-@login_required
-def sim_transfer_create(request):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    if request.method == 'POST':
-        form = TransferenciaSimuladaForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('sim_transfer_list')
-    else:
-        form = TransferenciaSimuladaForm()
-    return render(request, 'banco/sim_transfer_form.html', {'form': form})
-
-
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
 from django.shortcuts import render, redirect, get_object_or_404
@@ -438,31 +324,31 @@ def update_user_role(request, user_id):
 
 
 @login_required
-def movimiento_create(request, debtor_id, tipo):
-    """Registra un depósito o pago para un deudor."""
-    debtor = get_object_or_404(DebtorSimulado, pk=debtor_id)
+def account_movement_create(request, account_id, tipo):
+    """Registra un depósito o pago en una cuenta de deudor."""
+    account = get_object_or_404(DebtorAccount, pk=account_id)
     if request.method == "POST":
-        form = MovimientoForm(request.POST)
+        form = AccountMovementForm(request.POST)
         if form.is_valid():
             movimiento = form.save(commit=False)
-            movimiento.debtor = debtor
+            movimiento.account = account
             movimiento.tipo = tipo
             movimiento.save()
-            return redirect('estado_deudor', debtor_id=debtor.id)
+            return redirect('estado_cuenta', account_id=account.id)
     else:
-        form = MovimientoForm(initial={'tipo': tipo})
+        form = AccountMovementForm(initial={'tipo': tipo})
     return render(request, 'banco/movimiento_form.html', {
         'form': form,
-        'debtor': debtor,
+        'account': account,
         'tipo': tipo,
     })
 
 
 @login_required
-def estado_deudor(request, debtor_id):
-    """Muestra el estado de cuenta de un deudor."""
-    debtor = get_object_or_404(DebtorSimulado, pk=debtor_id)
-    movimientos = debtor.movimientos.order_by('-fecha')
+def estado_cuenta(request, account_id):
+    """Muestra el estado de cuenta de una cuenta de deudor."""
+    account = get_object_or_404(DebtorAccount, pk=account_id)
+    movimientos = account.movimientos.order_by('-fecha')
     start = request.GET.get('inicio')
     end = request.GET.get('fin')
     if start:
@@ -470,16 +356,16 @@ def estado_deudor(request, debtor_id):
     if end:
         movimientos = movimientos.filter(fecha__date__lte=end)
     return render(request, 'banco/estado_deudor.html', {
-        'debtor': debtor,
+        'account': account,
         'movimientos': movimientos,
     })
 
 
 @login_required
-def estado_deudor_pdf(request, debtor_id):
+def estado_cuenta_pdf(request, account_id):
     """Exporta el estado de cuenta en PDF."""
-    debtor = get_object_or_404(DebtorSimulado, pk=debtor_id)
-    movimientos = debtor.movimientos.order_by('fecha')
+    account = get_object_or_404(DebtorAccount, pk=account_id)
+    movimientos = account.movimientos.order_by('fecha')
     start = request.GET.get('inicio')
     end = request.GET.get('fin')
     if start:
@@ -493,7 +379,7 @@ def estado_deudor_pdf(request, debtor_id):
 
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
-    p.drawString(100, 750, f"Estado de cuenta de {debtor.nombre}")
+    p.drawString(100, 750, f"Estado de cuenta de {account.debtor.name}")
     y = 720
     for mov in movimientos:
         p.drawString(80, y, f"{mov.fecha.strftime('%Y-%m-%d %H:%M')} - {mov.tipo} - {mov.monto}")
@@ -501,85 +387,9 @@ def estado_deudor_pdf(request, debtor_id):
         if y < 50:
             p.showPage()
             y = 750
-    p.drawString(80, y-20, f"Saldo actual: {debtor.saldo}")
+    p.drawString(80, y-20, f"Saldo actual: {account.balance}")
     p.showPage()
     p.save()
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='estado.pdf')
 
-
-@login_required
-def sim_debtor_movimiento(request, pk):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    debtor = get_object_or_404(DebtorSimulado, pk=pk)
-    if request.method == 'POST':
-        form = MovimientoDebtorForm(request.POST)
-        if form.is_valid():
-            movimiento = form.save(commit=False)
-            movimiento.debtor = debtor
-            movimiento.save()
-            return redirect('sim_debtor_estado', pk=pk)
-    else:
-        form = MovimientoDebtorForm()
-    return render(request, 'banco/movimiento_form.html', {'form': form, 'debtor': debtor})
-
-
-@login_required
-def sim_debtor_estado(request, pk):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    debtor = get_object_or_404(DebtorSimulado, pk=pk)
-    movimientos = debtor.movimientos.all().order_by('-fecha')
-
-    start = request.GET.get('start')
-    end = request.GET.get('end')
-    tipo = request.GET.get('tipo')
-
-    if start:
-        movimientos = movimientos.filter(fecha__date__gte=start)
-    if end:
-        movimientos = movimientos.filter(fecha__date__lte=end)
-    if tipo in [MovimientoDeudor.DEPOSITO, MovimientoDeudor.PAGO]:
-        movimientos = movimientos.filter(tipo=tipo)
-
-    return render(request, 'banco/estado_cuenta.html', {
-        'debtor': debtor,
-        'movimientos': movimientos,
-    })
-
-
-@login_required
-def sim_debtor_estado_pdf(request, pk):
-    if not request.user.is_superuser:
-        return redirect('dashboard')
-    debtor = get_object_or_404(DebtorSimulado, pk=pk)
-    movimientos = debtor.movimientos.all().order_by('fecha')
-
-    start = request.GET.get('start')
-    end = request.GET.get('end')
-    tipo = request.GET.get('tipo')
-
-    if start:
-        movimientos = movimientos.filter(fecha__date__gte=start)
-    if end:
-        movimientos = movimientos.filter(fecha__date__lte=end)
-    if tipo in [MovimientoDeudor.DEPOSITO, MovimientoDeudor.PAGO]:
-        movimientos = movimientos.filter(tipo=tipo)
-
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename=estado_{debtor.id}.pdf'
-
-    p = canvas.Canvas(response, pagesize=letter)
-    y = 750
-    p.drawString(50, y, f"Estado de cuenta de {debtor.nombre}")
-    y -= 30
-    for m in movimientos:
-        p.drawString(50, y, f"{m.fecha.strftime('%Y-%m-%d')} - {m.get_tipo_display()} - {m.monto}")
-        y -= 20
-        if y < 50:
-            p.showPage()
-            y = 750
-    p.showPage()
-    p.save()
-    return response

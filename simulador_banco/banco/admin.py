@@ -1,7 +1,6 @@
 from django.contrib import admin
 from .models import (
     ClientID, CreditorAgent, Kid, OficialBancario, OTPChallenge,
-    DebtorSimulado, CreditorSimulado, PaymentIdentification, TransferenciaSimulada,
     Debtor, DebtorAccount,
     Creditor, CreditorAccount, Transfer,
     LogTransferencia, PostalAddress,
@@ -49,27 +48,7 @@ class OTPChallengeAdmin(admin.ModelAdmin):
     readonly_fields = ('challenge_id', 'created_at')
 
 
-@admin.register(DebtorSimulado)
-class DebtorSimuladoAdmin(admin.ModelAdmin):
-    list_display = ('nombre',)
-    search_fields = ('nombre',)
 
-
-@admin.register(CreditorSimulado)
-class CreditorSimuladoAdmin(admin.ModelAdmin):
-    list_display = ('nombre',)
-    search_fields = ('nombre',)
-
-
-@admin.register(TransferenciaSimulada)
-class TransferenciaSimuladaAdmin(admin.ModelAdmin):
-    list_display = ('payment_id', 'debtor', 'creditor', 'monto', 'oficial', 'status_display')
-    list_filter = ('oficial',)
-    search_fields = ('payment_id', 'debtor__nombre', 'creditor__nombre')
-
-    @admin.display(description='Destino / Oficial')
-    def status_display(self, obj):
-        return f"{obj.destino}" if obj.oficial else '—'
 
 
 # ——————————————————————————————————————————————

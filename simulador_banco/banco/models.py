@@ -27,69 +27,6 @@ class OTPChallenge(models.Model):
     def __str__(self):
         return f"{self.payment_id} - {self.challenge_id}"
     
-class DebtorSimulado(models.Model):
-    nombre = models.CharField(max_length=100)
-    movimientos = models.CharField(max_length=100)
-    saldo = models.DecimalField(max_digits=12, decimal_places=2)
-    
-    def __str__(self):
-        return self.nombre
-
-
-class CreditorSimulado(models.Model):
-    nombre = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nombre
-
-
-class TransferenciaSimulada(models.Model):
-    payment_id = models.CharField(max_length=100, unique=True)
-    debtor = models.ForeignKey(DebtorSimulado, on_delete=models.CASCADE)
-    creditor = models.ForeignKey(CreditorSimulado, on_delete=models.CASCADE)
-    monto = models.DecimalField(max_digits=10, decimal_places=2)
-    oficial = models.ForeignKey(
-        OficialBancario,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-    )
-    destino = models.CharField(max_length=200, blank=True)
-
-    def __str__(self):
-        return self.payment_id
-
-
-class MovimientoDeudor(models.Model):
-    """Movimientos de saldo para deudores simulados."""
-
-    DEPOSITO = 'DEPOSITO'
-    PAGO = 'PAGO'
-    TIPO_CHOICES = [
-        (DEPOSITO, 'Depósito'),
-        (PAGO, 'Pago'),
-    ]
-
-    debtor = models.ForeignKey(
-        DebtorSimulado,
-        on_delete=models.CASCADE,
-        related_name='movimientos'
-    )
-    tipo = models.CharField(max_length=10, choices=TIPO_CHOICES)
-    monto = models.DecimalField(max_digits=12, decimal_places=2)
-    fecha = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            if self.tipo == self.DEPOSITO:
-                self.debtor.saldo += self.monto
-            else:
-                self.debtor.saldo -= self.monto
-            self.debtor.save()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.debtor} {self.tipo} {self.monto}"
 
 
 # models.py
@@ -202,6 +139,7 @@ class Debtor(Party):
     class Meta(Party.Meta):
         db_table = 'sim_debtor'
 
+
 class DebtorAccount(Account):
     debtor = models.ForeignKey(
         Debtor, on_delete=models.CASCADE,
@@ -214,6 +152,39 @@ class DebtorAccount(Account):
 
     class Meta(Account.Meta):
         db_table = 'sim_debtor_account'
+
+
+class AccountMovement(models.Model):
+    """Movimientos de saldo para cuentas reales."""
+
+    DEPOSIT = 'DEPOSIT'
+    PAYMENT = 'PAYMENT'
+    TYPE_CHOICES = [
+        (DEPOSIT, 'Depósito'),
+        (PAYMENT, 'Pago'),
+    ]
+
+    account = models.ForeignKey(
+        DebtorAccount,
+        on_delete=models.CASCADE,
+        related_name='movimientos'
+    )
+    tipo = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    monto = models.DecimalField(max_digits=12, decimal_places=2)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if self.tipo == self.DEPOSIT:
+                self.account.balance += self.monto
+            else:
+                self.account.balance -= self.monto
+            self.account.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.account} {self.tipo} {self.monto}"
+
 
 class Creditor(Party):
     class Meta(Party.Meta):
