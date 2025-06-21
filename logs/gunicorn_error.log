@@ -277984,3 +277984,25 @@ Not Found: /static/images/background.png
 [2025-06-21 03:13:08 +0000] [2990149] [INFO] Worker exiting (pid: 2990149)
 [2025-06-21 05:13:08 +0200] [2993804] [INFO] Booting worker with pid: 2993804
 [2025-06-21 05:13:08 +0200] [2993805] [INFO] Booting worker with pid: 2993805
+[2025-06-21 03:13:39 +0000] [2993802] [INFO] Worker exiting (pid: 2993802)
+[2025-06-21 03:13:39 +0000] [2993804] [INFO] Worker exiting (pid: 2993804)
+[2025-06-21 05:13:39 +0200] [2990141] [INFO] Handling signal: term
+[2025-06-21 03:13:39 +0000] [2993805] [INFO] Worker exiting (pid: 2993805)
+[2025-06-21 05:13:39 +0200] [2990141] [INFO] Shutting down: Master
+[2025-06-21 05:14:31 +0200] [2994715] [INFO] Starting gunicorn 23.0.0
+[2025-06-21 05:14:31 +0200] [2994715] [INFO] Listening at: http://0.0.0.0:9181 (2994715)
+[2025-06-21 05:14:31 +0200] [2994715] [INFO] Using worker: sync
+[2025-06-21 05:14:31 +0200] [2994717] [INFO] Booting worker with pid: 2994717
+[2025-06-21 05:14:31 +0200] [2994718] [INFO] Booting worker with pid: 2994718
+[2025-06-21 05:14:32 +0200] [2994719] [INFO] Booting worker with pid: 2994719
+[2025-06-21 03:15:55 +0000] [2994718] [INFO] Worker exiting (pid: 2994718)
+[2025-06-21 03:15:55 +0000] [2994717] [INFO] Worker exiting (pid: 2994717)
+[2025-06-21 05:15:55 +0200] [2994715] [INFO] Handling signal: term
+[2025-06-21 03:15:55 +0000] [2994719] [INFO] Worker exiting (pid: 2994719)
+[2025-06-21 05:15:55 +0200] [2994715] [INFO] Shutting down: Master
+[2025-06-21 05:16:48 +0200] [2996112] [INFO] Starting gunicorn 23.0.0
+[2025-06-21 05:16:48 +0200] [2996112] [INFO] Listening at: http://0.0.0.0:9181 (2996112)
+[2025-06-21 05:16:48 +0200] [2996112] [INFO] Using worker: sync
+[2025-06-21 05:16:48 +0200] [2996118] [INFO] Booting worker with pid: 2996118
+[2025-06-21 05:16:48 +0200] [2996119] [INFO] Booting worker with pid: 2996119
+[2025-06-21 05:16:48 +0200] [2996120] [INFO] Booting worker with pid: 2996120
