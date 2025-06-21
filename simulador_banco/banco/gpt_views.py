@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from django.views import generic
+from django.views import generic, View
+from django.shortcuts import redirect, get_object_or_404
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
@@ -81,14 +82,14 @@ class ClientIDCreateView(LoginRequiredMixin, generic.CreateView):
     model = ClientID
     form_class = ClientIDForm
     template_name = 'api/GPT4/create_clientid.html'
-    success_url = reverse_lazy('dashboard')
+    success_url = reverse_lazy('list_clientidsGPT4')
 
 
 class KidCreateView(LoginRequiredMixin, generic.CreateView):
     model = Kid
     form_class = KidForm
     template_name = 'api/GPT4/create_kid.html'
-    success_url = reverse_lazy('dashboard')
+    success_url = reverse_lazy('list_kidsGPT4')
 
 
 class TransferListView(LoginRequiredMixin, generic.ListView):
@@ -118,4 +119,60 @@ class TransferUpdateView(LoginRequiredMixin, generic.UpdateView):
     slug_field = 'payment_id'
     slug_url_kwarg = 'payment_id'
     template_name = 'api/GPT4/edit_transfer.html'
-    success_url = reverse_lazy('list_transferGPT4')
+    succe
+ss_url = reverse_lazy('list_transferGPT4')
+
+
+class ClientIDListView(LoginRequiredMixin, generic.ListView):
+    model = ClientID
+    template_name = 'api/GPT4/list_clientids.html'
+    context_object_name = 'clientids'
+
+
+class ClientIDUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = ClientID
+    form_class = ClientIDForm
+    template_name = 'api/GPT4/edit_clientid.html'
+    success_url = reverse_lazy('list_clientidsGPT4')
+    pk_url_kwarg = 'codigo'
+
+
+class ClientIDDeleteView(LoginRequiredMixin, View):
+    def post(self, request, codigo):
+        obj = get_object_or_404(ClientID, pk=codigo)
+        obj.delete()
+        return redirect('list_clientidsGPT4')
+
+
+class KidListView(LoginRequiredMixin, generic.ListView):
+    model = Kid
+    template_name = 'api/GPT4/list_kids.html'
+    context_object_name = 'kids'
+
+
+class KidUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Kid
+    form_class = KidForm
+    template_name = 'api/GPT4/edit_kid.html'
+    success_url = reverse_lazy('list_kidsGPT4')
+    pk_url_kwarg = 'codigo'
+
+
+class KidDeleteView(LoginRequiredMixin, View):
+    def post(self, request, codigo):
+        obj = get_object_or_404(Kid, pk=codigo)
+        obj.delete()
+        return redirect('list_kidsGPT4')
+
+
+class DebtorUpdateView(LoginRequiredMixin, generic.UpdateView):
+    model = Debtor
+    form_class = DebtorForm
+    template_name = 'api/GPT4/edit_debtor.html'
+    success_url = reverse_lazy('list_debtorsGPT4')
+
+
+class DebtorDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = Debtor
+    template_name = 'api/GPT4/delete_debtor.html'
+    success_url = reverse_lazy('list_debtorsGPT4')

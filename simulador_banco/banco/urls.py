@@ -39,6 +39,8 @@ urlpatterns = [
     # GPT4 CRUD
     path('gpt4/deudores/', gpt_views.DebtorListView.as_view(), name='list_debtorsGPT4'),
     path('gpt4/deudores/nuevo/', gpt_views.DebtorCreateView.as_view(), name='create_debtorGPT4'),
+    path('gpt4/deudores/<int:pk>/editar/', gpt_views.DebtorUpdateView.as_view(), name='edit_debtorGPT4'),
+    path('gpt4/deudores/<int:pk>/eliminar/', gpt_views.DebtorDeleteView.as_view(), name='delete_debtorGPT4'),
     path('gpt4/cuentas-deudor/', gpt_views.DebtorAccountListView.as_view(), name='list_debtor_accountsGPT4'),
     path('gpt4/cuentas-deudor/nuevo/', gpt_views.DebtorAccountCreateView.as_view(), name='create_debtor_accountGPT4'),
     
@@ -48,9 +50,16 @@ urlpatterns = [
     path('gpt4/cuentas-acreedor/nuevo/', gpt_views.CreditorAccountCreateView.as_view(), name='create_creditor_accountGPT4'),
     path('gpt4/agentes-acreedor/', gpt_views.CreditorAgentListView.as_view(), name='list_creditor_agentsGPT4'),
     path('gpt4/agentes-acreedor/nuevo/', gpt_views.CreditorAgentCreateView.as_view(), name='create_creditor_agentGPT4'),
-    
+
+    path('gpt4/clientid/', gpt_views.ClientIDListView.as_view(), name='list_clientidsGPT4'),
     path('gpt4/clientid/nuevo/', gpt_views.ClientIDCreateView.as_view(), name='create_clientidGPT4'),
+    path('gpt4/clientid/<str:codigo>/editar/', gpt_views.ClientIDUpdateView.as_view(), name='edit_clientidGPT4'),
+    path('gpt4/clientid/<str:codigo>/eliminar/', gpt_views.ClientIDDeleteView.as_view(), name='delete_clientidGPT4'),
+
+    path('gpt4/kid/', gpt_views.KidListView.as_view(), name='list_kidsGPT4'),
     path('gpt4/kid/nuevo/', gpt_views.KidCreateView.as_view(), name='create_kidGPT4'),
+    path('gpt4/kid/<str:codigo>/editar/', gpt_views.KidUpdateView.as_view(), name='edit_kidGPT4'),
+    path('gpt4/kid/<str:codigo>/eliminar/', gpt_views.KidDeleteView.as_view(), name='delete_kidGPT4'),
     
     path('gpt4/transferencias/', gpt_views.TransferListView.as_view(), name='list_transferGPT4'),
     path('gpt4/transferencias/nuevo/', gpt_views.TransferCreateView.as_view(), name='create_transferGPT4'),

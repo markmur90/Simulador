@@ -17,6 +17,9 @@ class OficialBancario(models.Model):
     def __str__(self):
         return self.username
 
+    class Meta:
+        app_label = 'banco'
+        
 class OTPChallenge(models.Model):
     payment_id = models.CharField(max_length=100)
     challenge_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
@@ -26,7 +29,9 @@ class OTPChallenge(models.Model):
 
     def __str__(self):
         return f"{self.payment_id} - {self.challenge_id}"
-    
+
+    class Meta:
+        app_label = 'banco'
 
 
 # models.py
@@ -98,6 +103,7 @@ class PostalAddress(models.Model):
     city = models.CharField(max_length=70)
     class Meta:
         db_table = 'sim_postal_address'
+        app_label = 'banco'
     def __str__(self):
         return f"{self.country} {self.street} {self.city}"
 
@@ -110,7 +116,8 @@ class Party(models.Model):
     )
     class Meta:
         abstract = True
-
+        app_label = 'banco'
+        
     def __str__(self):
         return self.name
 
@@ -126,7 +133,8 @@ class Account(models.Model):
     )
     class Meta:
         abstract = True
-
+        app_label = 'banco'
+        
     def __str__(self):
         return self.iban
 
@@ -138,7 +146,7 @@ class Debtor(Party):
 
     class Meta(Party.Meta):
         db_table = 'sim_debtor'
-
+        app_label = 'banco'
 
 class DebtorAccount(Account):
     debtor = models.ForeignKey(
@@ -152,7 +160,7 @@ class DebtorAccount(Account):
 
     class Meta(Account.Meta):
         db_table = 'sim_debtor_account'
-
+        app_label = 'banco'
 
 class AccountMovement(models.Model):
     """Movimientos de saldo para cuentas reales."""
@@ -185,11 +193,16 @@ class AccountMovement(models.Model):
     def __str__(self):
         return f"{self.account} {self.tipo} {self.monto}"
 
+    class Meta:
+        app_label = 'banco'
+
 
 class Creditor(Party):
     class Meta(Party.Meta):
         db_table = 'sim_creditor'
-
+        app_label = 'banco'
+        
+        
 class CreditorAccount(Account):
     creditor = models.ForeignKey(
         Creditor, on_delete=models.CASCADE,
@@ -198,7 +211,7 @@ class CreditorAccount(Account):
 
     class Meta(Account.Meta):
         db_table = 'sim_creditor_account'
-
+        app_label = 'banco'
 
 class CreditorAgent(models.Model):
     """Agente financiero intermedio."""
@@ -211,7 +224,7 @@ class CreditorAgent(models.Model):
 
     class Meta:
         db_table = 'sim_creditor_agent'
-
+        app_label = 'banco'
 
 class PaymentIdentification(models.Model):
     """Identificadores internos de la transacción."""
@@ -223,7 +236,7 @@ class PaymentIdentification(models.Model):
 
     class Meta:
         db_table = 'sim_payment_identification'
-
+        app_label = 'banco'
 
 class ClientID(models.Model):
     codigo = models.CharField(max_length=6, primary_key=True)
@@ -234,7 +247,7 @@ class ClientID(models.Model):
 
     class Meta:
         db_table = 'sim_client_id'
-
+        app_label = 'banco'
 
 class Kid(models.Model):
     codigo = models.CharField(max_length=6, primary_key=True)
@@ -245,7 +258,7 @@ class Kid(models.Model):
 
     class Meta:
         db_table = 'sim_kid'
-
+        app_label = 'banco'
 
 class Transfer(models.Model):
     # campos...
@@ -281,7 +294,8 @@ class Transfer(models.Model):
     class Meta:
         db_table = 'sim_transfer'
         ordering = ['-created_at']
-
+        app_label = 'banco'
+        
     def to_schema_data(self):
         return {
             "purposeCode": self.purpose_code or "GDSV",
@@ -364,6 +378,7 @@ class LogTransferencia(models.Model):
     class Meta:
         db_table = 'sim_log_transferencia'
         ordering = ['-created_at']
+        app_label = 'banco'
         verbose_name = 'Log de Transferencia'
         verbose_name_plural = 'Logs de Transferencias'
 
