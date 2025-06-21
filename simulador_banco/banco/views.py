@@ -116,23 +116,6 @@ def logout_view(request):
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
-def user_management(request):
-    """Permite al superusuario crear y gestionar usuarios."""
-    users = User.objects.all()
-    if request.method == "POST":
-        form = UserCreateWithRoleForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            group = form.cleaned_data["role"]
-            user.groups.add(group)
-            return redirect("user_management")
-    else:
-        form = UserCreateWithRoleForm()
-    return render(request, "banco/user_management.html", {"form": form, "users": users})
-
-
-@login_required
-@user_passes_test(lambda u: u.is_superuser)
 def toggle_user_active(request, user_id):
     user = get_object_or_404(User, id=user_id)
     if user != request.user:
@@ -408,3 +391,44 @@ def sim_transfer_create(request):
     else:
         form = TransferenciaSimuladaForm()
     return render(request, 'banco/sim_transfer_form.html', {'form': form})
+
+
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.models import User, Group
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .forms import UserCreateWithRoleForm
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def user_management(request):
+    users = User.objects.all()
+    all_groups = Group.objects.all().order_by('name')
+    if request.method == "POST":
+        form = UserCreateWithRoleForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            group = form.cleaned_data["role"]
+            user.groups.add(group)
+            return redirect("user_management")
+    else:
+        form = UserCreateWithRoleForm()
+    return render(request, "banco/user_management.html", {
+        "form": form,
+        "users": users,
+        "all_groups": all_groups,
+    })
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def update_user_role(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    if request.method == "POST":
+        group_id = request.POST.get("group")
+        user.groups.clear()
+        if group_id:
+            group = get_object_or_404(Group, pk=group_id)
+            user.groups.add(group)
+        messages.success(request, f"El rol de «{user.username}» se actualizó correctamente.")
+    return redirect("user_management")
+

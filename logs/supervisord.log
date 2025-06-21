@@ -14248,3 +14248,30 @@
 2025-06-21 04:11:50,273 INFO spawned: 'tor' with pid 2959423
 2025-06-21 04:11:51,319 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2025-06-21 04:11:51,319 INFO success: tor entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-21 04:55:37,805 INFO waiting for gunicorn, tor to die
+2025-06-21 04:55:37,878 INFO stopped: tor (exit status 0)
+2025-06-21 04:55:38,776 INFO stopped: gunicorn (exit status 0)
+2025-06-21 04:56:55,762 INFO RPC interface 'supervisor' initialized
+2025-06-21 04:56:55,762 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2025-06-21 04:56:55,764 INFO RPC interface 'supervisor' initialized
+2025-06-21 04:56:55,764 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2025-06-21 04:56:55,766 INFO daemonizing the supervisord process
+2025-06-21 04:56:55,767 INFO supervisord started with pid 2983833
+2025-06-21 04:56:56,771 INFO spawned: 'gunicorn' with pid 2983843
+2025-06-21 04:56:56,774 INFO spawned: 'tor' with pid 2983844
+2025-06-21 04:56:57,842 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-21 04:56:57,842 INFO success: tor entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-21 05:05:28,071 WARN received SIGTERM indicating exit request
+2025-06-21 05:05:28,073 INFO waiting for gunicorn, tor to die
+2025-06-21 05:05:28,202 INFO stopped: tor (exit status 0)
+2025-06-21 05:05:28,757 INFO stopped: gunicorn (exit status 0)
+2025-06-21 05:06:18,589 INFO RPC interface 'supervisor' initialized
+2025-06-21 05:06:18,589 CRIT Server 'inet_http_server' running without any HTTP authentication checking
+2025-06-21 05:06:18,591 INFO RPC interface 'supervisor' initialized
+2025-06-21 05:06:18,591 CRIT Server 'unix_http_server' running without any HTTP authentication checking
+2025-06-21 05:06:18,594 INFO daemonizing the supervisord process
+2025-06-21 05:06:18,595 INFO supervisord started with pid 2990131
+2025-06-21 05:06:19,599 INFO spawned: 'gunicorn' with pid 2990141
+2025-06-21 05:06:19,602 INFO spawned: 'tor' with pid 2990142
+2025-06-21 05:06:21,512 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-21 05:06:21,512 INFO success: tor entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
