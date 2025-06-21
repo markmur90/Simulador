@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (
     ClientID, CreditorAgent, Kid, OficialBancario, OTPChallenge,
     Debtor, DebtorAccount,
-    Creditor, CreditorAccount, Transfer,
+    Creditor, CreditorAccount, PaymentIdentification, Transfer,
     LogTransferencia, PostalAddress,
 )
 

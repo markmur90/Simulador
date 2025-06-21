@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'simulador_banco.banco.apps.BancoConfig',
+    'banco.apps.BancoConfig',
     'django_bootstrap5',
 ]
 
@@ -70,7 +70,7 @@ MIDDLEWARE = [
 
 ]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-ROOT_URLCONF = 'simulador_banco.simulador_banco.urls'
+ROOT_URLCONF = 'simulador_banco.urls'
 
 TEMPLATES = [
     {

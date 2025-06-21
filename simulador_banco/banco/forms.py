@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount,
-    Kid, MovimientoDeudor, PaymentIdentification, Transfer, PostalAddress, AccountMovement
+    Kid, PaymentIdentification, Transfer, PostalAddress, AccountMovement
 )
 
 class BootstrapModelForm(forms.ModelForm):
@@ -134,19 +134,7 @@ class TransferForm(BootstrapModelForm):
         exclude = ['created_at', 'updated_at', 'auth_id']
 
 
-class DebtorSimuladoForm(BootstrapModelForm):
-    class Meta:
-        model = DebtorSimulado
-        fields = ['nombre', 'saldo']
-
-
 class AccountMovementForm(BootstrapModelForm):
-    class Meta:
-        model = MovimientoDeudor
-        fields = ['tipo', 'monto']
-
-
-class CreditorSimuladoForm(BootstrapModelForm):
     class Meta:
         model = AccountMovement
         fields = ['tipo', 'monto']
