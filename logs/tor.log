@@ -815,3 +815,6 @@ Jun 21 21:22:03.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough di
 Jun 21 21:22:03.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
 Jun 21 21:22:03.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
 Jun 21 21:22:03.000 [notice] Bootstrapped 100% (done): Done
+Jun 21 22:10:20.000 [notice] Received reload signal (hup). Reloading config and resetting internal state.
+Jun 21 22:10:21.000 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 21 22:10:22.000 [notice] Catching signal TERM, exiting cleanly.

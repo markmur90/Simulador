@@ -14453,3 +14453,13 @@
 2025-06-21 21:21:57,156 INFO spawned: 'tor' with pid 180479
 2025-06-21 21:21:58,262 INFO success: gunicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
 2025-06-21 21:21:58,262 INFO success: tor entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2025-06-21 22:10:21,044 WARN received SIGHUP indicating restart request
+2025-06-21 22:10:21,099 INFO waiting for gunicorn, tor to die
+2025-06-21 22:10:21,099 WARN received SIGTERM indicating exit request
+2025-06-21 22:10:24,138 INFO stopped: tor (exit status 0)
+2025-06-21 22:10:24,138 INFO waiting for gunicorn to die
+2025-06-21 22:10:27,142 INFO waiting for gunicorn to die
+2025-06-21 22:10:30,146 INFO waiting for gunicorn to die
+2025-06-21 22:10:33,150 INFO waiting for gunicorn to die
+2025-06-21 22:10:34,158 WARN killing 'gunicorn' (180478) with SIGKILL
+2025-06-21 22:10:35,260 WARN stopped: gunicorn (terminated by SIGKILL)

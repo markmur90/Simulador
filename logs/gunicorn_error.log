@@ -289390,3 +289390,152 @@ gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
 [2025-06-21 21:21:57 +0200] [180480] [INFO] Booting worker with pid: 180480
 [2025-06-21 21:21:57 +0200] [180481] [INFO] Booting worker with pid: 180481
 [2025-06-21 21:21:57 +0200] [180482] [INFO] Booting worker with pid: 180482
+[2025-06-21 22:10:20 +0200] [180478] [INFO] Handling signal: hup
+--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/logging/__init__.py", line 1154, in emit
+    self.flush()
+    ~~~~~~~~~~^^
+  File "/usr/lib/python3.13/logging/__init__.py", line 1136, in flush
+    self.stream.flush()
+    ~~~~~~~~~~~~~~~~~^^
+RuntimeError: reentrant call inside <_io.BufferedWriter name='/home/markmur88/Simulador/logs/gunicorn_error.log'>
+Call stack:
+  File "/home/markmur88/envAPP/bin/gunicorn", line 8, in <module>
+    sys.exit(run())
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 66, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/base.py", line 235, in run
+    super().run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/base.py", line 71, in run
+    Arbiter(self).run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 222, in run
+    self.log.info("Handling signal: %s", signame)
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/glogging.py", line 277, in info
+    self.error_log.info(msg, *args, **kwargs)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1519, in info
+    self._log(INFO, msg, args, **kwargs)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1664, in _log
+    self.handle(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1680, in handle
+    self.callHandlers(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1736, in callHandlers
+    hdlr.handle(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1026, in handle
+    self.emit(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1264, in emit
+    StreamHandler.emit(self, record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1154, in emit
+    self.flush()
+  File "/usr/lib/python3.13/logging/__init__.py", line 1136, in flush
+    self.stream.flush()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+    self.reap_workers()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 553, in reap_workers
+    self.log.error(msg)
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/glogging.py", line 271, in error
+    self.error_log.error(msg, *args, **kwargs)
+Message: 'Worker (pid:180480) was sent SIGHUP!'
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/logging/__init__.py", line 1154, in emit
+    self.flush()
+    ~~~~~~~~~~^^
+  File "/usr/lib/python3.13/logging/__init__.py", line 1136, in flush
+    self.stream.flush()
+    ~~~~~~~~~~~~~~~~~^^
+RuntimeError: reentrant call inside <_io.BufferedWriter name='/home/markmur88/Simulador/logs/gunicorn_error.log'>
+Call stack:
+  File "/home/markmur88/envAPP/bin/gunicorn", line 8, in <module>
+    sys.exit(run())
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 66, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/base.py", line 235, in run
+    super().run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/base.py", line 71, in run
+    Arbiter(self).run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 222, in run
+    self.log.info("Handling signal: %s", signame)
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/glogging.py", line 277, in info
+    self.error_log.info(msg, *args, **kwargs)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1519, in info
+    self._log(INFO, msg, args, **kwargs)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1664, in _log
+    self.handle(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1680, in handle
+    self.callHandlers(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1736, in callHandlers
+    hdlr.handle(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1026, in handle
+    self.emit(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1264, in emit
+    StreamHandler.emit(self, record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1154, in emit
+    self.flush()
+  File "/usr/lib/python3.13/logging/__init__.py", line 1136, in flush
+    self.stream.flush()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+    self.reap_workers()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 553, in reap_workers
+    self.log.error(msg)
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/glogging.py", line 271, in error
+    self.error_log.error(msg, *args, **kwargs)
+Message: 'Worker (pid:180481) was sent SIGHUP!'
+Arguments: ()
+--- Logging error ---
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/logging/__init__.py", line 1154, in emit
+    self.flush()
+    ~~~~~~~~~~^^
+  File "/usr/lib/python3.13/logging/__init__.py", line 1136, in flush
+    self.stream.flush()
+    ~~~~~~~~~~~~~~~~~^^
+RuntimeError: reentrant call inside <_io.BufferedWriter name='/home/markmur88/Simulador/logs/gunicorn_error.log'>
+Call stack:
+  File "/home/markmur88/envAPP/bin/gunicorn", line 8, in <module>
+    sys.exit(run())
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 66, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/base.py", line 235, in run
+    super().run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/app/base.py", line 71, in run
+    Arbiter(self).run()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 222, in run
+    self.log.info("Handling signal: %s", signame)
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/glogging.py", line 277, in info
+    self.error_log.info(msg, *args, **kwargs)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1519, in info
+    self._log(INFO, msg, args, **kwargs)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1664, in _log
+    self.handle(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1680, in handle
+    self.callHandlers(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1736, in callHandlers
+    hdlr.handle(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1026, in handle
+    self.emit(record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1264, in emit
+    StreamHandler.emit(self, record)
+  File "/usr/lib/python3.13/logging/__init__.py", line 1154, in emit
+    self.flush()
+  File "/usr/lib/python3.13/logging/__init__.py", line 1136, in flush
+    self.stream.flush()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+    self.reap_workers()
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/arbiter.py", line 553, in reap_workers
+    self.log.error(msg)
+  File "/home/markmur88/envAPP/lib/python3.13/site-packages/gunicorn/glogging.py", line 271, in error
+    self.error_log.error(msg, *args, **kwargs)
+Message: 'Worker (pid:180482) was sent SIGHUP!'
+Arguments: ()
+[2025-06-21 22:10:22 +0200] [180478] [INFO] Hang up: Master
+[2025-06-21 22:10:22 +0200] [212858] [INFO] Booting worker with pid: 212858
+[2025-06-21 22:10:22 +0200] [180478] [INFO] Handling signal: term
+[2025-06-21 22:10:22 +0200] [212859] [INFO] Booting worker with pid: 212859
+[2025-06-21 22:10:22 +0200] [212860] [INFO] Booting worker with pid: 212860
+[2025-06-21 20:10:41 +0000] [212858] [INFO] Worker exiting (pid: 212858)
+[2025-06-21 20:10:41 +0000] [212860] [INFO] Parent changed, shutting down: <Worker 212860>
+[2025-06-21 20:10:41 +0000] [212860] [INFO] Worker exiting (pid: 212860)
+[2025-06-21 20:10:41 +0000] [212859] [INFO] Parent changed, shutting down: <Worker 212859>
+[2025-06-21 20:10:41 +0000] [212859] [INFO] Worker exiting (pid: 212859)
