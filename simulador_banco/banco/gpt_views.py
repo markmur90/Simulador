@@ -9,7 +9,8 @@ from .models import (
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,
-    CreditorAgentForm, ClientIDForm, KidForm, TransferForm
+    CreditorAgentForm, ClientIDForm, KidForm, TransferForm,
+    DebtorUpdateForm
 )
 
 
@@ -166,7 +167,7 @@ class KidDeleteView(LoginRequiredMixin, View):
 
 class DebtorUpdateView(LoginRequiredMixin, generic.UpdateView):
     model = Debtor
-    form_class = DebtorForm
+    form_class = DebtorUpdateForm
     template_name = 'api/GPT4/edit_debtor.html'
     success_url = reverse_lazy('list_debtorsGPT4')
 

@@ -24,13 +24,14 @@ class DebtorForm(BootstrapModelForm):
     postal_address_country = forms.CharField(max_length=2)
     postal_address_street = forms.CharField(max_length=70)
     postal_address_city = forms.CharField(max_length=70)
-
+    balance = forms.DecimalField(max_digits=18, decimal_places=2, required=False)
+    
     class Meta:
         model = Debtor
         fields = [
             'name', 'mobile_phone_number', 'customer_id',
             'postal_address_country', 'postal_address_street',
-            'postal_address_city'
+            'postal_address_city', 'balance'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -40,7 +41,11 @@ class DebtorForm(BootstrapModelForm):
             self.fields['postal_address_country'].initial = addr.country
             self.fields['postal_address_street'].initial = addr.street
             self.fields['postal_address_city'].initial = addr.city
-
+        if self.instance.pk:
+            account = self.instance.accounts.first()
+            if account:
+                self.fields['balance'].initial = account.balance
+                
     def save(self, commit=True):
         debtor = super().save(commit=False)
         addr_data = {
@@ -56,6 +61,11 @@ class DebtorForm(BootstrapModelForm):
             else:
                 debtor.address = PostalAddress.objects.create(**addr_data)
             debtor.save()
+            account_balance = self.cleaned_data.get('balance')
+            account = debtor.accounts.first()
+            if account and account_balance is not None:
+                account.balance = account_balance
+                account.save()
         return debtor
 
 
@@ -64,6 +74,32 @@ class DebtorAccountForm(BootstrapModelForm):
         model = DebtorAccount
         fields = ['debtor', 'iban', 'balance', 'currency']
 
+
+class DebtorUpdateForm(DebtorForm):
+    """Extiende DebtorForm para permitir actualizar el saldo de la cuenta."""
+    account_balance = forms.DecimalField(
+        max_digits=18,
+        decimal_places=2,
+        required=False,
+        label='Saldo'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            account = self.instance.accounts.first()
+            if account:
+                self.fields['account_balance'].initial = account.balance
+
+    def save(self, commit=True):
+        debtor = super().save(commit=commit)
+        if self.instance.pk:
+            account = self.instance.accounts.first()
+            if account and 'account_balance' in self.cleaned_data:
+                account.balance = self.cleaned_data['account_balance'] or account.balance
+                if commit:
+                    account.save()
+        return debtor
 
 class CreditorForm(BootstrapModelForm):
     postal_address_country = forms.CharField(max_length=2)
