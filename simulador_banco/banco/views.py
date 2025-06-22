@@ -135,6 +135,15 @@ def generar_token(request):
 
 
 
+def oauth2_authorize(request):
+    """Endpoint de autorización simulado."""
+    if request.method != 'GET':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    return JsonResponse({'result': 'authorized'})
+
+
+
+
 # banco/views.py
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
@@ -207,6 +216,7 @@ def api_send_transfer(request):
 
     challenge.status = 'USED'
     challenge.save()
+    return JsonResponse({'status': 'processed'})
 
 
 def api_status_transfer(request):

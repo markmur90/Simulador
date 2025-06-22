@@ -16,6 +16,12 @@ urlpatterns = [
     path('usuarios/<int:user_id>/toggle/', views.toggle_user_active, name='toggle_user'),
     path('usuarios/<int:user_id>/update_role/', views.update_user_role, name='update_user_role'),    
     path('api/token', views.generar_token),
+    # Rutas externas equivalentes
+    path('oidc/token', views.generar_token),
+    path('oidc/authorize', views.oauth2_authorize, name='oauth2_authorize'),
+    path('auth/challenges', views.api_challenge),
+    path('otp/single', views.api_send_transfer),
+    path('payments', views.api_transfer_incoming),
     
     path('api/login/', login_api_simulador),
     path('api/challenge', views.api_challenge),

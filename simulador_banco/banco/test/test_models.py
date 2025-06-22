@@ -6,7 +6,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'simulador_banco.simulador_banco
 os.environ.setdefault('FIELD_ENCRYPTION_KEY', 'DbQG9CWLvBRa8Iu9pv9fJDVURCdKYQQErlZ9oCYGsY8=')
 django.setup()
 
-from simulador_banco.banco.models import Debtor, DebtorAccount, PostalAddress, AccountMovement
+from banco.models import Debtor, DebtorAccount, PostalAddress, AccountMovement
 
 @pytest.mark.django_db
 def test_account_movement_updates_balance():

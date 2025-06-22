@@ -48,6 +48,19 @@ OPENAI_API_KEY=<clave de OpenAI>
 TOTP_SECRET=<secreto base32 para OTP>
 ```
 
+Para conectarse a la API externa defina también la URL base y las rutas
+relativas utilizadas por el simulador:
+
+```
+BASE_URL=https://example.com
+TOKEN_PATH=/oidc/token
+AUTHORIZE_PATH=/oidc/authorize
+OTP_PATH=/otp/single
+AUTH_PATH=/auth/challenges
+API_PATH=/payments
+```
+
+
 ### ———————— OPENAI_API_KEY ————————
 
 #### 1. Ve a tu cuenta de OpenAI: https://platform.openai.com/account/api-keys  

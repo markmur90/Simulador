@@ -29,18 +29,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Clave para cifrado de campos sensibles (Fernet, AES-256+HMAC).
 # Generar con:
 #   from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())
-FIELD_ENCRYPTION_KEY = get_env('FIELD_ENCRYPTION_KEY', required=True)
+FIELD_ENCRYPTION_KEY = get_env('FIELD_ENCRYPTION_KEY', '_YRq3KaYgVk6Y4nMCEotU6gS4N3t4P6-vC0tAlwNa6c=')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_env('SECRET_KEY', required=True)
+SECRET_KEY = get_env('SECRET_KEY', 'secret')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = ['localhost','127.0.0.1','0.0.0.0','80.78.30.242']
+
+# URLs de la API externa
+BASE_URL = get_env('BASE_URL', 'https://example.com')
+TOKEN_PATH = get_env('TOKEN_PATH', '/oidc/token')
+AUTHORIZE_PATH = get_env('AUTHORIZE_PATH', '/oidc/authorize')
+OTP_PATH = get_env('OTP_PATH', '/otp/single')
+AUTH_PATH = get_env('AUTH_PATH', '/auth/challenges')
+API_PATH = get_env('API_PATH', '/payments')
+
+TOKEN_URL = BASE_URL + TOKEN_PATH
+AUTHORIZE_URL = BASE_URL + AUTHORIZE_PATH
+OTP_URL = BASE_URL + OTP_PATH
+AUTH_URL = BASE_URL + AUTH_PATH
+API_URL = BASE_URL + API_PATH
 
 
 # Application definition
@@ -175,4 +189,4 @@ TELEGRAM_CHAT_ID="769077177"
 OPENAI_API_KEY=""
 TOTP_SECRET=""
 
-SIMULATOR_NOTIFY_URL="http://localhost/notify"
+SIMULATOR_NOTIFY_URL = get_env('SIMULATOR_NOTIFY_URL', 'http://localhost/notify')
