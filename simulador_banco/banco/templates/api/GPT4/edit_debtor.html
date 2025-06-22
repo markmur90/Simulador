@@ -17,6 +17,7 @@
     <div class="card custom-card mb-4">
       <div class="custom-card-header">Información del Deudor</div>
       <div class="card-body custom-card-body">
+        
         <div class="row g-3">
           <div class="col-md-4">
             <label for="id_name" class="form-label">Nombre</label>
@@ -31,26 +32,26 @@
             {{ form.customer_id }}
           </div>
         </div>
+
         <div class="row g-3 mt-3">
           <div class="col-md-2">
             <label for="id_postal_address_country" class="form-label">País</label>
             {{ form.postal_address_country }}
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label for="id_postal_address_street" class="form-label">Calle</label>
             {{ form.postal_address_street }}
           </div>
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label for="id_postal_address_city" class="form-label">Ciudad</label>
             {{ form.postal_address_city }}
           </div>
-        </div>
-        <div class="row g-3 mt-3">
           <div class="col-md-3">
             <label for="id_account_balance" class="form-label">Saldo</label>
             {{ form.account_balance }}
           </div>
         </div>
+
       </div>
     </div>
 
