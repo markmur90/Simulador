@@ -1,6 +1,8 @@
+from datetime import datetime
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User, Group
+import pytz
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount,
     Kid, PaymentIdentification, Transfer, PostalAddress, AccountMovement
@@ -132,7 +134,27 @@ class TransferForm(BootstrapModelForm):
     class Meta:
         model = Transfer
         exclude = ['created_at', 'updated_at', 'auth_id']
-
+        widgets = {
+            'debtor': forms.Select(attrs={'class': 'form-control'}),
+            'debtor_account': forms.Select(attrs={'class': 'form-control'}),
+            'creditor': forms.Select(attrs={'class': 'form-control'}),
+            'creditor_account': forms.Select(attrs={'class': 'form-control'}),
+            'creditor_agent': forms.Select(attrs={'class': 'form-control'}),
+            'instructed_amount': forms.NumberInput(attrs={'class': 'form-control'}),
+            'currency': forms.TextInput(attrs={'class': 'form-control'}),
+            'purpose_code': forms.TextInput(attrs={'class': 'form-control'}),
+            'requested_execution_date': forms.DateInput(attrs={
+                'type': 'date',
+                'class': 'form-control',
+                'value': datetime.now(pytz.timezone('Europe/Berlin')).strftime('%Y-%m-%d')
+            }),
+            'remittance_information_unstructured': forms.TextInput(attrs={
+                'maxlength': 60,
+                'class': 'form-control',
+                'rows': 1,
+                'placeholder': 'Ingrese información no estructurada (máx. 60 caracteres)'
+            }),
+        }
 
 class AccountMovementForm(BootstrapModelForm):
     class Meta:
