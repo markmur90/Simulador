@@ -41,6 +41,7 @@ pytest-django==4.11.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
 python-telegram-bot==22.1
+pytz
 qrcode==8.2
 requests==2.32.4
 six==1.17.0
