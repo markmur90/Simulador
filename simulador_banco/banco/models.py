@@ -50,7 +50,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.core.validators import RegexValidator, MinValueValidator
 from django.utils import timezone
 from django.conf import settings
-from cryptography.fernet import Fernet
+from cryptography.fernet import Fernet, InvalidToken
 from django.utils.encoding import force_bytes, force_str
 import uuid
 from decimal import Decimal
@@ -63,19 +63,29 @@ class EncryptedCharField(models.Field):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('max_length', 255)
         super().__init__(*args, **kwargs)
-        key = getattr(settings, 'FIELD_ENCRYPTION_KEY', None)
-        if not key:
-            raise RuntimeError("Define FIELD_ENCRYPTION_KEY en settings.py")
-        self.fernet = Fernet(key)
+        keys = getattr(settings, 'FIELD_ENCRYPTION_KEYS', None)
+        if not keys:
+            key = getattr(settings, 'FIELD_ENCRYPTION_KEY', None)
+            if not key:
+                raise RuntimeError("Define FIELD_ENCRYPTION_KEY en settings.py")
+            keys = [key]
+        self.fernets = [Fernet(k) for k in keys]
     def get_prep_value(self, value):
         if value is None:
             return None
-        token = self.fernet.encrypt(force_bytes(value))
+        token = self.fernets[0].encrypt(force_bytes(value))
         return token.decode()
     def from_db_value(self, value, expression, connection):
         if value is None:
             return None
-        return force_str(self.fernet.decrypt(force_bytes(value)))
+        last_error = None
+        for f in self.fernets:
+            try:
+                return force_str(f.decrypt(force_bytes(value)))
+            except InvalidToken as e:
+                last_error = e
+                continue
+        raise last_error
     def db_type(self, connection):
         return 'text'
 

@@ -30,12 +30,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Generar con:
 #   from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())
 FIELD_ENCRYPTION_KEY = '_YRq3KaYgVk6Y4nMCEotU6gS4N3t4P6-vC0tAlwNa6c='
+# Optional comma-separated list of previous keys for decrypting
+FIELD_ENCRYPTION_FALLBACK_KEYS = os.environ.get('FIELD_ENCRYPTION_FALLBACK_KEYS', '')
+FIELD_ENCRYPTION_KEYS = [FIELD_ENCRYPTION_KEY] + [k for k in FIELD_ENCRYPTION_FALLBACK_KEYS.split(',') if k]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'L3hesOa21ZGRsk0TsVvKMI6kWuv8d-ZAGIfP87i4Hv0'
+SECRET_KEY = get_env('SECRET_KEY', 'L3hesOa21ZGRsk0TsVvKMI6kWuv8d-ZAGIfP87i4Hv0')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -174,13 +177,15 @@ LOGGING = {
     },
 }
 
-JWT_SECRET_KEY="Ptf8454Jd55"
+JWT_SECRET_KEY = get_env('JWT_SECRET_KEY', 'Ptf8454Jd55')
 
 
-TELEGRAM_BOT_TOKEN="7881009139:AAH1mokuP0AjmCbd_tN3VJIxVkG7Fq95j5o"
-TELEGRAM_CHAT_ID="769077177"
+TELEGRAM_BOT_TOKEN = get_env('TELEGRAM_BOT_TOKEN', '7881009139:AAH1mokuP0AjmCbd_tN3VJIxVkG7Fq95j5o')
+TELEGRAM_CHAT_ID = get_env('TELEGRAM_CHAT_ID', '769077177')
 
-OPENAI_API_KEY=""
-TOTP_SECRET=""
+
+OPENAI_API_KEY = get_env('OPENAI_API_KEY', '')
+TOTP_SECRET = get_env('TOTP_SECRET', '')
+
 
 SIMULATOR_NOTIFY_URL = 'http://localhost/notify'
