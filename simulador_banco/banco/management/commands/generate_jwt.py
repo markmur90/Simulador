@@ -22,6 +22,6 @@ class Command(BaseCommand):
             'iat': datetime.utcnow(),
             'exp': datetime.utcnow() + timedelta(hours=1)
         }
-        secret = getattr(settings, 'JWT_SECRET_KEY', settings.SECRET_KEY)
+        secret = getattr(settings, 'JWT_SECRET_KEY', settings.JWT_SECRET_KEY)
         token = jwt.encode(payload, secret, algorithm='HS256')
         self.stdout.write(token)

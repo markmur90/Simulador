@@ -115,8 +115,8 @@ def generar_token(request):
         return JsonResponse({'error': 'Método no permitido'}, status=405)
     
     data = json.loads(request.body.decode())
-    username = data.get('usuario')
-    password = data.get('clave')
+    username = data.get('username')
+    password = data.get('password')
 
     try:
         oficial = OficialBancario.objects.get(username=username)

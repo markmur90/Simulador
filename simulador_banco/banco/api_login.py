@@ -13,7 +13,7 @@ def emitir_jwt_simulador(user):
         "iat": datetime.datetime.utcnow(),
         "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=1)
     }
-    return jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm='HS256')
 
 @csrf_exempt
 def login_api_simulador(request):

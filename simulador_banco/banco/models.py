@@ -131,6 +131,7 @@ class Account(models.Model):
         max_length=3, default='EUR',
         validators=[currency_validator]
     )
+    
     class Meta:
         abstract = True
         app_label = 'banco'
