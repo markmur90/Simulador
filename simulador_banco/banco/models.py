@@ -24,6 +24,7 @@ class OTPChallenge(models.Model):
     payment_id = models.CharField(max_length=100)
     challenge_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     otp = models.CharField(max_length=6)
+    transfer_data = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=20, default="CREATED")
     created_at = models.DateTimeField(default=timezone.now)
 

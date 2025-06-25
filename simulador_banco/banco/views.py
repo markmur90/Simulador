@@ -27,6 +27,10 @@ from django.core.exceptions import ValidationError
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 
+# Registros simples en memoria para OAuth y transferencias pendientes
+OAUTH_APPROVED = {}
+PENDING_TRANSFERS = {}
+
 @csrf_exempt
 def recibir_transferencia(request):
     return JsonResponse({"error": "Funcionalidad deshabilitada"}, status=501)
@@ -136,10 +140,20 @@ def generar_token(request):
 
 
 def oauth2_authorize(request):
-    """Endpoint de autorización simulado."""
+    """Endpoint de autorización simulado.
+
+    Marca un ``payment_id`` como autorizado para posteriores
+    operaciones protegidas por OAuth.
+    """
     if request.method != 'GET':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
-    return JsonResponse({'result': 'authorized'})
+
+    payment_id = request.GET.get('payment_id')
+    if not payment_id:
+        return JsonResponse({'error': 'payment_id requerido'}, status=400)
+
+    OAUTH_APPROVED[payment_id] = True
+    return JsonResponse({'result': 'authorized', 'payment_id': payment_id})
 
 
 
@@ -186,6 +200,9 @@ def api_challenge(request):
     if not payment_id:
         return JsonResponse({'error': 'payment_id requerido'}, status=400)
 
+    if not OAUTH_APPROVED.get(payment_id):
+        return JsonResponse({'error': 'OAuth no aprobado'}, status=403)
+
     otp = get_random_string(6, allowed_chars='0123456789')
     challenge = OTPChallenge.objects.create(payment_id=payment_id, otp=otp)
     return JsonResponse({'challenge_id': str(challenge.challenge_id), 'otp': otp})
@@ -214,10 +231,14 @@ def api_send_transfer(request):
     except OTPChallenge.DoesNotExist:
         return JsonResponse({'error': 'OTP inválido'}, status=400)
 
+    try:
+        transfer = TransferService.ingest_transfer(challenge.transfer_data or {})
+    except ValidationError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
     challenge.status = 'USED'
     challenge.save()
-    return JsonResponse({'status': 'processed'})
-
+    return JsonResponse({'payment_id': transfer.payment_id, 'status': transfer.status})
 
 def api_status_transfer(request):
     payment_id = request.GET.get('payment_id')
@@ -229,9 +250,10 @@ def api_status_transfer(request):
 def transfer_simulator_frontend(request):
     return render(request, 'banco/transfer_simulator_frontend.html')
 
+
 @csrf_exempt
 def api_transfer_incoming(request):
-    """Recibe transferencias de sistemas externos"""
+    """Recibe transferencias de sistemas externos con verificación OTP."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
@@ -243,6 +265,33 @@ def api_transfer_incoming(request):
         data = json.loads(request.body.decode())
     except json.JSONDecodeError:
         return JsonResponse({'error': 'JSON inválido'}, status=400)
+
+    payment_id = data.get('payment_id')
+    otp = data.get('otp')
+    totp_code = data.get('totp')
+
+    if not otp:
+        if not payment_id:
+            return JsonResponse({'error': 'payment_id requerido'}, status=400)
+        otp_val = get_random_string(6, allowed_chars='0123456789')
+        challenge = OTPChallenge.objects.create(payment_id=payment_id, otp=otp_val)
+        return JsonResponse({
+            'challenge_id': str(challenge.challenge_id),
+            'otp_required': True,
+            'otp': otp_val
+        }, status=202)
+
+    from .totp_utils import verify_totp
+    if not verify_totp(str(totp_code)):
+        return JsonResponse({'error': 'TOTP inválido'}, status=400)
+
+    try:
+        challenge = OTPChallenge.objects.get(payment_id=payment_id, otp=otp, status='CREATED')
+    except OTPChallenge.DoesNotExist:
+        return JsonResponse({'error': 'OTP inválido'}, status=400)
+
+    challenge.status = 'USED'
+    challenge.save()
 
     try:
         transfer = TransferService.ingest_transfer(data)
