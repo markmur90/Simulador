@@ -125,7 +125,7 @@ class TransferUpdateView(LoginRequiredMixin, generic.UpdateView):
 
 class ClientIDListView(LoginRequiredMixin, generic.ListView):
     model = ClientID
-    template_name = 'api/GPT4/list_clientids.html'
+    template_name = 'api/GPT4/list_clientid.html'
     context_object_name = 'clientids'
 
 
