@@ -24,3 +24,33 @@ Jun 26 10:01:56.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough di
 Jun 26 10:01:56.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
 Jun 26 10:01:56.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
 Jun 26 10:01:57.000 [notice] Bootstrapped 100% (done): Done
+Jun 26 10:17:22.000 [notice] Catching signal TERM, exiting cleanly.
+Jun 26 10:24:40.004 [notice] Tor 0.4.8.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.5.0, Zlib 1.3.1, Liblzma 5.8.1, Libzstd 1.5.7 and Glibc 2.41 as libc.
+Jun 26 10:24:40.005 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jun 26 10:24:40.005 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 26 10:24:40.009 [notice] Opening Socks listener on 127.0.0.1:9053
+Jun 26 10:24:40.009 [notice] Opened Socks listener connection (ready) on 127.0.0.1:9053
+Jun 26 10:24:40.009 [notice] Opening Control listener on 127.0.0.1:9054
+Jun 26 10:24:40.009 [notice] Opened Control listener connection (ready) on 127.0.0.1:9054
+Jun 26 10:24:40.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
+Jun 26 10:24:40.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
+Jun 26 10:24:40.000 [notice] Bootstrapped 0% (starting): Starting
+Jun 26 10:24:42.000 [notice] Starting with guard context "default"
+Jun 26 10:24:42.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
+Jun 26 10:24:42.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
+Jun 26 10:24:43.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
+Jun 26 10:24:43.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
+Jun 26 10:24:43.000 [notice] Bootstrapped 45% (requesting_descriptors): Asking for relay descriptors
+Jun 26 10:24:44.000 [notice] Bootstrapped 55% (loading_descriptors): Loading relay descriptors
+Jun 26 10:24:46.000 [notice] Bootstrapped 60% (loading_descriptors): Loading relay descriptors
+Jun 26 10:24:47.000 [notice] Bootstrapped 68% (loading_descriptors): Loading relay descriptors
+Jun 26 10:24:49.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
+Jun 26 10:24:49.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Jun 26 10:24:49.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Jun 26 10:24:50.000 [notice] Bootstrapped 100% (done): Done
+Jun 26 19:16:35.000 [notice] Your system clock just jumped 20142 seconds forward; assuming established circuits no longer work.
+Jun 26 19:17:35.000 [notice] No circuits are opened. Relaxed timeout for circuit 92 (a Hidden service: Pre-built vanguard circuit 3-hop circuit in state doing handshakes with channel state open) to 60000ms. However, it appears the circuit has timed out anyway.
+Jun 26 19:17:36.000 [notice] Tor has not observed any network activity for the past 20205 seconds. Disabling circuit build timeout recording.
+Jun 26 19:21:54.000 [notice] Received reload signal (hup). Reloading config and resetting internal state.
+Jun 26 19:21:54.000 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jun 26 19:21:54.000 [notice] Catching signal TERM, exiting cleanly.
