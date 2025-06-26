@@ -7,9 +7,7 @@ from django.conf import settings
 def get_totp_secret() -> str:
     """Return the TOTP secret stored in env or create one."""
     secret = getattr(settings, "TOTP_SECRET", None)
-
     if not secret:
-        secret = pyotp.random_base32()
         settings["TOTP_SECRET"] = secret
     return secret
 
