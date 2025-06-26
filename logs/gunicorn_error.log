@@ -1685,3 +1685,32 @@
 [2025-06-26 10:16:44 +0200] [229683] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
 [2025-06-26 10:16:45 +0200] [229683] [ERROR] Connection in use: ('0.0.0.0', 9181)
 [2025-06-26 10:16:45 +0200] [229683] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:46 +0200] [229683] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:46 +0200] [229683] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:47 +0200] [229683] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:47 +0200] [229683] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:48 +0200] [229683] [ERROR] Can't connect to ('0.0.0.0', 9181)
+[2025-06-26 10:16:50 +0200] [229752] [INFO] Starting gunicorn 23.0.0
+[2025-06-26 10:16:50 +0200] [229752] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:50 +0200] [229752] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:51 +0200] [229752] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:51 +0200] [229752] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:52 +0200] [229752] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:52 +0200] [229752] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:53 +0200] [229752] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:53 +0200] [229752] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:54 +0200] [229752] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:54 +0200] [229752] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:55 +0200] [229752] [ERROR] Can't connect to ('0.0.0.0', 9181)
+[2025-06-26 10:16:56 +0200] [229811] [INFO] Starting gunicorn 23.0.0
+[2025-06-26 10:16:56 +0200] [229811] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:56 +0200] [229811] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:57 +0200] [229811] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:57 +0200] [229811] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:58 +0200] [229811] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:58 +0200] [229811] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:16:59 +0200] [229811] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:16:59 +0200] [229811] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:17:00 +0200] [229811] [ERROR] Connection in use: ('0.0.0.0', 9181)
+[2025-06-26 10:17:00 +0200] [229811] [ERROR] connection to ('0.0.0.0', 9181) failed: [Errno 98] Address already in use
+[2025-06-26 10:17:01 +0200] [229811] [ERROR] Can't connect to ('0.0.0.0', 9181)
