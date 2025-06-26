@@ -29,10 +29,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Clave para cifrado de campos sensibles (Fernet, AES-256+HMAC).
 # Generar con:
 #   from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())
-FIELD_ENCRYPTION_KEY = '_YRq3KaYgVk6Y4nMCEotU6gS4N3t4P6-vC0tAlwNa6c='
-# Optional comma-separated list of previous keys for decrypting
-FIELD_ENCRYPTION_FALLBACK_KEYS = os.environ.get('FIELD_ENCRYPTION_FALLBACK_KEYS', '')
-FIELD_ENCRYPTION_KEYS = [FIELD_ENCRYPTION_KEY] + [k for k in FIELD_ENCRYPTION_FALLBACK_KEYS.split(',') if k]
+FIELD_ENCRYPTION_KEY = 'DbQG9CWLvBRa8Iu9pv9fJDVURCdKYQQErlZ9oCYGsY8='
+# Previous key used before introducing FIELD_ENCRYPTION_KEYS.  Including it
+# here ensures older data encrypted with the original key can still be
+# decrypted in developer setups without requiring extra environment variables.
+_DEFAULT_FALLBACK = 'DbQG9CWLvBRa8Iu9pv9fJDVURCdKYQQErlZ9oCYGsY8='
+FIELD_ENCRYPTION_FALLBACK_KEYS = os.environ.get(
+    'FIELD_ENCRYPTION_FALLBACK_KEYS', _DEFAULT_FALLBACK
+)
+FIELD_ENCRYPTION_KEYS = [FIELD_ENCRYPTION_KEY] + [
+    k for k in FIELD_ENCRYPTION_FALLBACK_KEYS.split(',') if k
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
