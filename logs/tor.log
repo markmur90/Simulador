@@ -93,3 +93,4 @@ Jun 26 23:35:23.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough di
 Jun 26 23:35:23.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
 Jun 26 23:35:23.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
 Jun 26 23:35:24.000 [notice] Bootstrapped 100% (done): Done
+Jun 27 02:19:32.000 [notice] Catching signal TERM, exiting cleanly.
