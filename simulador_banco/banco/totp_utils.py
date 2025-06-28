@@ -5,11 +5,12 @@ from django.conf import settings
 
 
 def get_totp_secret() -> str:
-    """Return the TOTP secret stored in env or create one."""
+    """Return the TOTP secret from settings or the environment."""
     secret = getattr(settings, "TOTP_SECRET", None)
     if not secret:
-        settings["TOTP_SECRET"] = secret
+        secret = os.environ.get("TOTP_SECRET", "")
     return secret
+
 
 def verify_totp(code: str) -> bool:
     """Verify a TOTP code using the shared secret."""
@@ -18,6 +19,7 @@ def verify_totp(code: str) -> bool:
         return totp.verify(code)
     except Exception:
         return False
+
 
 def generate_totp_qr(user: str) -> str:
     """Generate a QR code for the TOTP secret and return its file path."""

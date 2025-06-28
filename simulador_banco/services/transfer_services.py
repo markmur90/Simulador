@@ -32,7 +32,7 @@ class TransferService:
         """
 
         # 1) Idempotencia
-        existing = Transfer.objects.filter(payment_id=data["payment_id"]).first()
+        existing = Transfer.objects.filter(payment_id=data["Idempotency-Id"]).first()
         if existing:
             return existing
 
