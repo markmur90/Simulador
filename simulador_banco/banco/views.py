@@ -452,3 +452,62 @@ def estado_cuenta_pdf(request, account_id):
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename='estado.pdf')
 
+
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import json
+from .models import Transfer
+from services.transfer_services import TransferService
+from .totp_utils import verify_totp
+
+@csrf_exempt
+def api_ingest_transfer(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    # 1) Validar JWT Simulador en Authorization: Bearer <token>
+    auth = request.headers.get('Authorization','').split()
+    if len(auth)!=2 or auth[0].lower()!='bearer':
+        return JsonResponse({'error':'No autenticado'}, status=401)
+    # Aquí decodificar jwt con JWT_SECRET, omitted
+
+    data = json.loads(request.body)
+    try:
+        # Ingiere y crea la transferencia en PDNG o RJCT
+        transfer = TransferService.ingest_transfer(data)
+    except Exception as e:
+        return JsonResponse({'status':'error','message':str(e)}, status=400)
+
+    # 2) Respuesta inicial: pedimos OTP
+    return JsonResponse({
+        'transfer_id': transfer.id,
+        'status': transfer.status,
+        'otp_required': transfer.status=='PDNG',
+    })
+
+@csrf_exempt
+def api_verify_otp(request):
+    if request.method != 'POST':
+        return JsonResponse({'error':'Sólo POST'}, status=405)
+
+    # Validar JWT igual que antes...
+
+    data = json.loads(request.body)
+    transfer_id = data.get('transfer_id')
+    otp = data.get('otp')
+
+    # Verificar OTP
+    if not verify_totp(otp):
+        return JsonResponse({'status':'error','message':'OTP inválido'}, status=401)
+
+    # Marcar la transferencia como PROCESADA
+    try:
+        tr = Transfer.objects.get(id=transfer_id)
+        tr.status = 'ACSC'  # o el código que signifique 'Aceptada'
+        tr.save()
+    except Transfer.DoesNotExist:
+        return JsonResponse({'error':'transfer_id no válido'}, status=404)
+
+    return JsonResponse({'status':'ok','transfer_id': transfer_id})
