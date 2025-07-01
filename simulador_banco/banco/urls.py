@@ -74,6 +74,6 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('api/transferencia/', api_ingest_transfer, name='api_ingest_transfer'),
-    path('api/transferencia/verify/', api_verify_otp, name='api_verify_otp'),
+    path('api/transferencia/', views.api_ingest_transfer, name='api_ingest_transfer'),
+    path('api/transferencia/verify/', views.api_verify_otp, name='api_verify_otp'),
 ]
