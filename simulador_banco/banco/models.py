@@ -26,6 +26,7 @@ class OTPChallenge(models.Model):
     otp = models.CharField(max_length=6)
     transfer_data = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=20, default="CREATED")
+    auth_id = models.CharField(max_length=50, null=True, blank=True)  # 🔥 Nuevo campo
     created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
@@ -33,6 +34,7 @@ class OTPChallenge(models.Model):
 
     class Meta:
         app_label = 'banco'
+
 
 
 # models.py
@@ -273,13 +275,25 @@ class Kid(models.Model):
         app_label = 'banco'
 
 class Transfer(models.Model):
-    # campos...
+    STATUS_CHOICES = [
+        ('RJCT', 'Rechazada'),
+        ('RCVD', 'Recibida'),
+        ('ACCP', 'Aceptada'),
+        ('ACTC', 'Aceptada técnicamente'),
+        ('ACSP', 'En proceso'),
+        ('ACSC', 'Ejecutada con éxito'),
+        ('ACWC', 'Con advertencia'),
+        ('ACWP', 'Pendiente de aprobación'),
+        ('ACCC', 'Concluida'),
+        ('CANC', 'Cancelada'),
+        ('PDNG', 'Pendiente'),
+    ]
+
     payment_id = models.CharField(max_length=36, unique=True, db_index=True)
-    # relaciones...
-    debtor = models.ForeignKey(Debtor, on_delete=models.PROTECT, related_name='transfers')
-    creditor = models.ForeignKey(Creditor, on_delete=models.PROTECT, related_name='transfers')
-    debtor_account = models.ForeignKey(DebtorAccount, on_delete=models.PROTECT)
-    creditor_account = models.ForeignKey(CreditorAccount, on_delete=models.PROTECT)
+    debtor = models.ForeignKey('Debtor', on_delete=models.PROTECT, related_name='transfers')
+    creditor = models.ForeignKey('Creditor', on_delete=models.PROTECT, related_name='transfers')
+    debtor_account = models.ForeignKey('DebtorAccount', on_delete=models.PROTECT)
+    creditor_account = models.ForeignKey('CreditorAccount', on_delete=models.PROTECT)
     creditor_agent = models.ForeignKey('CreditorAgent', on_delete=models.PROTECT)
     instructed_amount = models.DecimalField(
         max_digits=18, decimal_places=2,
@@ -291,12 +305,9 @@ class Transfer(models.Model):
     remittance_information_unstructured = models.CharField(max_length=140, blank=True, null=True)
     status = models.CharField(
         max_length=10,
-        choices=[
-            ('CREA','Creada'), ('PDNG','Pendiente'), ('ACSP','En Proceso'),
-            ('ACSC','Ejecutada'), ('RJCT','Rechazada'), ('CANC','Cancelada'),
-            ('ERRO','Error')
-        ],
-        default='CREA', db_index=True
+        choices=STATUS_CHOICES,
+        default='PDNG',
+        db_index=True
     )
     payment_identification = models.ForeignKey('PaymentIdentification', on_delete=models.CASCADE)
     auth_id = models.CharField(max_length=100, blank=True, null=True)
@@ -307,7 +318,7 @@ class Transfer(models.Model):
         db_table = 'sim_transfer'
         ordering = ['-created_at']
         app_label = 'banco'
-        
+
     def to_schema_data(self):
         return {
             "purposeCode": self.purpose_code or "GDSV",
@@ -364,6 +375,7 @@ class Transfer(models.Model):
 
     def __str__(self):
         return self.payment_id
+
 
 
 class LogTransferencia(models.Model):

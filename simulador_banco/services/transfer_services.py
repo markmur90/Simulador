@@ -3,7 +3,7 @@ from typing import Any, Dict
 from django.db import transaction
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from banco.models import Transfer, DebtorAccount
+from banco.models import Transfer, DebtorAccount, OTPChallenge
 from banco.tasks import process_transfer_task
 
 
@@ -14,7 +14,6 @@ class TransferService:
      - rate-limit (5 en 5 minutos)
      - procesamiento diferido a los 5 minutos
     """
-
     RATE_LIMIT = 5
     WINDOW_MINUTES = 5
 
@@ -22,13 +21,7 @@ class TransferService:
     @transaction.atomic
     def ingest_transfer(data: Dict[str, Any]) -> Transfer:
         """
-        Inserta o rechaza una transferencia según reglas:
-        data = {
-          "payment_id": "...",
-          "debtor_account_id": 1,
-          "instructed_amount": "100.00",
-          ... otros campos necesarios ...
-        }
+        Inserta o rechaza una transferencia según reglas y registra todos los datos enviados desde Heroku.
         """
 
         # 1) Determinar payment_id e Idempotency
@@ -41,8 +34,8 @@ class TransferService:
         existing = Transfer.objects.filter(payment_id=payment_id).first()
         if existing:
             return existing
-        
-        # 2) Rate-limit: contar en ventana de 5 minutos
+
+        # 2) Rate-limit por cuenta deudora
         window_start = timezone.now() - datetime.timedelta(
             minutes=TransferService.WINDOW_MINUTES
         )
@@ -51,22 +44,39 @@ class TransferService:
             created_at__gte=window_start
         ).count()
         if recent_count >= TransferService.RATE_LIMIT:
-            # Creamos igual para registro, pero con status ‘RJCT’
-            transfer = Transfer.objects.create(
-                status='RJCT',
-                **data
-            )
+            transfer = Transfer.objects.create(status='RJCT', **data)
             return transfer
 
-        # 3) Creamos en estado Pendiente (‘PDNG’)
+        # 3) Crear transferencia en estado PDNG
         data["status"] = 'PDNG'
         transfer = Transfer.objects.create(**data)
 
-        # 4) Programamos el procesamiento 5 minutos después
-        # Ignoramos chequeos de tipo para apply_async y acceso a id
-        process_transfer_task.apply_async(  # type: ignore[attr-defined]
-            args=[transfer.id],  # type: ignore[attr-defined]
+        # 4) Programar procesamiento
+        process_transfer_task.apply_async(
+            args=[transfer.id],
             countdown=TransferService.WINDOW_MINUTES * 60
         )
 
         return transfer
+
+
+def confirm_transfer(payment_id, otp_input, user):
+    challenge = OTPChallenge.objects.get(payment_id=payment_id, otp=otp_input, status="CREATED")
+    challenge.status = "CONFIRMED"
+    challenge.auth_id = user.username
+    challenge.save()
+
+    # También actualizar transferencia vinculada
+    transfer = Transfer.objects.filter(payment_id=payment_id).first()
+    if transfer:
+        transfer.status = "ACSC"
+        transfer.auth_id = user.username
+        transfer.timestamp = timezone.now()
+        transfer.save()
+
+    return {
+        "paymentId": payment_id,
+        "status": "ACSC",
+        "timestamp": timezone.now().isoformat(),
+        "auth_id": user.username
+    }
