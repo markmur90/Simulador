@@ -15,16 +15,16 @@ from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
-load_dotenv(os.path.join(Path(__file__).resolve().parent.parent, '.env'))
+
+# Carga variables de entorno desde .env en el directorio raíz de proyecto
+BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 def get_env(var_name, default=None, required=False):
     value = os.environ.get(var_name, default)
     if required and value is None:
         raise ImproperlyConfigured(f'La variable de entorno {var_name} no está definida.')
     return value
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Clave para cifrado de campos sensibles (Fernet, AES-256+HMAC).
 # Generar con:
@@ -44,19 +44,22 @@ FIELD_ENCRYPTION_KEYS = [FIELD_ENCRYPTION_KEY] + [
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
+# SECURITY
 SECRET_KEY = get_env('SECRET_KEY', 'L3hesOa21ZGRsk0TsVvKMI6kWuv8d-ZAGIfP87i4Hv0')
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = ['localhost','127.0.0.1','0.0.0.0','80.78.30.242']
 
-TOKEN_URL="http://80.78.30.242:9181/oidc/token"
-AUTHORIZE_URL="http://80.78.30.242:9181/oidc/authorize"
-OTP_URL="http://80.78.30.242:9181/otp/single"
-AUTH_URL="http://80.78.30.242:9181/auth/challenges"
-API_URL="http://80.78.30.242:9181/payments"
+# JWT
+JWT_SECRET_KEY = get_env('JWT_SECRET_KEY', 'Ptf8454Jd55')
+
+# URLs externas
+# settings.py
+
+# Configuración de endpoints del simulador, parametrizados vía .env
+SIMULADOR_API_URL    = os.getenv('SIMULADOR_API_URL',    'http://localhost:3000/api/transferencia/')
+SIMULADOR_TOKEN_URL  = os.getenv('SIMULADOR_TOKEN_URL',  'http://localhost:3000/api/login/')
+SIMULADOR_VERIFY_URL = os.getenv('SIMULADOR_VERIFY_URL', 'http://localhost:3000/api/transferencia/verify/')
+JWT_SECRET_KEY       = os.getenv('JWT_SECRET_KEY',       'Ptf8454Jd55')
 
 
 # Application definition
@@ -74,17 +77,17 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'simulador_banco.middleware.jwt_auth.JWTAuthMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← justo debajo de SecurityMiddleware
+    # JWT Authentication Middleware para proteger /api/
+    'simulador_banco.middleware.jwt_auth.JWTAuthenticationMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'simulador_banco.middleware.jwt_auth.JWTAuthenticationMiddleware',
-
 ]
+
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 ROOT_URLCONF = 'simulador_banco.urls'
 
@@ -177,22 +180,19 @@ LOGGING = {
         },
     },
     'loggers': {
-        'api_bank_h2.utils.allow_internal_network': {
+        'simulador_banco.middleware.allow_internal_network': {
             'handlers': ['console'],
             'level': 'WARNING',
         },
     },
 }
 
-JWT_SECRET_KEY = get_env('JWT_SECRET_KEY', 'Ptf8454Jd55')
-
-
+# Integraciones
 TELEGRAM_BOT_TOKEN = get_env('TELEGRAM_BOT_TOKEN', '7881009139:AAH1mokuP0AjmCbd_tN3VJIxVkG7Fq95j5o')
 TELEGRAM_CHAT_ID = get_env('TELEGRAM_CHAT_ID', '769077177')
-
 
 OPENAI_API_KEY = get_env('OPENAI_API_KEY', '')
 TOTP_SECRET = get_env('TOTP_SECRET', '')
 
-
 SIMULATOR_NOTIFY_URL = 'http://localhost/notify'
+

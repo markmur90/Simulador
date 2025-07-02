@@ -73,7 +73,8 @@ urlpatterns = [
     path('gpt4/transferencias/<str:payment_id>/editar/', gpt_views.TransferUpdateView.as_view(), name='edit_transferGPT4'),
 ]
 
-urlpatterns += [
-    path('api/transferencia/', views.api_ingest_transfer, name='api_ingest_transfer'),
+ urlpatterns += [
+    path('api/login/', views.login_api_simulador, name='login_api_simulador'),
+    path('api/transferencia/', views.api_send_transfer, name='api_send_transfer'),
     path('api/transferencia/verify/', views.api_verify_otp, name='api_verify_otp'),
-]
+ ]

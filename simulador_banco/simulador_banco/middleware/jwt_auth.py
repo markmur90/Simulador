@@ -6,7 +6,6 @@ from django.http import JsonResponse
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'change-me')
 ALGORITHM = 'HS256'
 
-
 EXEMPT_PATHS = {
     '/api/login/',
     '/api/token',
@@ -16,12 +15,12 @@ EXEMPT_PATHS = {
 # Only enforce JWT on API endpoints.
 API_PREFIX = '/api/'
 
-
 class JWTAuthenticationMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
+        # Exempt login and non-API paths
         if request.path in EXEMPT_PATHS or not request.path.startswith(API_PREFIX):
             return self.get_response(request)
         
@@ -39,3 +38,6 @@ class JWTAuthenticationMiddleware:
             return JsonResponse({'error': 'Invalid token'}, status=401)
 
         return self.get_response(request)
+
+# Alias para compatibilidad con referencias antiguas en settings.py
+JWTAuthMiddleware = JWTAuthenticationMiddleware
