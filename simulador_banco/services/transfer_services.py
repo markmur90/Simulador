@@ -1,4 +1,5 @@
 import datetime
+import random
 from typing import Any, Dict
 from django.db import transaction
 from django.utils import timezone
@@ -13,18 +14,19 @@ class TransferService:
      - idempotencia por payment_id
      - rate-limit (5 en 5 minutos)
      - procesamiento diferido a los 5 minutos
+     - generación automática de OTP
     """
     RATE_LIMIT = 5
     WINDOW_MINUTES = 5
 
     @staticmethod
     @transaction.atomic
-    def ingest_transfer(data: Dict[str, Any]) -> Transfer:
+    def ingest_transfer(data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Inserta o rechaza una transferencia según reglas y registra todos los datos enviados desde Heroku.
+        Inserta o rechaza una transferencia según reglas y genera un OTP.
+        Retorna estructura con estado y OTP generado.
         """
 
-        # 1) Determinar payment_id e Idempotency
         payment_id = data.pop("Idempotency-Id", None) or data.get("payment_id")
         if not payment_id:
             raise ValidationError("'payment_id' requerido")
@@ -33,9 +35,14 @@ class TransferService:
         # Idempotencia
         existing = Transfer.objects.filter(payment_id=payment_id).first()
         if existing:
-            return existing
+            return {
+                "transfer_id": existing.id,
+                "payment_id": existing.payment_id,
+                "status": existing.status,
+                "otp": None  # Ya fue creado previamente
+            }
 
-        # 2) Rate-limit por cuenta deudora
+        # Rate-limit
         window_start = timezone.now() - datetime.timedelta(
             minutes=TransferService.WINDOW_MINUTES
         )
@@ -45,19 +52,40 @@ class TransferService:
         ).count()
         if recent_count >= TransferService.RATE_LIMIT:
             transfer = Transfer.objects.create(status='RJCT', **data)
-            return transfer
+            return {
+                "transfer_id": transfer.id,
+                "payment_id": transfer.payment_id,
+                "status": transfer.status,
+                "otp": None
+            }
 
-        # 3) Crear transferencia en estado PDNG
+        # Crear transferencia
         data["status"] = 'PDNG'
         transfer = Transfer.objects.create(**data)
 
-        # 4) Programar procesamiento
+        # Generar OTP
+        otp = f"{random.randint(100000, 999999)}"
+
+        # Registrar OTPChallenge
+        OTPChallenge.objects.create(
+            payment_id=payment_id,
+            otp=otp,
+            transfer_data=data,
+            status="CREATED"
+        )
+
+        # Programar ejecución futura
         process_transfer_task.apply_async(
             args=[transfer.id],
             countdown=TransferService.WINDOW_MINUTES * 60
         )
 
-        return transfer
+        return {
+            "transfer_id": transfer.id,
+            "payment_id": transfer.payment_id,
+            "status": transfer.status,
+            "otp": otp
+        }
 
 
 def confirm_transfer(payment_id, otp_input, user):
@@ -66,7 +94,6 @@ def confirm_transfer(payment_id, otp_input, user):
     challenge.auth_id = user.username
     challenge.save()
 
-    # También actualizar transferencia vinculada
     transfer = Transfer.objects.filter(payment_id=payment_id).first()
     if transfer:
         transfer.status = "ACSC"
