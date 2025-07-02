@@ -31,9 +31,9 @@ from reportlab.lib.pagesizes import letter
 OAUTH_APPROVED = {}
 PENDING_TRANSFERS = {}
 
-@csrf_exempt
-def recibir_transferencia(request):
-    return JsonResponse({"error": "Funcionalidad deshabilitada"}, status=501)
+# @csrf_exempt
+# def recibir_transferencia(request):
+#     return JsonResponse({"error": "Funcionalidad deshabilitada"}, status=501)
 
 def login_view(request):
     if request.method == "POST":

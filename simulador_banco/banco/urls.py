@@ -28,7 +28,7 @@ urlpatterns = [
     path('api/transferencias/entrantes/', views.api_transfer_incoming),
     path('api/send-transfer', views.api_send_transfer),
     path('api/status-transfer', views.api_status_transfer),
-    path('api/transferencia/', views.recibir_transferencia, name='api_transferencia'),
+    # path('api/transferencia/', views.recibir_transferencia, name='api_transferencia'),
     path('frontend/transfer', views.transfer_simulator_frontend, name='transfer_simulator_frontend'),
 
     # Gestión de usuarios
@@ -74,7 +74,7 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('api/login/', login_api_simulador, name='api_login'),
-    path('api/transferencia/', views.api_send_transfer, name='api_send_transfer'),
-    path('api/transferencia/verify/', views.api_verify_otp, name='api_verify_otp'),
+    path('api/login/',            views.login_api_simulador,   name='login_api_simulador'),
+    path('api/transferencia/',     views.api_send_transfer,     name='api_send_transfer'),
+    path('api/transferencia/verify/', views.api_verify_otp,     name='api_verify_otp'),
 ]
