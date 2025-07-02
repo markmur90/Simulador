@@ -293,6 +293,11 @@ def api_send_transfer(request):
         return JsonResponse({'error': 'Autenticación requerida'}, status=401)
 
     data = json.loads(request.body)
+    # Tomar payment_id desde header Idempotency-Id si no viene en el body
+    if 'payment_id' not in data:
+        header_id = request.headers.get('Idempotency-Id')
+        if header_id:
+            data['payment_id'] = header_id
     try:
         transfer = TransferService.ingest_transfer(data)
     except Exception as e:

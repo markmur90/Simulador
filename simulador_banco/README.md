@@ -27,7 +27,8 @@ Este repositorio contiene un proyecto Django minimalista que funciona como simul
 
 ## Endpoint de transferencias entrantes
 
-El proyecto expone `/api/transferencias/entrantes/` para recibir transferencias de sistemas externos. Es necesario autenticarse con JWT (ver `/api/token`). El cuerpo de la solicitud debe ser JSON y es procesado por `TransferService`.
+El proyecto expone `/api/transferencias/entrantes/` para recibir transferencias de sistemas externos. Es necesario autenticarse con JWT (ver `/api/token`). El cuerpo de la solicitud debe ser JSON y es procesado por `TransferService`. Si el cuerpo no incluye `payment_id`, este se obtendrá del header `Idempotency-Id`.
+
 
 ## Pruebas manuales
 

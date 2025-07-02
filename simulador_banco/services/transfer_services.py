@@ -31,11 +31,17 @@ class TransferService:
         }
         """
 
-        # 1) Idempotencia
-        existing = Transfer.objects.filter(payment_id=data["Idempotency-Id"]).first()
+        # 1) Determinar payment_id e Idempotency
+        payment_id = data.pop("Idempotency-Id", None) or data.get("payment_id")
+        if not payment_id:
+            raise ValidationError("'payment_id' requerido")
+        data["payment_id"] = payment_id
+
+        # Idempotencia
+        existing = Transfer.objects.filter(payment_id=payment_id).first()
         if existing:
             return existing
-
+        
         # 2) Rate-limit: contar en ventana de 5 minutos
         window_start = timezone.now() - datetime.timedelta(
             minutes=TransferService.WINDOW_MINUTES
