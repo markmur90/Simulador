@@ -54,13 +54,13 @@ def confirm_transfer(payment_id, otp_input, user):
 
     transfer = Transfer.objects.filter(payment_id=payment_id).first()
     if transfer:
-        transfer.status = "ACSC"
+        transfer.status = "ACCP"
         transfer.auth_id = user.username
         transfer.save()
 
     return {
         "paymentId": payment_id,
-        "status": "ACSC",
+        "status": "ACCP",
         "timestamp": timezone.now().isoformat(),
         "auth_id": user.username
     }

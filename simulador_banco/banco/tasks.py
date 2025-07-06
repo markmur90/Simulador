@@ -92,7 +92,7 @@ def process_transfer_task(transfer_id: int):
         acct.save(update_fields=['balance'])
 
         # 3) Marcar como ejecutada
-        transfer.status = 'ACSC'
+        transfer.status = 'ACCP'
         transfer.save(update_fields=['status'])
 
     # 4) Notificar a la API externa
