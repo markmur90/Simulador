@@ -645,7 +645,7 @@ def api_verify_otp(request):
         )
 
     # Finalizar la transferencia
-    transfer.status = 'ACSC'
+    transfer.status = 'ACCP'
     transfer.auth_id = payload.get('usuario')
     transfer.save()
 

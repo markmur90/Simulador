@@ -59,7 +59,7 @@ def process_transfer_task(transfer_id: int):
     A los 5 minutos, procesa la transferencia:
      1) Verifica fondos
      2) Descuenta el monto del DebtorAccount.balance
-     3) Actualiza status a 'ACSC' o 'RJCT'
+     3) Actualiza status a 'ACCP' o 'RJCT'
      4) Notifica a la API externa
      5) Realiza análisis con OpenAI y notifica por Telegram
     """
