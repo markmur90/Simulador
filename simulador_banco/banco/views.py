@@ -193,24 +193,35 @@ def crear_transferencia(request):
 
 @csrf_exempt
 def api_challenge(request):
-    """Genera un OTP para una transferencia simulada."""
+    """
+    POST /api/challenge
+    Genera un nuevo desafío OTP para una transferencia.
+    """
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-    if not hasattr(request, 'user_jwt'):
-        return JsonResponse({'error': 'Autenticación requerida'}, status=401)
+    try:
+        data = json.loads(request.body)
+        payment_id = data.get('payment_id')
 
-    data = json.loads(request.body.decode())
-    payment_id = data.get('payment_id')
-    if not payment_id:
-        return JsonResponse({'error': 'payment_id requerido'}, status=400)
+        if not payment_id:
+            return JsonResponse({'error': 'payment_id requerido'}, status=400)
 
-    if not OAUTH_APPROVED.get(payment_id):
-        return JsonResponse({'error': 'OAuth no aprobado'}, status=403)
+        # Generar OTP
+        challenge, otp = SecurityService.generate_otp_challenge(
+            payment_id,
+            request.user_jwt.get('usuario')
+        )
 
-    otp = get_random_string(6, allowed_chars='0123456789')
-    challenge = OTPChallenge.objects.create(payment_id=payment_id, otp=otp)
-    return JsonResponse({'challenge_id': str(challenge.challenge_id), 'otp': otp})
+        return JsonResponse({
+            'challenge_id': str(challenge.challenge_id),
+            'otp': otp
+        })
+
+    except ValidationError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': 'Error interno'}, status=500)
 
 
 
@@ -224,6 +235,7 @@ from django.utils.crypto import get_random_string
 from .models import OficialBancario, OTPChallenge, Transfer
 from .totp_utils import verify_totp
 from services.transfer_services import TransferService
+from services.security_services import SecurityService
 
 # Clave y algoritmo para JWT
 import jwt
@@ -278,112 +290,142 @@ def _authenticate_jwt(request):
 @csrf_exempt
 def api_send_transfer(request):
     """
-    POST /api/transferencia/
-    --- Recibe datos SEPA, crea la transferencia en PDNG y devuelve challenge OTP.
-    Body JSON: según esquema SEPA.
-    Response:
-      {
-        "payment_id": "...",
-        "status": "PDNG",
-        "challenge_id": "...",
-        "otp_required": true
-      }
+    POST /api/send-transfer
+    Procesa una nueva transferencia con validación OTP.
     """
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-    # Autenticación JWT
-    payload = _authenticate_jwt(request)
-    if not payload:
-        return JsonResponse({'error': 'Autenticación requerida'}, status=401)
-
-    data = json.loads(request.body)
-    # Tomar payment_id desde header Idempotency-Id si no viene en el body
-    if 'payment_id' not in data:
-        header_id = request.headers.get('Idempotency-Id')
-        if header_id:
-            data['payment_id'] = header_id
     try:
-        transfer = TransferService.ingest_transfer(data)
-    except Exception as e:
+        data = json.loads(request.body)
+        payment_id = data.get('payment_id')
+        otp = data.get('otp')
+
+        if not payment_id or not otp:
+            return JsonResponse({'error': 'Faltan datos requeridos'}, status=400)
+
+        # Verificar OTP
+        try:
+            SecurityService.verify_otp_challenge(payment_id, otp)
+        except ValidationError as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+        # Obtener transferencia
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        
+        # Actualizar estado
+        transfer = TransferService.update_transfer_status(
+            transfer,
+            'ACCP',
+            request.user_jwt.get('usuario')
+        )
+
+        return JsonResponse({
+            'payment_id': transfer.payment_id,
+            'status': transfer.status
+        })
+
+    except ValidationError as e:
         return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': 'Error interno'}, status=500)
 
-    # Generar OTP y registrar challenge
-    otp_code = get_random_string(6, allowed_chars='0123456789')
-    challenge = OTPChallenge.objects.create(
-        transfer=transfer,
-        payment_id=transfer.payment_id,
-        otp=otp_code,
-        status='CREATED'
-    )
+@csrf_exempt
+def api_challenge(request):
+    """
+    POST /api/challenge
+    Genera un nuevo desafío OTP para una transferencia.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-    return JsonResponse({
-        'payment_id': transfer.payment_id,
-        'status': transfer.status,
-        'challenge_id': str(challenge.challenge_id),
-        'otp_required': True
-    }, status=202)
+    try:
+        data = json.loads(request.body)
+        payment_id = data.get('payment_id')
 
+        if not payment_id:
+            return JsonResponse({'error': 'payment_id requerido'}, status=400)
 
+        # Generar OTP
+        challenge, otp = SecurityService.generate_otp_challenge(
+            payment_id,
+            request.user_jwt.get('usuario')
+        )
+
+        return JsonResponse({
+            'challenge_id': str(challenge.challenge_id),
+            'otp': otp
+        })
+
+    except ValidationError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': 'Error interno'}, status=500)
+
+@csrf_exempt
+def api_transfer_incoming(request):
+    """
+    POST /api/transferencias/entrantes
+    Procesa transferencias entrantes.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+    try:
+        data = json.loads(request.body)
+        
+        # Crear transferencia
+        transfer = TransferService.ingest_transfer(data)
+
+        # Si requiere OTP, generar challenge
+        if transfer.status == 'PDNG':
+            challenge, otp = SecurityService.generate_otp_challenge(
+                transfer.payment_id,
+                request.user_jwt.get('usuario')
+            )
+            return JsonResponse({
+                'payment_id': transfer.payment_id,
+                'status': transfer.status,
+                'challenge_id': str(challenge.challenge_id),
+                'otp': otp,
+                'otp_required': True
+            })
+
+        return JsonResponse({
+            'payment_id': transfer.payment_id,
+            'status': transfer.status,
+            'otp_required': False
+        })
+
+    except ValidationError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': 'Error interno'}, status=500)
+
+@csrf_exempt
 def api_status_transfer(request):
+    """
+    GET /api/status-transfer
+    Consulta el estado de una transferencia.
+    """
     payment_id = request.GET.get('payment_id')
     if not payment_id:
         return JsonResponse({'error': 'payment_id requerido'}, status=400)
-    return JsonResponse({'payment_id': payment_id, 'status': 'RJCT'})
+
+    try:
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        return JsonResponse({
+            'payment_id': transfer.payment_id,
+            'status': transfer.status,
+            'created_at': transfer.created_at.isoformat(),
+            'updated_at': transfer.updated_at.isoformat()
+        })
+    except Exception as e:
+        return JsonResponse({'error': 'Error interno'}, status=500)
 
 
 def transfer_simulator_frontend(request):
     return render(request, 'banco/transfer_simulator_frontend.html')
-
-
-@csrf_exempt
-def api_transfer_incoming(request):
-    """Recibe transferencias de sistemas externos con verificación OTP."""
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
-
-    # Autenticación mediante JWT o sesión activa
-    if not hasattr(request, 'user_jwt') and not request.user.is_authenticated:
-        return JsonResponse({'error': 'Autenticación requerida'}, status=401)
-
-    try:
-        data = json.loads(request.body.decode())
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'JSON inválido'}, status=400)
-
-    payment_id = data.get('payment_id')
-    otp = data.get('otp')
-    totp_code = data.get('totp')
-
-    if not otp:
-        if not payment_id:
-            return JsonResponse({'error': 'payment_id requerido'}, status=400)
-        otp_val = get_random_string(6, allowed_chars='0123456789')
-        challenge = OTPChallenge.objects.create(payment_id=payment_id, otp=otp_val)
-        return JsonResponse({
-            'challenge_id': str(challenge.challenge_id),
-            'otp_required': True,
-            'otp': otp_val
-        }, status=202)
-
-    from .totp_utils import verify_totp
-    if not verify_totp(str(totp_code)):
-        return JsonResponse({'error': 'TOTP inválido'}, status=400)
-
-    try:
-        challenge = OTPChallenge.objects.get(payment_id=payment_id, otp=otp, status='CREATED')
-    except OTPChallenge.DoesNotExist:
-        return JsonResponse({'error': 'OTP inválido'}, status=400)
-
-    challenge.status = 'USED'
-    challenge.save()
-
-    try:
-        transfer = TransferService.ingest_transfer(data)
-    except ValidationError as e:
-        return JsonResponse({'error': str(e)}, status=400)
-
-    return JsonResponse({'payment_id': transfer.payment_id, 'status': transfer.status})
 
 
 # ---------------------------------------------------------------------------
