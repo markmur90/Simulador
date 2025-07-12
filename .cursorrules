@@ -1,0 +1,21 @@
+{
+    "language": "es",
+    "programming_level": "intermediate",
+    "preferences": {
+        "explain_code": true,
+        "provide_comments": true,
+        "comment_language": "es",
+        "show_examples": true,
+        "detailed_explanations": true
+    },
+    "code_style": {
+        "add_comments": true,
+        "verbose_variable_names": true,
+        "prefer_readability": true
+    },
+    "documentation": {
+        "language": "es",
+        "detail_level": "intermediate",
+        "include_examples": true
+    }
+} 
