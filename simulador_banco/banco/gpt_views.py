@@ -7,11 +7,13 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.utils import timezone
+from datetime import timedelta
 import weasyprint
+from decimal import Decimal
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
-    Transfer, PaymentIdentification
+    Transfer, PaymentIdentification, AccountMovement
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,
@@ -259,20 +261,81 @@ class SendTransferView(LoginRequiredMixin, generic.UpdateView):
 
 class DownloadTransferPDFView(LoginRequiredMixin, View):
     def get(self, request, payment_id):
-        # Obtener la transferencia
         transfer = get_object_or_404(Transfer, payment_id=payment_id)
         
-        # Renderizar el template HTML
-        html_string = render_to_string('api/GPT4/transfer_pdf.html', {
+        # Preparar el contexto para la plantilla
+        context = {
             'transfer': transfer,
             'generated_at': timezone.now()
-        })
+        }
+        
+        # Renderizar el HTML
+        html = render_to_string('api/GPT4/transfer_pdf.html', context)
         
         # Crear el PDF
-        pdf = weasyprint.HTML(string=html_string).write_pdf()
-        
-        # Preparar la respuesta
-        response = HttpResponse(pdf, content_type='application/pdf')
+        response = HttpResponse(content_type='application/pdf')
         response['Content-Disposition'] = f'attachment; filename="transfer_{payment_id}.pdf"'
         
+        # Generar PDF con WeasyPrint
+        pdf = weasyprint.HTML(string=html).write_pdf()
+        response.write(pdf)
+        
         return response
+
+
+class AccountStatementPDFView(LoginRequiredMixin, View):
+    def get(self, request, account_id):
+        account = get_object_or_404(DebtorAccount, pk=account_id)
+        
+        # Obtener los movimientos filtrados por fecha si se especifica
+        movements = account.movimientos.order_by('-fecha')
+        start_date = request.GET.get('start')
+        end_date = request.GET.get('end')
+        
+        if start_date:
+            movements = movements.filter(fecha__date__gte=start_date)
+        if end_date:
+            movements = movements.filter(fecha__date__lte=end_date)
+        
+        # Preparar el contexto para la plantilla
+        context = {
+            'account': account,
+            'movements': movements,
+            'start_date': start_date,
+            'end_date': end_date,
+            'generated_at': timezone.now()
+        }
+        
+        # Renderizar el HTML
+        html = render_to_string('api/GPT4/account_statement_pdf.html', context)
+        
+        # Crear el PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="account_statement_{account.iban}.pdf"'
+        
+        # Generar PDF con WeasyPrint
+        pdf = weasyprint.HTML(string=html).write_pdf()
+        response.write(pdf)
+        
+        return response
+
+
+class DebtorDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Debtor
+    template_name = 'api/GPT4/debtor_detail.html'
+    context_object_name = 'debtor'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Obtener las cuentas del deudor
+        context['accounts'] = self.object.accounts.all()
+        # Obtener las transferencias del deudor
+        context['transfers'] = self.object.transfers.order_by('-created_at')[:10]
+        
+        # Añadir fechas para los filtros
+        today = timezone.now().date()
+        context['today'] = today
+        context['week_ago'] = today - timedelta(days=7)
+        context['month_ago'] = today - timedelta(days=30)
+        
+        return context

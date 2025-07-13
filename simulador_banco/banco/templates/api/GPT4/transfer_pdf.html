@@ -2,130 +2,125 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Transferencia {{ transfer.payment_id }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
-            margin: 2cm;
+            margin: 40px;
         }
         .header {
             text-align: center;
-            margin-bottom: 2em;
-        }
-        .logo {
-            max-width: 200px;
-            margin-bottom: 1em;
+            margin-bottom: 30px;
         }
         .title {
             font-size: 24px;
-            color: #333;
-            margin-bottom: 1em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #7f8c8d;
         }
         .section {
-            margin-bottom: 2em;
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
         }
         .section-title {
             font-size: 18px;
-            color: #666;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 0.5em;
-            margin-bottom: 1em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
         }
-        .field {
-            margin-bottom: 0.5em;
+        .info-row {
+            margin: 10px 0;
         }
         .label {
             font-weight: bold;
-            color: #555;
+            color: #34495e;
+        }
+        .value {
+            color: #2c3e50;
+        }
+        .tracking-code {
+            text-align: center;
+            font-size: 20px;
+            color: #e74c3c;
+            padding: 15px;
+            margin: 20px 0;
+            border: 2px dashed #e74c3c;
+            border-radius: 5px;
         }
         .footer {
-            margin-top: 3em;
+            margin-top: 30px;
             text-align: center;
             font-size: 12px;
-            color: #888;
+            color: #7f8c8d;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 class="title">Detalles de la Transferencia</h1>
-        <p>Generado el: {{ generated_at|date:"d/m/Y H:i" }}</p>
+        <div class="title">Comprobante de Transferencia</div>
+        <div class="subtitle">Generado el {{ generated_at|date:"d/m/Y H:i" }}</div>
+    </div>
+
+    <div class="tracking-code">
+        <div class="label">Código de Seguimiento:</div>
+        <div class="value">{{ transfer.payment_id }}</div>
     </div>
 
     <div class="section">
-        <h2 class="section-title">Información General</h2>
-        <div class="field">
-            <span class="label">ID de Pago:</span>
-            <span>{{ transfer.payment_id }}</span>
-        </div>
-        <div class="field">
+        <div class="section-title">Detalles de la Transferencia</div>
+        <div class="info-row">
             <span class="label">Estado:</span>
-            <span>{{ transfer.get_status_display }}</span>
+            <span class="value">{{ transfer.get_status_display }}</span>
         </div>
-        <div class="field">
-            <span class="label">Fecha de Creación:</span>
-            <span>{{ transfer.created_at|date:"d/m/Y H:i" }}</span>
+        <div class="info-row">
+            <span class="label">Fecha de Ejecución:</span>
+            <span class="value">{{ transfer.requested_execution_date|date:"d/m/Y" }}</span>
         </div>
-    </div>
-
-    <div class="section">
-        <h2 class="section-title">Deudor</h2>
-        <div class="field">
-            <span class="label">Nombre:</span>
-            <span>{{ transfer.debtor.name }}</span>
-        </div>
-        <div class="field">
-            <span class="label">IBAN:</span>
-            <span>{{ transfer.debtor_account.iban }}</span>
-        </div>
-        <div class="field">
-            <span class="label">Dirección:</span>
-            <span>{{ transfer.debtor.address.street }}, {{ transfer.debtor.address.city }}</span>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2 class="section-title">Acreedor</h2>
-        <div class="field">
-            <span class="label">Nombre:</span>
-            <span>{{ transfer.creditor.name }}</span>
-        </div>
-        <div class="field">
-            <span class="label">IBAN:</span>
-            <span>{{ transfer.creditor_account.iban }}</span>
-        </div>
-        <div class="field">
-            <span class="label">Dirección:</span>
-            <span>{{ transfer.creditor.address.street }}, {{ transfer.creditor.address.city }}</span>
-        </div>
-    </div>
-
-    <div class="section">
-        <h2 class="section-title">Detalles del Pago</h2>
-        <div class="field">
+        <div class="info-row">
             <span class="label">Monto:</span>
-            <span>{{ transfer.instructed_amount }} {{ transfer.currency }}</span>
-        </div>
-        <div class="field">
-            <span class="label">Código de Propósito:</span>
-            <span>{{ transfer.purpose_code }}</span>
-        </div>
-        <div class="field">
-            <span class="label">Fecha de Ejecución Solicitada:</span>
-            <span>{{ transfer.requested_execution_date|date:"d/m/Y" }}</span>
+            <span class="value">{{ transfer.instructed_amount }} {{ transfer.currency }}</span>
         </div>
         {% if transfer.remittance_information_unstructured %}
-        <div class="field">
-            <span class="label">Información Adicional:</span>
-            <span>{{ transfer.remittance_information_unstructured }}</span>
+        <div class="info-row">
+            <span class="label">Concepto:</span>
+            <span class="value">{{ transfer.remittance_information_unstructured }}</span>
         </div>
         {% endif %}
     </div>
 
+    <div class="section">
+        <div class="section-title">Información del Ordenante</div>
+        <div class="info-row">
+            <span class="label">Nombre:</span>
+            <span class="value">{{ transfer.debtor.name }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">IBAN:</span>
+            <span class="value">{{ transfer.debtor_account.iban }}</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Información del Beneficiario</div>
+        <div class="info-row">
+            <span class="label">Nombre:</span>
+            <span class="value">{{ transfer.creditor.name }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">IBAN:</span>
+            <span class="value">{{ transfer.creditor_account.iban }}</span>
+        </div>
+    </div>
+
     <div class="footer">
-        <p>Este documento es un comprobante generado automáticamente.</p>
-        <p>Fecha y hora de generación: {{ generated_at|date:"d/m/Y H:i:s" }}</p>
+        <p>Este documento es un comprobante de transferencia. Por favor, conserve este documento para futuras referencias.</p>
+        <p>Código de Seguimiento: {{ transfer.payment_id }}</p>
     </div>
 </body>
 </html> 

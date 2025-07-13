@@ -47,6 +47,7 @@ urlpatterns = [
     path('gpt4/deudores/nuevo/', gpt_views.DebtorCreateView.as_view(), name='create_debtorGPT4'),
     path('gpt4/deudores/<int:pk>/editar/', gpt_views.DebtorUpdateView.as_view(), name='edit_debtorGPT4'),
     path('gpt4/deudores/<int:pk>/eliminar/', gpt_views.DebtorDeleteView.as_view(), name='delete_debtorGPT4'),
+    path('gpt4/deudores/<int:pk>/', gpt_views.DebtorDetailView.as_view(), name='debtor_detailGPT4'),
     path('gpt4/cuentas-deudor/', gpt_views.DebtorAccountListView.as_view(), name='list_debtor_accountsGPT4'),
     path('gpt4/cuentas-deudor/nuevo/', gpt_views.DebtorAccountCreateView.as_view(), name='create_debtor_accountGPT4'),
     
@@ -80,3 +81,5 @@ urlpatterns += [
     path('api/transferencia/',     views.api_send_transfer,     name='api_send_transfer'),
     path('api/transferencia/verify/', views.api_verify_otp,     name='api_verify_otp'),
 ]
+
+path('gpt4/cuentas/<int:account_id>/estado/pdf/', gpt_views.AccountStatementPDFView.as_view(), name='account_statement_pdfGPT4'),

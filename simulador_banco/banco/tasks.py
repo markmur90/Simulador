@@ -9,7 +9,7 @@ from celery import shared_task
 from django.conf import settings
 from django.db import transaction
 
-from banco.models import DebtorAccount, Transfer
+from banco.models import DebtorAccount, Transfer, AccountMovement
 
 
 def analyze_transfer(transfer: Transfer) -> str:
@@ -59,9 +59,10 @@ def process_transfer_task(transfer_id: int):
     A los 5 minutos, procesa la transferencia:
      1) Verifica fondos
      2) Descuenta el monto del DebtorAccount.balance
-     3) Actualiza status a 'ACCP' o 'RJCT'
-     4) Notifica a la API externa
-     5) Realiza análisis con OpenAI y notifica por Telegram
+     3) Registra el movimiento en la cuenta
+     4) Actualiza status a 'ACCP' o 'RJCT'
+     5) Notifica a la API externa
+     6) Realiza análisis con OpenAI y notifica por Telegram
     """
     try:
         transfer = (
@@ -85,22 +86,39 @@ def process_transfer_task(transfer_id: int):
         if acct.balance < transfer.instructed_amount:
             transfer.status = 'RJCT'
             transfer.save(update_fields=['status'])
+            
+            # Registrar el intento fallido
+            AccountMovement.objects.create(
+                account=acct,
+                tipo='TRANSFER_FAILED',
+                monto=transfer.instructed_amount,
+                descripcion=f'Transferencia rechazada por fondos insuficientes: {transfer.payment_id}'
+            )
             return
 
         # 2) Descontar y actualizar
         acct.balance -= transfer.instructed_amount
         acct.save(update_fields=['balance'])
 
-        # 3) Marcar como ejecutada
+        # 3) Registrar el movimiento
+        AccountMovement.objects.create(
+            account=acct,
+            tipo='TRANSFER_OUT',
+            monto=transfer.instructed_amount,
+            descripcion=f'Transferencia enviada a {transfer.creditor.name} - ID: {transfer.payment_id}'
+        )
+
+        # 4) Marcar como ejecutada
         transfer.status = 'ACCP'
         transfer.save(update_fields=['status'])
 
-    # 4) Notificar a la API externa
+    # 5) Notificar a la API externa
     payload = {
         "payment_id": transfer.payment_id,
         "status": transfer.status,
         "debtor_account": acct.iban,
         "amount": str(transfer.instructed_amount),
+        "current_balance": str(acct.balance)  # Incluir saldo actual
     }
     try:
         requests.post(
@@ -112,8 +130,8 @@ def process_transfer_task(transfer_id: int):
         # Podríamos reintentar o loguear el fallo
         pass
 
-    # 5) Análisis y notificación
+    # 6) Análisis y notificación
     analysis = analyze_transfer(transfer)
     send_telegram_notification(
-        f"Transferencia {transfer.payment_id}: {analysis}"
+        f"Transferencia {transfer.payment_id}: {analysis}\nSaldo actual: {acct.balance} {transfer.currency}"
     )
