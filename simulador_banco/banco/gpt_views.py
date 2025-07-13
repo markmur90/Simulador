@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views import generic, View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
@@ -108,18 +109,28 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
     success_url = reverse_lazy('list_transferGPT4')
 
     def form_invalid(self, form):
-        # Agregar mensajes de error al contexto
-        context = self.get_context_data(form=form)
-        context['form_errors'] = form.errors
-        return self.render_to_response(context)
+        """
+        Maneja los errores de validación del formulario.
+        Si hay errores en form.errors, los mantiene en sus campos específicos.
+        """
+        return self.render_to_response(self.get_context_data(form=form))
 
     def form_valid(self, form):
+        """
+        Intenta guardar el formulario y maneja cualquier error que ocurra.
+        """
         try:
-            response = super().form_valid(form)
+            self.object = form.save()
             messages.success(self.request, 'Transferencia creada exitosamente.')
-            return response
-        except Exception as e:
-            form.add_error(None, str(e))
+            return redirect(self.get_success_url())
+        except ValidationError as e:
+            if hasattr(e, 'message_dict'):
+                # Si el error tiene un diccionario de mensajes, actualizar los errores del formulario
+                for field, error in e.message_dict.items():
+                    form.add_error(field, error)
+            else:
+                # Si es un error simple, agregarlo al formulario
+                form.add_error(None, str(e))
             return self.form_invalid(form)
 
 
