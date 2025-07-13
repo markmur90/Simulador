@@ -1,4 +1,4 @@
-# Tor state file last generated on 2025-07-13 23:17:38 local time
+# Tor state file last generated on 2025-07-13 23:26:51 local time
 # Other times below are in UTC
 # You *do not* need to edit this file.
 
@@ -153,7 +153,6 @@ Guard in=default rsa_id=4B273B712FF7369F39043752AED79FE8F28EECA4 nickname=Quetza
 Guard in=default rsa_id=049091E0582A6439D7AC7E157D32AB9319B8B78C nickname=Mlrage sampled_on=2025-06-09T04:05:15 sampled_idx=55 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=01E388EF92B569074D8FA86CC9D442E829F6E885 nickname=ThanasRelay0 sampled_on=2025-06-07T11:32:04 sampled_idx=56 sampled_by=0.4.8.16 listed=1
 Guard in=default rsa_id=D99C0B4A6AAB8FECDC98CB2488520F0DE5337D13 nickname=mikrogravitationB sampled_on=2025-06-26T21:41:43 sampled_idx=57 sampled_by=0.4.7.16 listed=1
-LastWritten 2025-07-13 21:17:38
-MinutesSinceUserActivity 1
+LastWritten 2025-07-13 21:26:51
 TorVersion Tor 0.4.7.16
 TotalBuildTimes 502
