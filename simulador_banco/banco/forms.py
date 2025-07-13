@@ -190,12 +190,30 @@ class TransferForm(BootstrapModelForm):
                 'value': datetime.now(pytz.timezone('Europe/Berlin')).strftime('%Y-%m-%d')
             }),
             'remittance_information_unstructured': forms.TextInput(attrs={
-                'maxlength': 60,
                 'class': 'form-control',
                 'rows': 1,
                 'placeholder': 'Ingrese información no estructurada (máx. 60 caracteres)'
             }),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Validar que exista cuenta de débito
+        debtor_account = cleaned_data.get('debtor_account')
+        if not debtor_account:
+            raise ValidationError({
+                'debtor_account': 'La cuenta de débito es requerida'
+            })
+            
+        # Validar que exista cuenta de crédito
+        creditor_account = cleaned_data.get('creditor_account')
+        if not creditor_account:
+            raise ValidationError({
+                'creditor_account': 'La cuenta de crédito es requerida'
+            })
+            
+        return cleaned_data
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -233,13 +251,20 @@ class TransferForm(BootstrapModelForm):
             
             return transfer
         except ValidationError as e:
-            if hasattr(e, 'error_dict'):
+            if hasattr(e, 'message_dict'):
                 # Si es un dict de errores, propagarlo
                 raise
-            # Si es un error simple, asignarlo al campo de monto
-            raise ValidationError({
-                'instructed_amount': str(e)
-            })
+            # Si es un error simple, asignarlo al campo correspondiente
+            error_message = str(e)
+            if 'débito' in error_message.lower():
+                raise ValidationError({'debtor_account': error_message})
+            elif 'crédito' in error_message.lower():
+                raise ValidationError({'creditor_account': error_message})
+            elif 'saldo' in error_message.lower():
+                raise ValidationError({'instructed_amount': error_message})
+            else:
+                # Si no podemos identificar el campo específico, lo asignamos a __all__
+                raise ValidationError({'__all__': error_message})
 
 class AccountMovementForm(BootstrapModelForm):
     class Meta:

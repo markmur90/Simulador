@@ -41,22 +41,30 @@ class TransferService:
                 iban=debtor_account
             )
         except DebtorAccount.DoesNotExist:
-            raise ValidationError('Cuenta de débito no encontrada')
+            raise ValidationError({
+                'debtor_account': 'Cuenta de débito no encontrada'
+            })
 
         try:
             credit_acc = CreditorAccount.objects.select_related('creditor').get(
                 iban=creditor_account
             )
         except CreditorAccount.DoesNotExist:
-            raise ValidationError('Cuenta de crédito no encontrada')
+            raise ValidationError({
+                'creditor_account': 'Cuenta de crédito no encontrada'
+            })
 
         # Validar que el deudor tenga todos los datos necesarios
         if not debit_acc.debtor.name or not debit_acc.debtor.address:
-            raise ValidationError('Datos incompletos del deudor')
+            raise ValidationError({
+                'debtor_account': 'Datos incompletos del deudor'
+            })
 
         # Validar que el acreedor tenga todos los datos necesarios
         if not credit_acc.creditor.name or not credit_acc.creditor.address:
-            raise ValidationError('Datos incompletos del acreedor')
+            raise ValidationError({
+                'creditor_account': 'Datos incompletos del acreedor'
+            })
 
         return debit_acc, credit_acc
 
@@ -64,7 +72,9 @@ class TransferService:
     def validate_balance(cls, account: DebtorAccount, amount: Decimal) -> None:
         """Valida que la cuenta tenga saldo suficiente."""
         if account.balance < amount:
-            raise ValidationError('Saldo insuficiente')
+            raise ValidationError({
+                'instructed_amount': 'Saldo insuficiente'
+            })
 
     @classmethod
     def generate_auth_id(cls) -> str:
