@@ -55,15 +55,19 @@ class TransferService:
         )
         
         # Buscar cuenta deudora
-        debit_acc = DebtorAccount.objects.select_related('debtor').get(
-            iban=debtor_account
-        )
+        debit_acc = None
+        all_debit_accounts = DebtorAccount.objects.select_related('debtor').all()
+        
+        for acc in all_debit_accounts:
+            if acc.iban == debtor_account:
+                debit_acc = acc
+                break
         
         if not debit_acc:
             LogTransferencia.objects.create(
                 registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
                 tipo_log='ERROR',
-                contenido=f'Cuenta de débito no encontrada para IBAN: {debtor_account}. Cuentas disponibles: {[acc.iban for acc in all_accounts]}'
+                contenido=f'Cuenta de débito no encontrada para IBAN: {debtor_account}. Cuentas disponibles: {[acc.iban for acc in all_debit_accounts]}'
             )
             raise ValidationError({
                 'debtor_account': 'Cuenta de débito no encontrada'
@@ -86,6 +90,11 @@ class TransferService:
                 break
         
         if not credit_acc:
+            LogTransferencia.objects.create(
+                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                tipo_log='ERROR',
+                contenido=f'Cuenta de crédito no encontrada para IBAN: {creditor_account}. Cuentas disponibles: {[acc.iban for acc in all_creditor_accounts]}'
+            )
             raise ValidationError({
                 'creditor_account': 'Cuenta de crédito no encontrada'
             })
