@@ -8,6 +8,10 @@ from .models import (
     Kid, PaymentIdentification, Transfer, PostalAddress, AccountMovement
 )
 import uuid
+from services.transfer_services import TransferService
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from .models import LogTransferencia
 
 class BootstrapModelForm(forms.ModelForm):
     """Base form que aplica clases de Bootstrap a los campos."""
@@ -170,7 +174,7 @@ class PaymentIdentificationForm(BootstrapModelForm):
 class TransferForm(BootstrapModelForm):
     class Meta:
         model = Transfer
-        exclude = ['created_at', 'updated_at', 'auth_id', 'payment_id', 'payment_identification']
+        exclude = ['created_at', 'updated_at', 'auth_id', 'payment_id', 'payment_identification', 'status']
         widgets = {
             'debtor': forms.Select(attrs={'class': 'form-control'}),
             'debtor_account': forms.Select(attrs={'class': 'form-control'}),
@@ -196,22 +200,46 @@ class TransferForm(BootstrapModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         
-        # Generar payment_id único si no existe
-        if not instance.payment_id:
-            instance.payment_id = str(uuid.uuid4())
+        # Generar IDs únicos
+        transfer_id = str(uuid.uuid4())
+        end_to_end_id = f"E2E{transfer_id[:30]}"  # Máximo 35 caracteres
+        instruction_id = f"INS{transfer_id[:30]}"  # Máximo 35 caracteres
         
-        # Crear PaymentIdentification si no existe
-        if not instance.payment_identification_id:
-            payment_ident = PaymentIdentification.objects.create(
-                end_to_end_id=instance.payment_id[:35],
-                instruction_id=instance.payment_id[:35]
+        # Preparar datos para el servicio
+        data = {
+            'payment_id': transfer_id,
+            'end_to_end_id': end_to_end_id,
+            'instruction_id': instruction_id,
+            'debtor_account': instance.debtor_account.iban if instance.debtor_account else None,
+            'creditor_account': instance.creditor_account.iban if instance.creditor_account else None,
+            'instructed_amount': instance.instructed_amount,
+            'currency': instance.currency or 'EUR',
+            'purpose_code': instance.purpose_code or 'GDSV',
+            'requested_execution_date': instance.requested_execution_date or timezone.now().date(),
+            'remittance_information_unstructured': instance.remittance_information_unstructured,
+            'creditor_agent': instance.creditor_agent
+        }
+        
+        try:
+            # Usar el servicio para crear la transferencia
+            transfer = TransferService.create_transfer(data)
+            
+            # Registrar en el log
+            LogTransferencia.objects.create(
+                registro=transfer.payment_id,
+                tipo_log='TRANSFER',
+                contenido=f'Transferencia creada desde formulario: {transfer.payment_id}'
             )
-            instance.payment_identification = payment_ident
-        
-        if commit:
-            instance.save()
-        
-        return instance
+            
+            return transfer
+        except ValidationError as e:
+            if hasattr(e, 'error_dict'):
+                # Si es un dict de errores, propagarlo
+                raise
+            # Si es un error simple, asignarlo al campo de monto
+            raise ValidationError({
+                'instructed_amount': str(e)
+            })
 
 class AccountMovementForm(BootstrapModelForm):
     class Meta:

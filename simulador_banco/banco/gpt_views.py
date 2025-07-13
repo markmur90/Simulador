@@ -2,10 +2,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic, View
 from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
-    Transfer
+    Transfer, PaymentIdentification
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,
@@ -112,6 +113,15 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
         context['form_errors'] = form.errors
         return self.render_to_response(context)
 
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+            messages.success(self.request, 'Transferencia creada exitosamente.')
+            return response
+        except Exception as e:
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
+
 
 class TransferDetailView(LoginRequiredMixin, generic.DetailView):
     model = Transfer
@@ -127,6 +137,15 @@ class TransferUpdateView(LoginRequiredMixin, generic.UpdateView):
     slug_url_kwarg = 'payment_id'
     template_name = 'api/GPT4/edit_transfer.html'
     success_url = reverse_lazy('list_transferGPT4')
+
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+            messages.success(self.request, 'Transferencia actualizada exitosamente.')
+            return response
+        except Exception as e:
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
 
 
 class ClientIDListView(LoginRequiredMixin, generic.ListView):
