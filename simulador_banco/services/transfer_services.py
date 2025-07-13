@@ -36,11 +36,32 @@ class TransferService:
     @classmethod
     def validate_accounts(cls, debtor_account: str, creditor_account: str) -> tuple:
         """Valida y retorna las cuentas de débito y crédito."""
+        # Log para depuración
+        LogTransferencia.objects.create(
+            registro=f"DEBUG_{debtor_account[:8]}",
+            tipo_log='DEBUG',
+            contenido=f'Buscando cuenta de débito con IBAN: {debtor_account}'
+        )
+        
         try:
             debit_acc = DebtorAccount.objects.select_related('debtor').get(
                 iban=debtor_account
             )
+            
+            # Log de éxito
+            LogTransferencia.objects.create(
+                registro=f"DEBUG_{debtor_account[:8]}",
+                tipo_log='DEBUG',
+                contenido=f'Cuenta de débito encontrada: {debit_acc.iban}'
+            )
+            
         except DebtorAccount.DoesNotExist:
+            # Log del error
+            LogTransferencia.objects.create(
+                registro=f"DEBUG_{debtor_account[:8]}",
+                tipo_log='ERROR',
+                contenido=f'Cuenta de débito no encontrada para IBAN: {debtor_account}'
+            )
             raise ValidationError({
                 'debtor_account': 'Cuenta de débito no encontrada'
             })

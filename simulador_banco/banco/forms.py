@@ -294,12 +294,20 @@ class TransferForm(BootstrapModelForm):
         end_to_end_id = f"E2E{transfer_id[:30]}"  # Máximo 35 caracteres
         instruction_id = f"INS{transfer_id[:30]}"  # Máximo 35 caracteres
         
+        # Log para depuración
+        debtor_iban = instance.debtor_account.iban if instance.debtor_account else None
+        LogTransferencia.objects.create(
+            registro=f"DEBUG_FORM_{transfer_id[:8]}",
+            tipo_log='DEBUG',
+            contenido=f'IBAN desde el formulario: {debtor_iban}'
+        )
+        
         # Preparar datos para el servicio
         data = {
             'payment_id': transfer_id,
             'end_to_end_id': end_to_end_id,
             'instruction_id': instruction_id,
-            'debtor_account': instance.debtor_account.iban if instance.debtor_account else None,
+            'debtor_account': debtor_iban,
             'creditor_account': instance.creditor_account.iban if instance.creditor_account else None,
             'instructed_amount': instance.instructed_amount,
             'currency': instance.currency or 'EUR',
