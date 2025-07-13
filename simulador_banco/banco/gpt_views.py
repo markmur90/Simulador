@@ -2,10 +2,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic, View
 from django.shortcuts import redirect, get_object_or_404
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
-    Transfer
+    Transfer, PaymentIdentification
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,
@@ -38,6 +40,20 @@ class DebtorAccountCreateView(LoginRequiredMixin, generic.CreateView):
     form_class = DebtorAccountForm
     template_name = 'api/GPT4/create_debtor_account.html'
     success_url = reverse_lazy('list_debtor_accountsGPT4')
+
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+            messages.success(self.request, 'Cuenta de débito creada exitosamente.')
+            return response
+        except Exception as e:
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Crear Nueva Cuenta de Débito'
+        return context
 
 
 class CreditorListView(LoginRequiredMixin, generic.ListView):
@@ -106,6 +122,31 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'api/GPT4/create_transfer.html'
     success_url = reverse_lazy('list_transferGPT4')
 
+    def form_invalid(self, form):
+        """
+        Maneja los errores de validación del formulario.
+        Si hay errores en form.errors, los mantiene en sus campos específicos.
+        """
+        return self.render_to_response(self.get_context_data(form=form))
+
+    def form_valid(self, form):
+        """
+        Intenta guardar el formulario y maneja cualquier error que ocurra.
+        """
+        try:
+            self.object = form.save()
+            messages.success(self.request, 'Transferencia creada exitosamente.')
+            return redirect(self.get_success_url())
+        except ValidationError as e:
+            if hasattr(e, 'message_dict'):
+                # Si el error tiene un diccionario de mensajes, actualizar los errores del formulario
+                for field, error in e.message_dict.items():
+                    form.add_error(field, error)
+            else:
+                # Si es un error simple, agregarlo al formulario
+                form.add_error(None, str(e))
+            return self.form_invalid(form)
+
 
 class TransferDetailView(LoginRequiredMixin, generic.DetailView):
     model = Transfer
@@ -121,6 +162,15 @@ class TransferUpdateView(LoginRequiredMixin, generic.UpdateView):
     slug_url_kwarg = 'payment_id'
     template_name = 'api/GPT4/edit_transfer.html'
     success_url = reverse_lazy('list_transferGPT4')
+
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+            messages.success(self.request, 'Transferencia actualizada exitosamente.')
+            return response
+        except Exception as e:
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
 
 
 class ClientIDListView(LoginRequiredMixin, generic.ListView):
