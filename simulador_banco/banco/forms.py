@@ -7,6 +7,11 @@ from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount,
     Kid, PaymentIdentification, Transfer, PostalAddress, AccountMovement
 )
+import uuid
+from services.transfer_services import TransferService
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from .models import LogTransferencia
 
 class BootstrapModelForm(forms.ModelForm):
     """Base form que aplica clases de Bootstrap a los campos."""
@@ -73,6 +78,77 @@ class DebtorAccountForm(BootstrapModelForm):
     class Meta:
         model = DebtorAccount
         fields = ['debtor', 'iban', 'balance', 'currency']
+        widgets = {
+            'debtor': forms.Select(attrs={'class': 'form-control'}),
+            'iban': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ejemplo: ES91 2100 0418 4502 0005 1332'
+            }),
+            'balance': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01'
+            }),
+            'currency': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'EUR'
+            })
+        }
+
+    def clean_iban(self):
+        iban = self.cleaned_data.get('iban')
+        if iban:
+            # Eliminar espacios y convertir a mayúsculas
+            iban = ''.join(iban.split()).upper()
+            
+            # Validar formato básico de IBAN
+            if not iban.startswith(('ES', 'DE', 'FR', 'GB', 'IT')):
+                raise ValidationError('El IBAN debe comenzar con un código de país válido (ES, DE, FR, GB, IT)')
+            
+            if not len(iban) >= 15:
+                raise ValidationError('El IBAN es demasiado corto')
+                
+            if not len(iban) <= 34:
+                raise ValidationError('El IBAN es demasiado largo')
+                
+            # Verificar que solo contiene caracteres válidos
+            if not all(c.isalnum() for c in iban):
+                raise ValidationError('El IBAN solo puede contener letras y números')
+            
+            # Verificar si ya existe
+            try:
+                existing = DebtorAccount.objects.get(iban=iban)
+                if existing and (not self.instance or existing.pk != self.instance.pk):
+                    raise ValidationError('Este IBAN ya está registrado')
+            except DebtorAccount.DoesNotExist:
+                pass
+                
+            return iban
+        return None
+
+    def clean_balance(self):
+        balance = self.cleaned_data.get('balance')
+        if balance is not None and balance < 0:
+            raise ValidationError('El saldo no puede ser negativo')
+        return balance
+
+    def clean_currency(self):
+        currency = self.cleaned_data.get('currency')
+        if currency:
+            currency = currency.upper()
+            if currency not in ['EUR', 'USD', 'GBP']:
+                raise ValidationError('Moneda no válida. Use EUR, USD o GBP')
+            return currency
+        return None
+
+    def clean(self):
+        cleaned_data = super().clean()
+        debtor = cleaned_data.get('debtor')
+        if not debtor:
+            raise ValidationError({
+                'debtor': 'Debe seleccionar un deudor'
+            })
+        return cleaned_data
 
 
 class DebtorUpdateForm(DebtorForm):
@@ -169,7 +245,7 @@ class PaymentIdentificationForm(BootstrapModelForm):
 class TransferForm(BootstrapModelForm):
     class Meta:
         model = Transfer
-        exclude = ['created_at', 'updated_at', 'auth_id']
+        exclude = ['created_at', 'updated_at', 'auth_id', 'payment_id', 'payment_identification', 'status']
         widgets = {
             'debtor': forms.Select(attrs={'class': 'form-control'}),
             'debtor_account': forms.Select(attrs={'class': 'form-control'}),
@@ -185,12 +261,89 @@ class TransferForm(BootstrapModelForm):
                 'value': datetime.now(pytz.timezone('Europe/Berlin')).strftime('%Y-%m-%d')
             }),
             'remittance_information_unstructured': forms.TextInput(attrs={
-                'maxlength': 60,
                 'class': 'form-control',
                 'rows': 1,
                 'placeholder': 'Ingrese información no estructurada (máx. 60 caracteres)'
             }),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Validar que exista cuenta de débito
+        debtor_account = cleaned_data.get('debtor_account')
+        if not debtor_account:
+            raise ValidationError({
+                'debtor_account': 'La cuenta de débito es requerida'
+            })
+            
+        # Validar que exista cuenta de crédito
+        creditor_account = cleaned_data.get('creditor_account')
+        if not creditor_account:
+            raise ValidationError({
+                'creditor_account': 'La cuenta de crédito es requerida'
+            })
+            
+        return cleaned_data
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Generar IDs únicos
+        transfer_id = str(uuid.uuid4())
+        end_to_end_id = f"E2E{transfer_id[:30]}"  # Máximo 35 caracteres
+        instruction_id = f"INS{transfer_id[:30]}"  # Máximo 35 caracteres
+        
+        # Log para depuración
+        debtor_iban = instance.debtor_account.iban if instance.debtor_account else None
+        LogTransferencia.objects.create(
+            registro=f"DEBUG_FORM_{transfer_id[:8]}",
+            tipo_log='DEBUG',
+            contenido=f'IBAN desde el formulario: {debtor_iban}'
+        )
+        
+        # Preparar datos para el servicio
+        data = {
+            'payment_id': transfer_id,
+            'end_to_end_id': end_to_end_id,
+            'instruction_id': instruction_id,
+            'debtor_account': debtor_iban,
+            'creditor_account': instance.creditor_account.iban if instance.creditor_account else None,
+            'instructed_amount': instance.instructed_amount,
+            'currency': instance.currency or 'EUR',
+            'purpose_code': instance.purpose_code or 'GDSV',
+            'requested_execution_date': instance.requested_execution_date or timezone.now().date(),
+            'remittance_information_unstructured': instance.remittance_information_unstructured,
+            'creditor_agent': instance.creditor_agent
+        }
+        
+        try:
+            # Usar el servicio para crear la transferencia
+            transfer = TransferService.create_transfer(data)
+            
+            # Registrar en el log
+            LogTransferencia.objects.create(
+                registro=transfer.payment_id,
+                tipo_log='TRANSFER',
+                contenido=f'Transferencia creada desde formulario: {transfer.payment_id}'
+            )
+            
+            return transfer
+        except ValidationError as e:
+            if hasattr(e, 'message_dict'):
+                # Si es un dict de errores, propagarlo
+                raise
+            # Si es un error simple, asignarlo al campo correspondiente
+            error_message = str(e)
+            if 'débito' in error_message.lower():
+                raise ValidationError({'debtor_account': error_message})
+            elif 'crédito' in error_message.lower():
+                raise ValidationError({'creditor_account': error_message})
+            elif 'saldo' in error_message.lower():
+                raise ValidationError({'instructed_amount': error_message})
+            else:
+                # Si no podemos identificar el campo específico, lo asignamos a __all__
+                raise ValidationError({'__all__': error_message})
 
 class AccountMovementForm(BootstrapModelForm):
     class Meta:
