@@ -11,14 +11,19 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Agregar services al PYTHONPATH
+sys.path.insert(0, str(BASE_DIR))
 
 # Carga variables de entorno desde .env en el directorio raíz de proyecto
-BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / '.env')
+load_dotenv(str(BASE_DIR / '.env'))
 
 def get_env(var_name, default=None, required=False):
     value = os.environ.get(var_name, default)

@@ -93,7 +93,7 @@
                 <td class="fw-bold">{{ transfer.instructed_amount }} {{ transfer.currency }}</td>
                 <td>
                   <span class="badge 
-                    {% if transfer.status == 'ACSC' %}bg-success
+                    {% if transfer.status == 'ACCP' %}bg-success
                     {% elif transfer.status == 'PDNG' %}bg-warning
                     {% elif transfer.status == 'RJCT' %}bg-danger
                     {% else %}bg-secondary{% endif %}">

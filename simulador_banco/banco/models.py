@@ -27,7 +27,9 @@ class OTPChallenge(models.Model):
     transfer_data = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=20, default="CREATED")
     auth_id = models.CharField(max_length=50, null=True, blank=True)  # 🔥 Nuevo campo
+    attempts = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
+    expires_at = models.DateTimeField()
 
     def __str__(self):
         return f"{self.payment_id} - {self.challenge_id}"
@@ -368,7 +370,7 @@ class Transfer(models.Model):
     def get_status_color(self):
         return {
             'PDNG': 'warning',
-            'ACSC': 'success',
+            'ACCP': 'success',
             'RJCT': 'danger',
             'CANC': 'secondary'
         }.get(self.status, 'dark')
