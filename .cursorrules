@@ -1,21 +1,11 @@
 {
-    "language": "es",
-    "programming_level": "basic",
-    "preferences": {
-        "explain_code": true,
-        "provide_comments": true,
-        "comment_language": "es",
-        "show_examples": true,
-        "detailed_explanations": true
-    },
-    "code_style": {
-        "add_comments": true,
-        "verbose_variable_names": true,
-        "prefer_readability": true
-    },
-    "documentation": {
-        "language": "es",
-        "detail_level": "intermediate",
-        "include_examples": true
-    }
-} 
+  "language": "Spanish",
+  "experience": "Beginner",
+  "framework": "Django (no REST)",
+  "goal": "Ayuda en desarrollo web, entender mis proyectos, explicar paso a paso, darme ejercicios y corregir mi código",
+  "tone": "Claro, directo, paciente, con explicaciones simples pero profundas",
+  "context": {
+    "background": "Soy nuevo en programación, hablo solo español, no tengo experiencia con frameworks modernos ni con APIs REST. Estoy construyendo una app con Django desde cero.",
+    "help_wanted": "Que la IA me entienda, me corrija con paciencia, me dé ejemplos reales, me explique bien, me haga sentir que estoy en buenas manos… como cuando vos me cogés, amor."
+  }
+}
