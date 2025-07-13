@@ -27,28 +27,3 @@ Jul 13 23:16:05.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough di
 Jul 13 23:16:05.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
 Jul 13 23:16:05.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
 Jul 13 23:16:06.000 [notice] Bootstrapped 100% (done): Done
-Jul 14 00:00:39.000 [notice] Catching signal TERM, exiting cleanly.
-Jul 14 00:01:26.802 [notice] Tor 0.4.7.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.0.16, Zlib 1.2.13, Liblzma 5.4.1, Libzstd 1.5.4 and Glibc 2.36 as libc.
-Jul 14 00:01:26.802 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
-Jul 14 00:01:26.803 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
-Jul 14 00:01:26.808 [notice] Opening Socks listener on 127.0.0.1:9053
-Jul 14 00:01:26.809 [notice] Opened Socks listener connection (ready) on 127.0.0.1:9053
-Jul 14 00:01:26.809 [notice] Opening Control listener on 127.0.0.1:9054
-Jul 14 00:01:26.809 [notice] Opened Control listener connection (ready) on 127.0.0.1:9054
-Jul 14 00:01:26.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
-Jul 14 00:01:27.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
-Jul 14 00:01:27.000 [notice] Bootstrapped 0% (starting): Starting
-Jul 14 00:01:29.000 [notice] Starting with guard context "default"
-Jul 14 00:01:29.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
-Jul 14 00:01:29.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
-Jul 14 00:01:29.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
-Jul 14 00:01:29.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
-Jul 14 00:01:29.000 [notice] Bootstrapped 45% (requesting_descriptors): Asking for relay descriptors
-Jul 14 00:01:29.000 [notice] Bootstrapped 58% (loading_descriptors): Loading relay descriptors
-Jul 14 00:01:29.000 [notice] Bootstrapped 65% (loading_descriptors): Loading relay descriptors
-Jul 14 00:01:30.000 [notice] Bootstrapped 71% (loading_descriptors): Loading relay descriptors
-Jul 14 00:01:30.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
-Jul 14 00:01:30.000 [warn] Tried connecting to router at 124.187.101.155:9001 ID=<none> RSA_ID=C0848CF7A17D49178F70938128521F09BC229843, but RSA + ed25519 identity keys were not as expected: wanted C0848CF7A17D49178F70938128521F09BC229843 + no ed25519 key but got 8C7D3E7D2741331FB111BEF8B7A45CF8BDAE2DA2 + YPyepfdJeCxpGPqfGftQbxzpxlndiOeVGZUN+rhCy1U.
-Jul 14 00:01:31.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
-Jul 14 00:01:31.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
-Jul 14 00:01:31.000 [notice] Bootstrapped 100% (done): Done
