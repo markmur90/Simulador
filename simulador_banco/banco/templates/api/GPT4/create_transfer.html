@@ -12,12 +12,21 @@
 <div class="container-fluid">
   <h1 class="text-center mb-4 display-6 fw-bold">GPT4 Crear Nueva Transferencia SEPA</h1>
 
+  {% if form_errors %}
+  <div class="alert alert-danger">
+    <h5>Por favor corrija los siguientes errores:</h5>
+    <ul>
+      {% for field, errors in form_errors.items %}
+        {% for error in errors %}
+          <li>{{ field }}: {{ error }}</li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
   <form method="post" class="needs-validation" novalidate>
     {% csrf_token %}
-
-
-
-
 
     <div class="card custom-card mb-4">
       <div class="custom-card-header">Datos del Deudor</div>
@@ -26,11 +35,21 @@
           <div class="col-md-6">
             <label for="id_debtor" class="form-label">Deudor</label>
             {{ form.debtor }}
+            {% if form.debtor.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.debtor.errors|join:", " }}
+            </div>
+            {% endif %}
             <a href="{% url 'create_debtorGPT4' %}" class="btn btn-link">Crear nuevo deudor</a>
           </div>
           <div class="col-md-6">
             <label for="id_debtor_account" class="form-label">Cuenta del Deudor</label>
             {{ form.debtor_account }}
+            {% if form.debtor_account.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.debtor_account.errors|join:", " }}
+            </div>
+            {% endif %}
             <a href="{% url 'create_debtor_accountGPT4' %}" class="btn btn-link">Crear nueva cuenta</a>
           </div>
         </div>
@@ -44,16 +63,31 @@
           <div class="col-md-4">
             <label for="id_creditor" class="form-label">Acreedor</label>
             {{ form.creditor }}
+            {% if form.creditor.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.creditor.errors|join:", " }}
+            </div>
+            {% endif %}
             <a href="{% url 'create_creditorGPT4' %}" class="btn btn-link">Crear nuevo acreedor</a>
           </div>
           <div class="col-md-4">
             <label for="id_creditor_account" class="form-label">Cuenta del Acreedor</label>
             {{ form.creditor_account }}
+            {% if form.creditor_account.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.creditor_account.errors|join:", " }}
+            </div>
+            {% endif %}
             <a href="{% url 'create_creditor_accountGPT4' %}" class="btn btn-link">Crear nueva cuenta</a>
           </div>
           <div class="col-md-4">
             <label for="id_creditor_agent" class="form-label">Agente del Acreedor</label>
             {{ form.creditor_agent }}
+            {% if form.creditor_agent.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.creditor_agent.errors|join:", " }}
+            </div>
+            {% endif %}
             <a href="{% url 'create_creditor_agentGPT4' %}" class="btn btn-link">Crear nuevo agente</a>
           </div>
         </div>
@@ -67,24 +101,49 @@
           <div class="col-md-4">
             <label for="id_instructed_amount" class="form-label">Monto</label>
             {{ form.instructed_amount }}
+            {% if form.instructed_amount.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.instructed_amount.errors|join:", " }}
+            </div>
+            {% endif %}
           </div>
           <div class="col-md-4">
             <label for="id_currency" class="form-label">Moneda</label>
             {{ form.currency }}
+            {% if form.currency.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.currency.errors|join:", " }}
+            </div>
+            {% endif %}
           </div>
           <div class="col-md-4">
             <label for="id_purpose_code" class="form-label">Código de Propósito</label>
             {{ form.purpose_code }}
+            {% if form.purpose_code.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.purpose_code.errors|join:", " }}
+            </div>
+            {% endif %}
           </div>
         </div>
         <div class="row g-3 mt-3">
           <div class="col-md-6">
             <label for="id_requested_execution_date" class="form-label">Fecha de Ejecución</label>
             {{ form.requested_execution_date }}
+            {% if form.requested_execution_date.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.requested_execution_date.errors|join:", " }}
+            </div>
+            {% endif %}
           </div>
           <div class="col-md-6">
             <label for="id_remittance_information_unstructured" class="form-label">Referencia de Pago</label>
             {{ form.remittance_information_unstructured }}
+            {% if form.remittance_information_unstructured.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.remittance_information_unstructured.errors|join:", " }}
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>

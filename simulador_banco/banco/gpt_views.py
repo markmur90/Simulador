@@ -106,6 +106,12 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'api/GPT4/create_transfer.html'
     success_url = reverse_lazy('list_transferGPT4')
 
+    def form_invalid(self, form):
+        # Agregar mensajes de error al contexto
+        context = self.get_context_data(form=form)
+        context['form_errors'] = form.errors
+        return self.render_to_response(context)
+
 
 class TransferDetailView(LoginRequiredMixin, generic.DetailView):
     model = Transfer

@@ -7,6 +7,7 @@ from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount,
     Kid, PaymentIdentification, Transfer, PostalAddress, AccountMovement
 )
+import uuid
 
 class BootstrapModelForm(forms.ModelForm):
     """Base form que aplica clases de Bootstrap a los campos."""
@@ -169,7 +170,7 @@ class PaymentIdentificationForm(BootstrapModelForm):
 class TransferForm(BootstrapModelForm):
     class Meta:
         model = Transfer
-        exclude = ['created_at', 'updated_at', 'auth_id']
+        exclude = ['created_at', 'updated_at', 'auth_id', 'payment_id', 'payment_identification']
         widgets = {
             'debtor': forms.Select(attrs={'class': 'form-control'}),
             'debtor_account': forms.Select(attrs={'class': 'form-control'}),
@@ -191,6 +192,26 @@ class TransferForm(BootstrapModelForm):
                 'placeholder': 'Ingrese información no estructurada (máx. 60 caracteres)'
             }),
         }
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        
+        # Generar payment_id único si no existe
+        if not instance.payment_id:
+            instance.payment_id = str(uuid.uuid4())
+        
+        # Crear PaymentIdentification si no existe
+        if not instance.payment_identification_id:
+            payment_ident = PaymentIdentification.objects.create(
+                end_to_end_id=instance.payment_id[:35],
+                instruction_id=instance.payment_id[:35]
+            )
+            instance.payment_identification = payment_ident
+        
+        if commit:
+            instance.save()
+        
+        return instance
 
 class AccountMovementForm(BootstrapModelForm):
     class Meta:
