@@ -36,51 +36,31 @@ class TransferService:
     @classmethod
     def validate_accounts(cls, debtor_account: str, creditor_account: str) -> tuple:
         """Valida y retorna las cuentas de débito y crédito."""
-        # Log para depuración inicial
+        # Log para depuración
         LogTransferencia.objects.create(
-            registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+            registro=f"DEBUG_{debtor_account[:8]}",
             tipo_log='DEBUG',
-            contenido=f'Iniciando validación de cuentas - Deudor: {debtor_account}, Acreedor: {creditor_account}'
-        )
-        
-        # Normalizar IBANs
-        debtor_account = ''.join(debtor_account.split()).upper()
-        creditor_account = ''.join(creditor_account.split()).upper()
-        
-        # Log después de normalización
-        LogTransferencia.objects.create(
-            registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-            tipo_log='DEBUG',
-            contenido=f'IBANs normalizados - Deudor: {debtor_account}, Acreedor: {creditor_account}'
+            contenido=f'Buscando cuenta de débito con IBAN: {debtor_account}'
         )
         
         try:
-            # Intentar obtener todas las cuentas deudoras para depuración
-            all_accounts = DebtorAccount.objects.all()
-            for acc in all_accounts:
-                LogTransferencia.objects.create(
-                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                    tipo_log='DEBUG',
-                    contenido=f'Cuenta en BD: {acc.iban}'
-                )
-            
             debit_acc = DebtorAccount.objects.select_related('debtor').get(
                 iban=debtor_account
             )
             
             # Log de éxito
             LogTransferencia.objects.create(
-                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                registro=f"DEBUG_{debtor_account[:8]}",
                 tipo_log='DEBUG',
                 contenido=f'Cuenta de débito encontrada: {debit_acc.iban}'
             )
             
         except DebtorAccount.DoesNotExist:
-            # Log del error detallado
+            # Log del error
             LogTransferencia.objects.create(
-                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                registro=f"DEBUG_{debtor_account[:8]}",
                 tipo_log='ERROR',
-                contenido=f'Cuenta de débito no encontrada para IBAN: {debtor_account}. Todas las cuentas revisadas.'
+                contenido=f'Cuenta de débito no encontrada para IBAN: {debtor_account}'
             )
             raise ValidationError({
                 'debtor_account': 'Cuenta de débito no encontrada'
