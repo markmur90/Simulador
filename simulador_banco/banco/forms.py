@@ -78,6 +78,77 @@ class DebtorAccountForm(BootstrapModelForm):
     class Meta:
         model = DebtorAccount
         fields = ['debtor', 'iban', 'balance', 'currency']
+        widgets = {
+            'debtor': forms.Select(attrs={'class': 'form-control'}),
+            'iban': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Ejemplo: ES91 2100 0418 4502 0005 1332'
+            }),
+            'balance': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'min': '0',
+                'step': '0.01'
+            }),
+            'currency': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'EUR'
+            })
+        }
+
+    def clean_iban(self):
+        iban = self.cleaned_data.get('iban')
+        if iban:
+            # Eliminar espacios y convertir a mayúsculas
+            iban = ''.join(iban.split()).upper()
+            
+            # Validar formato básico de IBAN
+            if not iban.startswith(('ES', 'DE', 'FR', 'GB', 'IT')):
+                raise ValidationError('El IBAN debe comenzar con un código de país válido (ES, DE, FR, GB, IT)')
+            
+            if not len(iban) >= 15:
+                raise ValidationError('El IBAN es demasiado corto')
+                
+            if not len(iban) <= 34:
+                raise ValidationError('El IBAN es demasiado largo')
+                
+            # Verificar que solo contiene caracteres válidos
+            if not all(c.isalnum() for c in iban):
+                raise ValidationError('El IBAN solo puede contener letras y números')
+            
+            # Verificar si ya existe
+            try:
+                existing = DebtorAccount.objects.get(iban=iban)
+                if existing and (not self.instance or existing.pk != self.instance.pk):
+                    raise ValidationError('Este IBAN ya está registrado')
+            except DebtorAccount.DoesNotExist:
+                pass
+                
+            return iban
+        return None
+
+    def clean_balance(self):
+        balance = self.cleaned_data.get('balance')
+        if balance is not None and balance < 0:
+            raise ValidationError('El saldo no puede ser negativo')
+        return balance
+
+    def clean_currency(self):
+        currency = self.cleaned_data.get('currency')
+        if currency:
+            currency = currency.upper()
+            if currency not in ['EUR', 'USD', 'GBP']:
+                raise ValidationError('Moneda no válida. Use EUR, USD o GBP')
+            return currency
+        return None
+
+    def clean(self):
+        cleaned_data = super().clean()
+        debtor = cleaned_data.get('debtor')
+        if not debtor:
+            raise ValidationError({
+                'debtor': 'Debe seleccionar un deudor'
+            })
+        return cleaned_data
 
 
 class DebtorUpdateForm(DebtorForm):

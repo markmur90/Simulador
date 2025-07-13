@@ -41,6 +41,20 @@ class DebtorAccountCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'api/GPT4/create_debtor_account.html'
     success_url = reverse_lazy('list_debtor_accountsGPT4')
 
+    def form_valid(self, form):
+        try:
+            response = super().form_valid(form)
+            messages.success(self.request, 'Cuenta de débito creada exitosamente.')
+            return response
+        except Exception as e:
+            form.add_error(None, str(e))
+            return self.form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Crear Nueva Cuenta de Débito'
+        return context
+
 
 class CreditorListView(LoginRequiredMixin, generic.ListView):
     model = Creditor

@@ -7,10 +7,20 @@
   .custom-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
   .custom-card-header { background: linear-gradient(45deg,#343a40,#495057); color: #fff; font-weight: 600; font-size: 1.3rem; padding: 1rem 1.5rem; border-top-left-radius: 1rem; border-top-right-radius: 1rem; }
   .custom-card-body { padding: 1.5rem; }
+  .error-feedback { color: #dc3545; font-size: 0.875em; margin-top: 0.25rem; }
+  .help-text { color: #6c757d; font-size: 0.875em; margin-top: 0.25rem; }
 </style>
 
 <div class="container-fluid">
-  <h1 class="text-center display-6 fw-bold mb-4">GPT4 Crear Nueva Cuenta de Deudor</h1>
+  <h1 class="text-center display-6 fw-bold mb-4">{{ title|default:"GPT4 Crear Nueva Cuenta de Débito" }}</h1>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger">
+    {% for error in form.non_field_errors %}
+      {{ error }}
+    {% endfor %}
+  </div>
+  {% endif %}
 
   <form method="post" class="needs-validation" novalidate>
     {% csrf_token %}
@@ -21,18 +31,51 @@
           <div class="col-md-6">
             <label for="id_debtor" class="form-label">Deudor</label>
             {{ form.debtor }}
+            {% if form.debtor.errors %}
+            <div class="error-feedback">
+              {{ form.debtor.errors|join:", " }}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Seleccione el deudor para esta cuenta. Si no existe, puede crear uno nuevo.
+            </div>
+            <a href="{% url 'create_debtorGPT4' %}" class="btn btn-link">Crear nuevo deudor</a>
           </div>
-          <div class="col-md-4">
+          <div class="col-md-6">
             <label for="id_iban" class="form-label">IBAN</label>
             {{ form.iban }}
+            {% if form.iban.errors %}
+            <div class="error-feedback">
+              {{ form.iban.errors|join:", " }}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Formato: ESXX XXXX XXXX XXXX XXXX XXXX (sin espacios)
+            </div>
           </div>
-          <div class="col-md-3">
-            <label for="id_balance" class="form-label">Monto Inicial</label>
+          <div class="col-md-6">
+            <label for="id_balance" class="form-label">Saldo Inicial</label>
             {{ form.balance }}
+            {% if form.balance.errors %}
+            <div class="error-feedback">
+              {{ form.balance.errors|join:", " }}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Saldo inicial de la cuenta. Debe ser un número positivo.
+            </div>
           </div>
-          <div class="col-md-2">
+          <div class="col-md-6">
             <label for="id_currency" class="form-label">Moneda</label>
             {{ form.currency }}
+            {% if form.currency.errors %}
+            <div class="error-feedback">
+              {{ form.currency.errors|join:", " }}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Monedas soportadas: EUR, USD, GBP
+            </div>
           </div>
         </div>
       </div>
