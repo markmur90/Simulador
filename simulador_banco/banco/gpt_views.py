@@ -14,6 +14,7 @@ from .forms import (
     CreditorAgentForm, ClientIDForm, KidForm, TransferForm,
     DebtorUpdateForm
 )
+from services.transfer_services import TransferService
 
 
 class DebtorListView(LoginRequiredMixin, generic.ListView):
@@ -226,3 +227,27 @@ class DebtorDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Debtor
     template_name = 'api/GPT4/delete_debtor.html'
     success_url = reverse_lazy('list_debtorsGPT4')
+
+
+class SendTransferView(LoginRequiredMixin, generic.UpdateView):
+    model = Transfer
+    template_name = 'api/GPT4/send_transfer.html'
+    fields = []  # No necesitamos campos editables
+    slug_field = 'payment_id'
+    slug_url_kwarg = 'payment_id'
+
+    def get_success_url(self):
+        return reverse_lazy('transfer_detailGPT4', kwargs={'payment_id': self.object.payment_id})
+
+    def form_valid(self, form):
+        try:
+            # Intentar procesar la transferencia
+            TransferService.process_transfer(self.object)
+            messages.success(self.request, 'Transferencia enviada exitosamente.')
+            return super().form_valid(form)
+        except ValidationError as e:
+            messages.error(self.request, str(e))
+            return redirect('transfer_detailGPT4', payment_id=self.object.payment_id)
+        except Exception as e:
+            messages.error(self.request, f'Error al procesar la transferencia: {str(e)}')
+            return redirect('transfer_detailGPT4', payment_id=self.object.payment_id)

@@ -71,6 +71,7 @@ urlpatterns = [
     path('gpt4/transferencias/nuevo/', gpt_views.TransferCreateView.as_view(), name='create_transferGPT4'),
     path('gpt4/transferencias/<str:payment_id>/', gpt_views.TransferDetailView.as_view(), name='transfer_detailGPT4'),
     path('gpt4/transferencias/<str:payment_id>/editar/', gpt_views.TransferUpdateView.as_view(), name='edit_transferGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/enviar/', gpt_views.SendTransferView.as_view(), name='send_transfer_viewGPT4'),
 ]
 
 urlpatterns += [
