@@ -4,6 +4,10 @@ from django.views import generic, View
 from django.shortcuts import redirect, get_object_or_404
 from django.contrib import messages
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.utils import timezone
+import weasyprint
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
@@ -251,3 +255,24 @@ class SendTransferView(LoginRequiredMixin, generic.UpdateView):
         except Exception as e:
             messages.error(self.request, f'Error al procesar la transferencia: {str(e)}')
             return redirect('transfer_detailGPT4', payment_id=self.object.payment_id)
+
+
+class DownloadTransferPDFView(LoginRequiredMixin, View):
+    def get(self, request, payment_id):
+        # Obtener la transferencia
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        
+        # Renderizar el template HTML
+        html_string = render_to_string('api/GPT4/transfer_pdf.html', {
+            'transfer': transfer,
+            'generated_at': timezone.now()
+        })
+        
+        # Crear el PDF
+        pdf = weasyprint.HTML(string=html_string).write_pdf()
+        
+        # Preparar la respuesta
+        response = HttpResponse(pdf, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="transfer_{payment_id}.pdf"'
+        
+        return response

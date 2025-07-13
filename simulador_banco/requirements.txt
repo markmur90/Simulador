@@ -59,4 +59,4 @@ whitenoise
 reportlab
 django-stubs
 typing-extensions
-
+weasyprint

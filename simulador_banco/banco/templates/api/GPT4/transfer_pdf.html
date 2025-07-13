@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Transferencia {{ transfer.payment_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 2cm;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2em;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 1em;
+        }
+        .title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 1em;
+        }
+        .section {
+            margin-bottom: 2em;
+        }
+        .section-title {
+            font-size: 18px;
+            color: #666;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 0.5em;
+            margin-bottom: 1em;
+        }
+        .field {
+            margin-bottom: 0.5em;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+        .footer {
+            margin-top: 3em;
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">Detalles de la Transferencia</h1>
+        <p>Generado el: {{ generated_at|date:"d/m/Y H:i" }}</p>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Información General</h2>
+        <div class="field">
+            <span class="label">ID de Pago:</span>
+            <span>{{ transfer.payment_id }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Estado:</span>
+            <span>{{ transfer.get_status_display }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Fecha de Creación:</span>
+            <span>{{ transfer.created_at|date:"d/m/Y H:i" }}</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Deudor</h2>
+        <div class="field">
+            <span class="label">Nombre:</span>
+            <span>{{ transfer.debtor.name }}</span>
+        </div>
+        <div class="field">
+            <span class="label">IBAN:</span>
+            <span>{{ transfer.debtor_account.iban }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Dirección:</span>
+            <span>{{ transfer.debtor.address.street }}, {{ transfer.debtor.address.city }}</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Acreedor</h2>
+        <div class="field">
+            <span class="label">Nombre:</span>
+            <span>{{ transfer.creditor.name }}</span>
+        </div>
+        <div class="field">
+            <span class="label">IBAN:</span>
+            <span>{{ transfer.creditor_account.iban }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Dirección:</span>
+            <span>{{ transfer.creditor.address.street }}, {{ transfer.creditor.address.city }}</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2 class="section-title">Detalles del Pago</h2>
+        <div class="field">
+            <span class="label">Monto:</span>
+            <span>{{ transfer.instructed_amount }} {{ transfer.currency }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Código de Propósito:</span>
+            <span>{{ transfer.purpose_code }}</span>
+        </div>
+        <div class="field">
+            <span class="label">Fecha de Ejecución Solicitada:</span>
+            <span>{{ transfer.requested_execution_date|date:"d/m/Y" }}</span>
+        </div>
+        {% if transfer.remittance_information_unstructured %}
+        <div class="field">
+            <span class="label">Información Adicional:</span>
+            <span>{{ transfer.remittance_information_unstructured }}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <p>Este documento es un comprobante generado automáticamente.</p>
+        <p>Fecha y hora de generación: {{ generated_at|date:"d/m/Y H:i:s" }}</p>
+    </div>
+</body>
+</html> 
