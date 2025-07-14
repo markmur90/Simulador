@@ -10,6 +10,7 @@ from django.utils import timezone
 from datetime import timedelta
 import weasyprint
 from decimal import Decimal
+from django.db import ProtectedError
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
@@ -339,3 +340,21 @@ class DebtorDetailView(LoginRequiredMixin, generic.DetailView):
         context['month_ago'] = today - timedelta(days=30)
         
         return context
+
+
+class DebtorAccountDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = DebtorAccount
+    template_name = 'api/GPT4/delete_debtor_account.html'
+    success_url = reverse_lazy('list_debtor_accountsGPT4')
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            response = super().delete(request, *args, **kwargs)
+            messages.success(request, 'Cuenta eliminada exitosamente.')
+            return response
+        except ProtectedError:
+            messages.error(request, 'No se puede eliminar esta cuenta porque tiene movimientos o transferencias asociadas.')
+            return redirect('list_debtor_accountsGPT4')
+        except Exception as e:
+            messages.error(request, f'Error al eliminar la cuenta: {str(e)}')
+            return redirect('list_debtor_accountsGPT4')

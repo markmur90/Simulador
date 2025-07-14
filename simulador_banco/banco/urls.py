@@ -50,6 +50,7 @@ urlpatterns = [
     path('gpt4/deudores/<int:pk>/', gpt_views.DebtorDetailView.as_view(), name='debtor_detailGPT4'),
     path('gpt4/cuentas-deudor/', gpt_views.DebtorAccountListView.as_view(), name='list_debtor_accountsGPT4'),
     path('gpt4/cuentas-deudor/nuevo/', gpt_views.DebtorAccountCreateView.as_view(), name='create_debtor_accountGPT4'),
+    path('gpt4/cuentas-deudor/<int:pk>/eliminar/', gpt_views.DebtorAccountDeleteView.as_view(), name='delete_debtor_accountGPT4'),
     
     path('gpt4/acreedores/', gpt_views.CreditorListView.as_view(), name='list_creditorsGPT4'),
     path('gpt4/acreedores/nuevo/', gpt_views.CreditorCreateView.as_view(), name='create_creditorGPT4'),
