@@ -10,7 +10,8 @@ from django.utils import timezone
 from datetime import timedelta
 import weasyprint
 from decimal import Decimal
-from django.db import ProtectedError
+from django.db import models
+from django.db.models.deletion import ProtectedError
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
