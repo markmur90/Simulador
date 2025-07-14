@@ -22,6 +22,7 @@ from .forms import (
     DebtorUpdateForm
 )
 from services.transfer_services import TransferService
+from services.api_validator import APITransferValidator
 
 
 class DebtorListView(LoginRequiredMixin, generic.ListView):
@@ -248,10 +249,22 @@ class SendTransferView(LoginRequiredMixin, generic.UpdateView):
 
     def form_valid(self, form):
         try:
+            # Primero validamos la transferencia para la API
+            es_valido, error_msg = APITransferValidator.validate_transfer_for_api(self.object)
+            
+            if not es_valido:
+                messages.error(self.request, f'Error de validación: {error_msg}')
+                return redirect('transfer_detailGPT4', payment_id=self.object.payment_id)
+            
+            # Si la validación es exitosa, formateamos los datos para la API
+            datos_api = APITransferValidator.format_transfer_for_api(self.object)
+            
             # Intentar procesar la transferencia
             TransferService.process_transfer(self.object)
-            messages.success(self.request, 'Transferencia enviada exitosamente.')
+            
+            messages.success(self.request, 'Transferencia validada y enviada exitosamente.')
             return super().form_valid(form)
+            
         except ValidationError as e:
             messages.error(self.request, str(e))
             return redirect('transfer_detailGPT4', payment_id=self.object.payment_id)
