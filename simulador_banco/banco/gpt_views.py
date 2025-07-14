@@ -65,6 +65,24 @@ class DebtorAccountCreateView(LoginRequiredMixin, generic.CreateView):
         return context
 
 
+class DebtorAccountDeleteView(LoginRequiredMixin, generic.DeleteView):
+    model = DebtorAccount
+    template_name = 'api/GPT4/delete_debtor_account.html'
+    success_url = reverse_lazy('list_debtor_accountsGPT4')
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            response = super().delete(request, *args, **kwargs)
+            messages.success(request, 'Cuenta eliminada exitosamente.')
+            return response
+        except ProtectedError:
+            messages.error(request, 'No se puede eliminar esta cuenta porque tiene movimientos o transferencias asociadas.')
+            return redirect('list_debtor_accountsGPT4')
+        except Exception as e:
+            messages.error(request, f'Error al eliminar la cuenta: {str(e)}')
+            return redirect('list_debtor_accountsGPT4')
+
+
 class CreditorListView(LoginRequiredMixin, generic.ListView):
     model = Creditor
     template_name = 'api/GPT4/list_creditors.html'
