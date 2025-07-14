@@ -11,7 +11,7 @@ import secrets
 from banco.models import (
     Transfer, Debtor, Creditor, DebtorAccount,
     CreditorAccount, CreditorAgent, PaymentIdentification,
-    LogTransferencia
+    LogTransferencia, AccountMovement
 )
 
 class TransferService:
@@ -204,6 +204,14 @@ class TransferService:
         # Actualizar saldos
         transfer.debtor_account.balance -= transfer.instructed_amount
         transfer.debtor_account.save()
+
+        # Crear registro de movimiento
+        AccountMovement.objects.create(
+            account=transfer.debtor_account,
+            tipo='PAYMENT',
+            monto=transfer.instructed_amount,
+            descripcion=f'Transferencia a {transfer.creditor.name} - ID: {transfer.payment_id}'
+        )
 
         # Actualizar estado
         transfer.status = 'ACCP'

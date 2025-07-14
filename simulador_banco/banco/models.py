@@ -196,6 +196,7 @@ class AccountMovement(models.Model):
     tipo = models.CharField(max_length=10, choices=TYPE_CHOICES)
     monto = models.DecimalField(max_digits=12, decimal_places=2)
     fecha = models.DateTimeField(auto_now_add=True)
+    descripcion = models.CharField(max_length=200, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:
