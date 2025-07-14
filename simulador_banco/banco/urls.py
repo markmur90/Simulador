@@ -74,6 +74,7 @@ urlpatterns = [
     path('gpt4/transferencias/<str:payment_id>/editar/', gpt_views.TransferUpdateView.as_view(), name='edit_transferGPT4'),
     path('gpt4/transferencias/<str:payment_id>/enviar/', gpt_views.SendTransferView.as_view(), name='send_transfer_viewGPT4'),
     path('gpt4/transferencias/<str:payment_id>/pdf/', gpt_views.DownloadTransferPDFView.as_view(), name='descargar_pdfGPT4'),
+    path('gpt4/cuentas/<int:account_id>/estado/pdf/', gpt_views.AccountStatementPDFView.as_view(), name='account_statement_pdfGPT4'),
 ]
 
 urlpatterns += [
@@ -81,5 +82,3 @@ urlpatterns += [
     path('api/transferencia/',     views.api_send_transfer,     name='api_send_transfer'),
     path('api/transferencia/verify/', views.api_verify_otp,     name='api_verify_otp'),
 ]
-
-path('gpt4/cuentas/<int:account_id>/estado/pdf/', gpt_views.AccountStatementPDFView.as_view(), name='account_statement_pdfGPT4'),
