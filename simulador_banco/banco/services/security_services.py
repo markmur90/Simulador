@@ -1,6 +1,7 @@
 import secrets
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple
+import requests
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -42,29 +43,60 @@ class SecurityService:
         )
 
     @classmethod
-    def verify_jwt(cls, token: str) -> Dict:
+    def notify_external_client(cls, payment_id: str, otp: str, challenge_id: str) -> bool:
         """
-        Verifica un token JWT y retorna su payload.
+        Notifica al cliente externo sobre el nuevo OTP generado.
         
         Args:
-            token: Token JWT a verificar
+            payment_id: ID de la transferencia
+            otp: Código OTP generado
+            challenge_id: ID del desafío
             
         Returns:
-            Dict: Payload del token
-            
-        Raises:
-            ValidationError: Si el token es inválido
+            bool: True si la notificación fue exitosa
         """
         try:
-            return jwt.decode(
-                token,
-                settings.JWT_SECRET_KEY,
-                algorithms=[cls.JWT_ALGORITHM]
+            # URL del cliente externo configurada en settings
+            external_url = settings.EXTERNAL_CLIENT_URL
+            
+            # Datos a enviar
+            payload = {
+                "payment_id": payment_id,
+                "challenge_id": str(challenge_id),
+                "otp": otp,
+                "expires_in": cls.OTP_EXPIRY_MINUTES * 60  # en segundos
+            }
+            
+            # Enviar notificación
+            response = requests.post(
+                f"{external_url}/verify-otp",
+                json=payload,
+                headers={
+                    "Authorization": f"Bearer {settings.EXTERNAL_CLIENT_TOKEN}",
+                    "Content-Type": "application/json"
+                },
+                timeout=5  # timeout en segundos
             )
-        except jwt.ExpiredSignatureError:
-            raise ValidationError('Token expirado')
-        except jwt.InvalidTokenError:
-            raise ValidationError('Token inválido')
+            
+            success = response.status_code == 200
+            
+            # Registrar el resultado
+            LogTransferencia.objects.create(
+                registro=payment_id,
+                tipo_log='OTP_NOTIFICATION',
+                contenido=f'Notificación externa: {"exitosa" if success else "fallida"}'
+            )
+            
+            return success
+            
+        except Exception as e:
+            # Registrar el error
+            LogTransferencia.objects.create(
+                registro=payment_id,
+                tipo_log='OTP_NOTIFICATION_ERROR',
+                contenido=f'Error al notificar: {str(e)}'
+            )
+            return False
 
     @classmethod
     def generate_otp_challenge(
@@ -73,7 +105,7 @@ class SecurityService:
         auth_id: Optional[str] = None
     ) -> Tuple[OTPChallenge, str]:
         """
-        Genera un nuevo desafío OTP.
+        Genera un nuevo desafío OTP y notifica al cliente externo.
         
         Args:
             payment_id: ID de la transferencia
@@ -82,24 +114,33 @@ class SecurityService:
         Returns:
             Tuple[OTPChallenge, str]: Objeto challenge y código OTP
         """
+        # Generar OTP
         otp = ''.join(
             secrets.choice('0123456789') 
             for _ in range(cls.OTP_LENGTH)
         )
         
+        # Crear challenge
         challenge = OTPChallenge.objects.create(
             payment_id=payment_id,
-            otp=otp,
             status='CREATED',
             auth_id=auth_id,
             expires_at=timezone.now() + timedelta(minutes=cls.OTP_EXPIRY_MINUTES)
         )
         
+        # Encriptar y guardar OTP
+        challenge.set_otp(otp)
+        challenge.save()
+        
+        # Registrar en log
         LogTransferencia.objects.create(
             registro=payment_id,
             tipo_log='OTP',
             contenido=f'Challenge generado: {challenge.challenge_id}'
         )
+        
+        # Notificar al cliente externo
+        cls.notify_external_client(payment_id, otp, challenge.challenge_id)
         
         return challenge, otp
 
@@ -149,7 +190,7 @@ class SecurityService:
             raise ValidationError('Usuario no autorizado para este OTP')
 
         # Verificar código OTP
-        if challenge.otp != otp:
+        if challenge.get_otp() != otp:
             challenge.attempts = (challenge.attempts or 0) + 1
             challenge.status = 'ATTEMPTED'
             challenge.save()
