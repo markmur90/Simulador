@@ -24,4 +24,3 @@ celerybeat-schedule
 node_modules/
 npm-debug.log
 tor_data/*
-.env
