@@ -36,115 +36,109 @@
     <!-- Cuenta origen -->
     <div class="mb-3">
       <label for="debtor_account_iban" class="form-label">Cuenta Origen</label>
-      <select class="form-select" id="debtor_account_iban" name="debtor_account_iban" required>
+      <select name="debtor_account_iban" id="debtor_account_iban" class="form-control" required>
         <option value="">Seleccione una cuenta</option>
-        {% for account in debtor_accounts %}
-          <option value="{{ account.iban }}">
-            {{ account.iban }} - {{ account.currency }} {{ account.balance }}
-          </option>
-        {% endfor %}
       </select>
-      <div class="invalid-feedback">
-        Por favor seleccione una cuenta origen
-      </div>
+      <div class="invalid-feedback">Por favor seleccione una cuenta origen</div>
     </div>
 
-    <!-- Cuenta destino (cambia según el tipo) -->
+    <!-- Cuenta destino -->
     <div class="mb-3">
       <label for="creditor_account_iban" class="form-label">Cuenta Destino</label>
-      <select class="form-select" id="creditor_account_iban" name="creditor_account_iban" required>
+      <select name="creditor_account_iban" id="creditor_account_iban" class="form-control" required>
         <option value="">Seleccione una cuenta</option>
       </select>
-      <div class="invalid-feedback">
-        Por favor seleccione una cuenta destino
-      </div>
+      <div class="invalid-feedback">Por favor seleccione una cuenta destino</div>
     </div>
 
     <!-- Monto -->
     <div class="mb-3">
       <label for="amount" class="form-label">Monto</label>
-      <div class="input-group">
-        <input type="number" step="0.01" min="0.01" class="form-control" id="amount" name="amount" required>
-        <span class="input-group-text" id="currency-addon">EUR</span>
-      </div>
-      <div class="invalid-feedback">
-        Por favor ingrese un monto válido
-      </div>
+      <input type="number" name="amount" id="amount" class="form-control" step="0.01" min="0.01" required>
+      <div class="invalid-feedback">Por favor ingrese un monto válido</div>
     </div>
 
     <!-- Descripción -->
     <div class="mb-3">
       <label for="description" class="form-label">Descripción</label>
-      <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+      <input type="text" name="description" id="description" class="form-control" maxlength="140">
     </div>
 
     <button type="submit" class="btn btn-primary">Realizar Transferencia</button>
   </form>
 </div>
 
-{% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const transferTypeInputs = document.querySelectorAll('input[name="transfer_type"]');
-  const creditorSelect = document.getElementById('creditor_account_iban');
-  const debtorSelect = document.getElementById('debtor_account_iban');
-  
-  // Datos de cuentas
-  const debtorAccounts = {{ debtor_accounts|safe }};
-  const creditorAccounts = {{ creditor_accounts|safe }};
-  
-  function updateCreditorAccounts() {
-    const transferType = document.querySelector('input[name="transfer_type"]:checked').value;
-    const selectedDebtorIban = debtorSelect.value;
-    
-    // Limpiar select
-    creditorSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
-    
-    if (transferType === 'internal') {
-      // Mostrar solo cuentas del mismo deudor
-      debtorAccounts.forEach(account => {
-        if (account.iban !== selectedDebtorIban) {
-          const option = new Option(
-            `${account.iban} - ${account.currency} ${account.balance}`,
-            account.iban
-          );
-          creditorSelect.add(option);
-        }
-      });
-    } else {
-      // Mostrar cuentas de otros deudores
-      creditorAccounts.forEach(account => {
-        const option = new Option(
-          `${account.iban} - ${account.creditor_name}`,
-          account.iban
-        );
-        creditorSelect.add(option);
-      });
-    }
-  }
-  
-  // Actualizar cuando cambia el tipo de transferencia
-  transferTypeInputs.forEach(input => {
-    input.addEventListener('change', updateCreditorAccounts);
+// Datos de cuentas pasados desde el backend
+const debtorAccounts = {{ debtor_accounts|safe }};
+const creditorAccounts = {{ creditor_accounts|safe }};
+
+// Elementos del DOM
+const transferTypeInputs = document.querySelectorAll('input[name="transfer_type"]');
+const debtorAccountSelect = document.getElementById('debtor_account_iban');
+const creditorAccountSelect = document.getElementById('creditor_account_iban');
+
+// Función para cargar las cuentas origen
+function loadDebtorAccounts() {
+  debtorAccountSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+  debtorAccounts.forEach(account => {
+    const option = document.createElement('option');
+    option.value = account.iban;
+    option.textContent = `${account.iban} - Saldo: ${account.balance} ${account.currency}`;
+    debtorAccountSelect.appendChild(option);
   });
+}
+
+// Función para cargar las cuentas destino según el tipo de transferencia
+function loadCreditorAccounts(transferType) {
+  creditorAccountSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
   
-  // Actualizar cuando cambia la cuenta origen
-  debtorSelect.addEventListener('change', updateCreditorAccounts);
-  
-  // Inicializar
-  updateCreditorAccounts();
-  
-  // Validación del formulario
-  const form = document.querySelector('form');
-  form.addEventListener('submit', function(event) {
-    if (!form.checkValidity()) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    form.classList.add('was-validated');
+  if (transferType === 'internal') {
+    // Para transferencias internas, mostrar las mismas cuentas del deudor excepto la seleccionada
+    const selectedDebtorIban = debtorAccountSelect.value;
+    debtorAccounts.forEach(account => {
+      if (account.iban !== selectedDebtorIban) {
+        const option = document.createElement('option');
+        option.value = account.iban;
+        option.textContent = `${account.iban} - Saldo: ${account.balance} ${account.currency}`;
+        creditorAccountSelect.appendChild(option);
+      }
+    });
+  } else {
+    // Para transferencias externas, mostrar cuentas de acreedores
+    creditorAccounts.forEach(account => {
+      const option = document.createElement('option');
+      option.value = account.iban;
+      option.textContent = `${account.iban} - ${account.creditor_name}`;
+      creditorAccountSelect.appendChild(option);
+    });
+  }
+}
+
+// Cargar cuentas origen al inicio
+loadDebtorAccounts();
+
+// Manejar cambio en el tipo de transferencia
+transferTypeInputs.forEach(input => {
+  input.addEventListener('change', (e) => {
+    loadCreditorAccounts(e.target.value);
   });
 });
-</script>
-{% endblock %}
 
+// Manejar cambio en la cuenta origen
+debtorAccountSelect.addEventListener('change', () => {
+  const selectedTransferType = document.querySelector('input[name="transfer_type"]:checked').value;
+  loadCreditorAccounts(selectedTransferType);
+});
+
+// Validación del formulario
+const form = document.querySelector('form');
+form.addEventListener('submit', (e) => {
+  if (!form.checkValidity()) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  form.classList.add('was-validated');
+});
+</script>
 {% endblock %}

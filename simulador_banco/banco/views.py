@@ -761,7 +761,7 @@ def transfer_view(request):
 
             # Verificar que la cuenta pertenezca al usuario actual
             if not request.user.groups.filter(name='Oficial Bancario').exists():
-                if debtor_account.debtor.user != request.user:
+                if debtor_account.debtor.customer_id != request.user.username:
                     raise ValidationError('No tienes permiso para usar esta cuenta')
 
             # Validar saldo suficiente
@@ -784,7 +784,7 @@ def transfer_view(request):
                 # Transferencia entre cuentas propias
                 try:
                     creditor_account = DebtorAccount.objects.get(iban=creditor_account_iban)
-                    if creditor_account.debtor != debtor_account.debtor:
+                    if creditor_account.debtor.customer_id != request.user.username:
                         raise ValidationError('La cuenta destino no pertenece al mismo titular')
                     
                     transfer_data['creditor_account'] = creditor_account_iban
@@ -818,27 +818,37 @@ def transfer_view(request):
             messages.error(request, 'Error al procesar la transferencia')
             
     # GET: Mostrar formulario
-    context = {
-        'debtor_accounts': DebtorAccount.objects.filter(
-            debtor__user=request.user
-        ) if not request.user.groups.filter(name='Oficial Bancario').exists() else DebtorAccount.objects.all(),
-        'creditor_accounts': CreditorAccount.objects.all().values('iban', 'creditor__name')
-    }
+    # Obtener cuentas del deudor según el rol del usuario
+    if request.user.groups.filter(name='Oficial Bancario').exists():
+        debtor_accounts = DebtorAccount.objects.select_related('debtor').all()
+    else:
+        try:
+            debtor = Debtor.objects.get(customer_id=request.user.username)
+            debtor_accounts = DebtorAccount.objects.filter(debtor=debtor)
+        except Debtor.DoesNotExist:
+            debtor_accounts = DebtorAccount.objects.none()
     
-    # Convertir QuerySets a listas para serialización JSON
-    context['debtor_accounts'] = [
-        {
-            'iban': account.iban,
-            'currency': account.currency,
-            'balance': float(account.balance)
-        } for account in context['debtor_accounts']
-    ]
-    context['creditor_accounts'] = [
-        {
-            'iban': account['iban'],
-            'creditor_name': account['creditor__name']
-        } for account in context['creditor_accounts']
-    ]
+    # Obtener cuentas de acreedores
+    creditor_accounts = CreditorAccount.objects.select_related('creditor').all()
+    
+    # Preparar datos para el template
+    context = {
+        'debtor_accounts': [
+            {
+                'iban': account.iban,
+                'currency': account.currency,
+                'balance': float(account.balance),
+                'debtor_name': account.debtor.name
+            } for account in debtor_accounts
+        ],
+        'creditor_accounts': [
+            {
+                'iban': account.iban,
+                'currency': account.currency,
+                'creditor_name': account.creditor.name
+            } for account in creditor_accounts
+        ]
+    }
     
     return render(request, 'banco/transfer_form.html', context)
 
