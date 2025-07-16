@@ -67,11 +67,18 @@ def dashboard_view(request):
         debtor_accounts = DebtorAccount.objects.all()
         transfers = Transfer.objects.all()
     else:
-        debtor_accounts = DebtorAccount.objects.filter(debtor__user=request.user)
-        transfers = Transfer.objects.filter(
-            Q(debtor_account__in=debtor_accounts) |
-            Q(creditor_account__in=debtor_accounts)
-        )
+        # Buscar el deudor asociado al usuario
+        try:
+            debtor = Debtor.objects.get(customer_id=request.user.username)
+            debtor_accounts = DebtorAccount.objects.filter(debtor=debtor)
+            transfers = Transfer.objects.filter(
+                Q(debtor_account__in=debtor_accounts) |
+                Q(creditor_account__in=debtor_accounts)
+            )
+        except Debtor.DoesNotExist:
+            # Si el usuario no tiene un deudor asociado, mostrar listas vacías
+            debtor_accounts = DebtorAccount.objects.none()
+            transfers = Transfer.objects.none()
 
     # Ordenar transferencias por fecha
     transfers = transfers.order_by('-created_at')

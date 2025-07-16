@@ -56,6 +56,7 @@ from django.utils import timezone
 from django.conf import settings
 from cryptography.fernet import Fernet, InvalidToken
 from django.utils.encoding import force_bytes, force_str
+from django.contrib.auth.models import User
 import uuid
 from decimal import Decimal
 
@@ -159,6 +160,7 @@ class Account(models.Model):
 # ------------------------------------------------------------------------------
 class Debtor(Party):
     customer_id = models.CharField(max_length=35, unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='debtor', null=True)
 
     class Meta(Party.Meta):
         db_table = 'sim_debtor'
