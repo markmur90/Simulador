@@ -35,11 +35,11 @@
 
     <!-- Cuenta origen -->
     <div class="mb-3">
-      <label for="debtor_account_id" class="form-label">Cuenta Origen</label>
-      <select class="form-select" id="debtor_account_id" name="debtor_account_id" required>
+      <label for="debtor_account_iban" class="form-label">Cuenta Origen</label>
+      <select class="form-select" id="debtor_account_iban" name="debtor_account_iban" required>
         <option value="">Seleccione una cuenta</option>
         {% for account in debtor_accounts %}
-          <option value="{{ account.id }}">
+          <option value="{{ account.iban }}">
             {{ account.iban }} - {{ account.currency }} {{ account.balance }}
           </option>
         {% endfor %}
@@ -51,8 +51,8 @@
 
     <!-- Cuenta destino (cambia según el tipo) -->
     <div class="mb-3">
-      <label for="creditor_account_id" class="form-label">Cuenta Destino</label>
-      <select class="form-select" id="creditor_account_id" name="creditor_account_id" required>
+      <label for="creditor_account_iban" class="form-label">Cuenta Destino</label>
+      <select class="form-select" id="creditor_account_iban" name="creditor_account_iban" required>
         <option value="">Seleccione una cuenta</option>
       </select>
       <div class="invalid-feedback">
@@ -86,8 +86,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const transferTypeInputs = document.querySelectorAll('input[name="transfer_type"]');
-  const creditorSelect = document.getElementById('creditor_account_id');
-  const debtorSelect = document.getElementById('debtor_account_id');
+  const creditorSelect = document.getElementById('creditor_account_iban');
+  const debtorSelect = document.getElementById('debtor_account_iban');
   
   // Datos de cuentas
   const debtorAccounts = {{ debtor_accounts|safe }};
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function updateCreditorAccounts() {
     const transferType = document.querySelector('input[name="transfer_type"]:checked').value;
-    const selectedDebtorId = debtorSelect.value;
+    const selectedDebtorIban = debtorSelect.value;
     
     // Limpiar select
     creditorSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
@@ -103,10 +103,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (transferType === 'internal') {
       // Mostrar solo cuentas del mismo deudor
       debtorAccounts.forEach(account => {
-        if (account.id !== parseInt(selectedDebtorId)) {
+        if (account.iban !== selectedDebtorIban) {
           const option = new Option(
             `${account.iban} - ${account.currency} ${account.balance}`,
-            account.id
+            account.iban
           );
           creditorSelect.add(option);
         }
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
       creditorAccounts.forEach(account => {
         const option = new Option(
           `${account.iban} - ${account.creditor_name}`,
-          account.id
+          account.iban
         );
         creditorSelect.add(option);
       });

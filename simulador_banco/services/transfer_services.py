@@ -55,19 +55,13 @@ class TransferService:
         )
         
         # Buscar cuenta deudora
-        debit_acc = None
-        all_debit_accounts = DebtorAccount.objects.select_related('debtor').all()
-        
-        for acc in all_debit_accounts:
-            if acc.iban == debtor_account:
-                debit_acc = acc
-                break
-        
-        if not debit_acc:
+        try:
+            debit_acc = DebtorAccount.objects.select_related('debtor').get(iban=debtor_account)
+        except DebtorAccount.DoesNotExist:
             LogTransferencia.objects.create(
                 registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
                 tipo_log='ERROR',
-                contenido=f'Cuenta de débito no encontrada para IBAN: {debtor_account}. Cuentas disponibles: {[acc.iban for acc in all_debit_accounts]}'
+                contenido=f'Cuenta de débito no encontrada para IBAN: {debtor_account}'
             )
             raise ValidationError({
                 'debtor_account': 'Cuenta de débito no encontrada'
@@ -81,19 +75,20 @@ class TransferService:
         )
         
         # Buscar cuenta acreedora
-        credit_acc = None
-        all_creditor_accounts = CreditorAccount.objects.select_related('creditor').all()
-        
-        for acc in all_creditor_accounts:
-            if acc.iban == creditor_account:
-                credit_acc = acc
-                break
-        
-        if not credit_acc:
+        try:
+            # Primero intentar encontrar como cuenta interna
+            try:
+                credit_acc = DebtorAccount.objects.select_related('debtor').get(iban=creditor_account)
+                is_internal = True
+            except DebtorAccount.DoesNotExist:
+                # Si no es interna, buscar como cuenta externa
+                credit_acc = CreditorAccount.objects.select_related('creditor').get(iban=creditor_account)
+                is_internal = False
+        except (DebtorAccount.DoesNotExist, CreditorAccount.DoesNotExist):
             LogTransferencia.objects.create(
                 registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
                 tipo_log='ERROR',
-                contenido=f'Cuenta de crédito no encontrada para IBAN: {creditor_account}. Cuentas disponibles: {[acc.iban for acc in all_creditor_accounts]}'
+                contenido=f'Cuenta de crédito no encontrada para IBAN: {creditor_account}'
             )
             raise ValidationError({
                 'creditor_account': 'Cuenta de crédito no encontrada'
@@ -106,10 +101,16 @@ class TransferService:
             })
 
         # Validar que el acreedor tenga todos los datos necesarios
-        if not credit_acc.creditor.name or not credit_acc.creditor.address:
-            raise ValidationError({
-                'creditor_account': 'Datos incompletos del acreedor'
-            })
+        if is_internal:
+            if not credit_acc.debtor.name or not credit_acc.debtor.address:
+                raise ValidationError({
+                    'creditor_account': 'Datos incompletos del deudor destino'
+                })
+        else:
+            if not credit_acc.creditor.name or not credit_acc.creditor.address:
+                raise ValidationError({
+                    'creditor_account': 'Datos incompletos del acreedor'
+                })
 
         return debit_acc, credit_acc
 

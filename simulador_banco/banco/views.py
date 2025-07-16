@@ -733,14 +733,14 @@ def transfer_view(request):
     if request.method == "POST":
         try:
             # Obtener datos del formulario
-            debtor_account_id = request.POST.get('debtor_account_id')
-            creditor_account_id = request.POST.get('creditor_account_id')
+            debtor_account_iban = request.POST.get('debtor_account_iban')
+            creditor_account_iban = request.POST.get('creditor_account_iban')
             amount = Decimal(request.POST.get('amount', '0'))
             description = request.POST.get('description', '')
             transfer_type = request.POST.get('transfer_type')  # 'internal' o 'external'
 
             # Validar datos básicos
-            if not all([debtor_account_id, creditor_account_id, amount]):
+            if not all([debtor_account_iban, creditor_account_iban, amount]):
                 raise ValidationError('Todos los campos son requeridos')
 
             if amount <= 0:
@@ -748,7 +748,7 @@ def transfer_view(request):
 
             # Obtener la cuenta deudora
             try:
-                debtor_account = DebtorAccount.objects.get(id=debtor_account_id)
+                debtor_account = DebtorAccount.objects.get(iban=debtor_account_iban)
             except DebtorAccount.DoesNotExist:
                 raise ValidationError('Cuenta deudora no encontrada')
 
@@ -767,7 +767,7 @@ def transfer_view(request):
             # Preparar datos para la transferencia
             transfer_data = {
                 'payment_id': payment_id,
-                'debtor_account': debtor_account.iban,
+                'debtor_account': debtor_account_iban,
                 'instructed_amount': amount,
                 'currency': debtor_account.currency,
                 'description': description
@@ -776,19 +776,19 @@ def transfer_view(request):
             if transfer_type == 'internal':
                 # Transferencia entre cuentas propias
                 try:
-                    creditor_account = DebtorAccount.objects.get(id=creditor_account_id)
+                    creditor_account = DebtorAccount.objects.get(iban=creditor_account_iban)
                     if creditor_account.debtor != debtor_account.debtor:
                         raise ValidationError('La cuenta destino no pertenece al mismo titular')
                     
-                    transfer_data['creditor_account'] = creditor_account.iban
+                    transfer_data['creditor_account'] = creditor_account_iban
                 except DebtorAccount.DoesNotExist:
                     raise ValidationError('Cuenta destino no encontrada')
 
             else:
                 # Transferencia externa
                 try:
-                    creditor_account = CreditorAccount.objects.get(id=creditor_account_id)
-                    transfer_data['creditor_account'] = creditor_account.iban
+                    creditor_account = CreditorAccount.objects.get(iban=creditor_account_iban)
+                    transfer_data['creditor_account'] = creditor_account_iban
                 except CreditorAccount.DoesNotExist:
                     raise ValidationError('Cuenta destino no encontrada')
 
@@ -815,8 +815,24 @@ def transfer_view(request):
         'debtor_accounts': DebtorAccount.objects.filter(
             debtor__user=request.user
         ) if not request.user.groups.filter(name='Oficial Bancario').exists() else DebtorAccount.objects.all(),
-        'creditor_accounts': CreditorAccount.objects.all()
+        'creditor_accounts': CreditorAccount.objects.all().values('iban', 'creditor__name')
     }
+    
+    # Convertir QuerySets a listas para serialización JSON
+    context['debtor_accounts'] = [
+        {
+            'iban': account.iban,
+            'currency': account.currency,
+            'balance': float(account.balance)
+        } for account in context['debtor_accounts']
+    ]
+    context['creditor_accounts'] = [
+        {
+            'iban': account['iban'],
+            'creditor_name': account['creditor__name']
+        } for account in context['creditor_accounts']
+    ]
+    
     return render(request, 'banco/transfer_form.html', context)
 
 @login_required
