@@ -36,6 +36,44 @@ urlpatterns = [
     
     # Movimientos y estados
     path('cuentas/<int:account_id>/deposito/', views.account_movement_create, {'tipo': 'DEPOSIT'}, name='deposito_cuenta'),
+    
+    # GPT4 URLs
+    path('gpt4/transferencias/', gpt_views.TransferListView.as_view(), name='list_transferGPT4'),
+    path('gpt4/transferencias/nuevo/', gpt_views.TransferCreateView.as_view(), name='create_transferGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/', gpt_views.TransferDetailView.as_view(), name='transfer_detailGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/editar/', gpt_views.TransferUpdateView.as_view(), name='edit_transferGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/enviar/', gpt_views.SendTransferView.as_view(), name='send_transfer_viewGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/pdf/', gpt_views.DownloadTransferPDFView.as_view(), name='descargar_pdfGPT4'),
+    
+    path('gpt4/deudores/', gpt_views.DebtorListView.as_view(), name='list_debtorsGPT4'),
+    path('gpt4/deudores/nuevo/', gpt_views.DebtorCreateView.as_view(), name='create_debtorGPT4'),
+    path('gpt4/deudores/<int:pk>/', gpt_views.DebtorDetailView.as_view(), name='debtor_detailGPT4'),
+    path('gpt4/deudores/<int:pk>/editar/', gpt_views.DebtorUpdateView.as_view(), name='edit_debtorGPT4'),
+    path('gpt4/deudores/<int:pk>/eliminar/', gpt_views.DebtorDeleteView.as_view(), name='delete_debtorGPT4'),
+    
+    path('gpt4/cuentas-deudor/', gpt_views.DebtorAccountListView.as_view(), name='list_debtor_accountsGPT4'),
+    path('gpt4/cuentas-deudor/nuevo/', gpt_views.DebtorAccountCreateView.as_view(), name='create_debtor_accountGPT4'),
+    path('gpt4/cuentas-deudor/<int:pk>/eliminar/', gpt_views.DebtorAccountDeleteView.as_view(), name='delete_debtor_accountGPT4'),
+    path('gpt4/cuentas-deudor/<int:account_id>/pdf/', gpt_views.AccountStatementPDFView.as_view(), name='account_statement_pdfGPT4'),
+    
+    path('gpt4/acreedores/', gpt_views.CreditorListView.as_view(), name='list_creditorsGPT4'),
+    path('gpt4/acreedores/nuevo/', gpt_views.CreditorCreateView.as_view(), name='create_creditorGPT4'),
+    
+    path('gpt4/cuentas-acreedor/', gpt_views.CreditorAccountListView.as_view(), name='list_creditor_accountsGPT4'),
+    path('gpt4/cuentas-acreedor/nuevo/', gpt_views.CreditorAccountCreateView.as_view(), name='create_creditor_accountGPT4'),
+    
+    path('gpt4/agentes-acreedor/', gpt_views.CreditorAgentListView.as_view(), name='list_creditor_agentsGPT4'),
+    path('gpt4/agentes-acreedor/nuevo/', gpt_views.CreditorAgentCreateView.as_view(), name='create_creditor_agentGPT4'),
+    
+    path('gpt4/clientids/', gpt_views.ClientIDListView.as_view(), name='list_clientidsGPT4'),
+    path('gpt4/clientids/nuevo/', gpt_views.ClientIDCreateView.as_view(), name='create_clientidGPT4'),
+    path('gpt4/clientids/<str:codigo>/editar/', gpt_views.ClientIDUpdateView.as_view(), name='edit_clientidGPT4'),
+    path('gpt4/clientids/<str:codigo>/eliminar/', gpt_views.ClientIDDeleteView.as_view(), name='delete_clientidGPT4'),
+    
+    path('gpt4/kids/', gpt_views.KidListView.as_view(), name='list_kidsGPT4'),
+    path('gpt4/kids/nuevo/', gpt_views.KidCreateView.as_view(), name='create_kidGPT4'),
+    path('gpt4/kids/<str:codigo>/editar/', gpt_views.KidUpdateView.as_view(), name='edit_kidGPT4'),
+    path('gpt4/kids/<str:codigo>/eliminar/', gpt_views.KidDeleteView.as_view(), name='delete_kidGPT4'),
 ]
 
 urlpatterns += [
