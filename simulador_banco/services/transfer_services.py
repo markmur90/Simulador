@@ -161,19 +161,28 @@ class TransferService:
             instruction_id=data.get('instruction_id', uuid.uuid4().hex)
         )
 
+        # Determinar si es una transferencia interna
+        is_internal = isinstance(credit_acc, DebtorAccount)
+
+        # Obtener o crear agente acreedor por defecto
+        default_agent = CreditorAgent.objects.first() or CreditorAgent.objects.create(
+            bic="DEUTDEFF",
+            financial_institution_id="BANKDEFF"
+        )
+
         # Crear transferencia
         transfer = Transfer.objects.create(
             payment_id=data['payment_id'],
             debtor=debit_acc.debtor,
-            creditor=credit_acc.creditor,
+            creditor=credit_acc.debtor if is_internal else credit_acc.creditor,
             debtor_account=debit_acc,
-            creditor_account=credit_acc,
-            creditor_agent=data.get('creditor_agent'),
+            creditor_account=credit_acc if not is_internal else None,
+            creditor_agent=data.get('creditor_agent', default_agent),
             instructed_amount=amount,
             currency=data.get('currency', 'EUR'),
             purpose_code=data.get('purpose_code', 'GDSV'),
             requested_execution_date=data.get('requested_execution_date', timezone.now().date()),
-            remittance_information_unstructured=data.get('remittance_information_unstructured'),
+            remittance_information_unstructured=data.get('description', ''),
             payment_identification=payment_id,
             status='PDNG'
         )
@@ -181,7 +190,7 @@ class TransferService:
         LogTransferencia.objects.create(
             registro=transfer.payment_id,
             tipo_log='TRANSFER',
-            contenido=f'Transferencia creada: {transfer.payment_id}'
+            contenido=f'Transferencia creada: {transfer.payment_id} - {"Interna" if is_internal else "Externa"}'
         )
 
         return transfer

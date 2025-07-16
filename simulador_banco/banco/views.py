@@ -64,16 +64,22 @@ def dashboard_view(request):
     
     # Obtener cuentas según el rol del usuario
     if request.user.groups.filter(name='Oficial Bancario').exists():
-        debtor_accounts = DebtorAccount.objects.all()
-        transfers = Transfer.objects.all()
+        debtor_accounts = DebtorAccount.objects.select_related('debtor').all()
+        transfers = Transfer.objects.select_related(
+            'debtor', 'creditor', 'debtor_account', 'creditor_account'
+        ).all()
     else:
         # Buscar el deudor asociado al usuario
         try:
             debtor = Debtor.objects.get(customer_id=request.user.username)
             debtor_accounts = DebtorAccount.objects.filter(debtor=debtor)
-            transfers = Transfer.objects.filter(
-                Q(debtor_account__in=debtor_accounts) |
-                Q(creditor_account__in=debtor_accounts)
+            
+            # Obtener todas las transferencias donde el usuario es deudor o acreedor
+            transfers = Transfer.objects.select_related(
+                'debtor', 'creditor', 'debtor_account', 'creditor_account'
+            ).filter(
+                Q(debtor=debtor) |  # Usuario como deudor
+                Q(creditor=debtor)   # Usuario como acreedor en transferencia interna
             )
         except Debtor.DoesNotExist:
             # Si el usuario no tiene un deudor asociado, mostrar listas vacías
