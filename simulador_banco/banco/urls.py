@@ -13,6 +13,14 @@ urlpatterns = [
     path('registro/', views.registro_view, name='registro'),
     path('logout/', views.logout_view, name='logout'),
     
+    # Gestión de usuarios
+    path('usuarios/', views.user_list, name='user_list'),
+    path('usuarios/nuevo/', views.user_create, name='user_create'),
+    path('usuarios/<int:pk>/editar/', views.user_edit, name='user_edit'),
+    path('usuarios/gestion/', views.user_management, name='user_management'),
+    path('usuarios/<int:user_id>/toggle/', views.toggle_user_active, name='toggle_user'),
+    path('usuarios/<int:user_id>/update_role/', views.update_user_role, name='update_user_role'),
+    
     # APIs
     path('api/token', views.generar_token),
     path('oidc/token', views.generar_token),
@@ -25,13 +33,6 @@ urlpatterns = [
     path('transferencias/nueva/', views.transfer_view, name='new_transfer'),
     path('transferencias/<str:payment_id>/estado/', views.transfer_status_view, name='transfer_status'),
     path('api/transferencias/estado/<str:payment_id>/', views.api_transfer_status, name='api_transfer_status'),
-    
-    # Gestión de usuarios
-    path('usuarios/', views.user_list, name='user_list'),
-    path('usuarios/nuevo/', views.user_create, name='user_create'),
-    path('usuarios/<int:pk>/editar/', views.user_edit, name='user_edit'),
-    path('usuarios/<int:user_id>/toggle/', views.toggle_user_active, name='toggle_user'),
-    path('usuarios/<int:user_id>/update_role/', views.update_user_role, name='update_user_role'),
     
     # Movimientos y estados
     path('cuentas/<int:account_id>/deposito/', views.account_movement_create, {'tipo': 'DEPOSIT'}, name='deposito_cuenta'),
