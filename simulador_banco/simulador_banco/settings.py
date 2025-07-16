@@ -15,7 +15,6 @@ import sys
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
-from cryptography.fernet import Fernet
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,13 +45,6 @@ FIELD_ENCRYPTION_FALLBACK_KEYS = os.environ.get(
 FIELD_ENCRYPTION_KEYS = [FIELD_ENCRYPTION_KEY] + [
     k for k in FIELD_ENCRYPTION_FALLBACK_KEYS.split(',') if k
 ]
-
-# Configuración de encriptación
-ENCRYPTION_KEY = os.environ.get('ENCRYPTION_KEY', Fernet.generate_key())
-
-# Configuración del cliente externo
-EXTERNAL_CLIENT_URL = os.environ.get('EXTERNAL_CLIENT_URL', 'http://cliente-externo.example.com')
-EXTERNAL_CLIENT_TOKEN = os.environ.get('EXTERNAL_CLIENT_TOKEN', 'default-token-change-me')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/

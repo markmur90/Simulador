@@ -27,3 +27,35 @@ Jul 13 23:16:05.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough di
 Jul 13 23:16:05.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
 Jul 13 23:16:05.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
 Jul 13 23:16:06.000 [notice] Bootstrapped 100% (done): Done
+Jul 15 20:04:57.867 [notice] Tor 0.4.7.16 running on Linux with Libevent 2.1.12-stable, OpenSSL 3.0.16, Zlib 1.2.13, Liblzma 5.4.1, Libzstd 1.5.4 and Glibc 2.36 as libc.
+Jul 15 20:04:57.867 [notice] Tor can't help you if you use it wrong! Learn how to be safe at https://support.torproject.org/faq/staying-anonymous/
+Jul 15 20:04:57.867 [notice] Read configuration file "/home/markmur88/Simulador/config/torrc_simulador".
+Jul 15 20:04:57.886 [notice] Opening Socks listener on 127.0.0.1:9053
+Jul 15 20:04:57.887 [notice] Opened Socks listener connection (ready) on 127.0.0.1:9053
+Jul 15 20:04:57.887 [notice] Opening Control listener on 127.0.0.1:9054
+Jul 15 20:04:57.887 [notice] Opened Control listener connection (ready) on 127.0.0.1:9054
+Jul 15 20:04:57.000 [notice] Parsing GEOIP IPv4 file /usr/share/tor/geoip.
+Jul 15 20:04:58.000 [notice] Parsing GEOIP IPv6 file /usr/share/tor/geoip6.
+Jul 15 20:04:58.000 [notice] Bootstrapped 0% (starting): Starting
+Jul 15 20:05:00.000 [notice] Starting with guard context "default"
+Jul 15 20:05:00.000 [notice] Bootstrapped 5% (conn): Connecting to a relay
+Jul 15 20:05:00.000 [notice] Bootstrapped 10% (conn_done): Connected to a relay
+Jul 15 20:05:00.000 [notice] Bootstrapped 14% (handshake): Handshaking with a relay
+Jul 15 20:05:00.000 [notice] Bootstrapped 15% (handshake_done): Handshake with a relay done
+Jul 15 20:05:00.000 [notice] Bootstrapped 20% (onehop_create): Establishing an encrypted directory connection
+Jul 15 20:05:00.000 [notice] Bootstrapped 25% (requesting_status): Asking for networkstatus consensus
+Jul 15 20:05:00.000 [notice] I learned some more directory information, but not enough to build a circuit: We have no recent usable consensus.
+Jul 15 20:05:01.000 [notice] Bootstrapped 30% (loading_status): Loading networkstatus consensus
+Jul 15 20:05:02.000 [notice] Bootstrapped 45% (requesting_descriptors): Asking for relay descriptors
+Jul 15 20:05:02.000 [notice] I learned some more directory information, but not enough to build a circuit: We need more microdescriptors: we have 5012/8822, and can only build 15% of likely paths. (We have 52% of guards bw, 53% of midpoint bw, and 54% of exit bw = 15% of path bw.)
+Jul 15 20:05:02.000 [notice] Bootstrapped 56% (loading_descriptors): Loading relay descriptors
+Jul 15 20:05:02.000 [warn] Received http status code 404 ("Not found") from server 94.23.152.96:9000 while fetching "/tor/keys/fp/14C131DFC5C6F93646BE72FA1401C02A8DF2E8B4".
+Jul 15 20:05:03.000 [notice] Bootstrapped 63% (loading_descriptors): Loading relay descriptors
+Jul 15 20:05:03.000 [notice] Bootstrapped 71% (loading_descriptors): Loading relay descriptors
+Jul 15 20:05:04.000 [notice] Bootstrapped 75% (enough_dirinfo): Loaded enough directory info to build circuits
+Jul 15 20:05:05.000 [notice] Bootstrapped 90% (ap_handshake_done): Handshake finished with a relay to build circuits
+Jul 15 20:05:05.000 [notice] Bootstrapped 95% (circuit_create): Establishing a Tor circuit
+Jul 15 20:05:05.000 [notice] Bootstrapped 100% (done): Done
+Jul 15 21:10:02.000 [warn] Received http status code 404 ("Not found") from server 94.23.152.96:9000 while fetching "/tor/keys/fp/14C131DFC5C6F93646BE72FA1401C02A8DF2E8B4".
+Jul 15 21:49:02.000 [warn] Received http status code 404 ("Not found") from server 94.23.152.96:9000 while fetching "/tor/keys/fp/14C131DFC5C6F93646BE72FA1401C02A8DF2E8B4".
+Jul 15 23:51:02.000 [warn] Received http status code 404 ("Not found") from server 94.23.152.96:9000 while fetching "/tor/keys/fp/14C131DFC5C6F93646BE72FA1401C02A8DF2E8B4".

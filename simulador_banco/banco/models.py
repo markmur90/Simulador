@@ -3,8 +3,6 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.core.files.base import ContentFile
 from django.utils import timezone
 import uuid
-from django.conf import settings
-from cryptography.fernet import Fernet
 
 class OficialBancario(models.Model):
     username = models.CharField(max_length=50, unique=True)
@@ -25,26 +23,16 @@ class OficialBancario(models.Model):
 class OTPChallenge(models.Model):
     payment_id = models.CharField(max_length=100)
     challenge_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
-    otp = models.CharField(max_length=255)  # Aumentado para almacenar el valor encriptado
+    otp = models.CharField(max_length=6)
     transfer_data = models.JSONField(null=True, blank=True)
     status = models.CharField(max_length=20, default="CREATED")
-    auth_id = models.CharField(max_length=50, null=True, blank=True)
+    auth_id = models.CharField(max_length=50, null=True, blank=True)  # 🔥 Nuevo campo
     attempts = models.IntegerField(default=0)
     created_at = models.DateTimeField(default=timezone.now)
     expires_at = models.DateTimeField()
 
     def __str__(self):
         return f"{self.payment_id} - {self.challenge_id}"
-
-    def set_otp(self, otp_value):
-        """Encripta el OTP antes de guardarlo"""
-        f = Fernet(settings.ENCRYPTION_KEY)
-        self.otp = f.encrypt(otp_value.encode()).decode()
-
-    def get_otp(self):
-        """Desencripta el OTP"""
-        f = Fernet(settings.ENCRYPTION_KEY)
-        return f.decrypt(self.otp.encode()).decode()
 
     class Meta:
         app_label = 'banco'
