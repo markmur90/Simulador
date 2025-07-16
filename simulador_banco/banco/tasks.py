@@ -97,8 +97,16 @@ def process_transfer_task(transfer_id: int):
             return
 
         # 2) Descontar y actualizar
-        acct.balance -= transfer.instructed_amount
-        acct.save(update_fields=['balance'])
+        # acct.balance -= transfer.instructed_amount
+        # acct.save(update_fields=['balance'])
+        
+        # Solo crear el movimiento y dejar que él actualice el balance:
+        AccountMovement.objects.create(
+            account=acct,
+            tipo='TRANSFER_OUT',
+            monto=transfer.instructed_amount,
+            descripcion=f'Transferencia enviada a {transfer.creditor.name} - ID: {transfer.payment_id}'
+        )
 
         # 3) Registrar el movimiento
         AccountMovement.objects.create(
