@@ -26,6 +26,7 @@ from .models import (
     OTPChallenge,
     PaymentIdentification,
     Transfer,
+    LogTransferencia,
 )
 from .forms import UserCreateWithRoleForm
 from django.utils.crypto import get_random_string
@@ -745,12 +746,19 @@ def transfer_view(request):
     """Vista para realizar transferencias internas y externas"""
     if request.method == "POST":
         try:
-            # Obtener datos del formulario
-            debtor_account_iban = request.POST.get('debtor_account_iban')
-            creditor_account_iban = request.POST.get('creditor_account_iban')
+            # Obtener y normalizar datos del formulario
+            debtor_account_iban = request.POST.get('debtor_account_iban', '').replace(' ', '').upper()
+            creditor_account_iban = request.POST.get('creditor_account_iban', '').replace(' ', '').upper()
             amount = Decimal(request.POST.get('amount', '0'))
             description = request.POST.get('description', '')
             transfer_type = request.POST.get('transfer_type')  # 'internal' o 'external'
+
+            # Log para depuración
+            LogTransferencia.objects.create(
+                registro=f"TRANSFER_VIEW_{debtor_account_iban[:8]}",
+                tipo_log='DEBUG',
+                contenido=f'Datos recibidos - Deudor: {debtor_account_iban}, Acreedor: {creditor_account_iban}, Tipo: {transfer_type}'
+            )
 
             # Validar datos básicos
             if not all([debtor_account_iban, creditor_account_iban, amount]):
@@ -761,13 +769,28 @@ def transfer_view(request):
 
             # Obtener la cuenta deudora
             try:
-                debtor_account = DebtorAccount.objects.get(iban=debtor_account_iban)
+                debtor_account = DebtorAccount.objects.select_related('debtor').get(iban=debtor_account_iban)
+                LogTransferencia.objects.create(
+                    registro=f"TRANSFER_VIEW_{debtor_account_iban[:8]}",
+                    tipo_log='DEBUG',
+                    contenido=f'Cuenta deudora encontrada: {debtor_account.iban} - Deudor: {debtor_account.debtor.name}'
+                )
             except DebtorAccount.DoesNotExist:
+                LogTransferencia.objects.create(
+                    registro=f"TRANSFER_VIEW_{debtor_account_iban[:8]}",
+                    tipo_log='ERROR',
+                    contenido=f'Cuenta deudora no encontrada: {debtor_account_iban}'
+                )
                 raise ValidationError('Cuenta deudora no encontrada')
 
             # Verificar que la cuenta pertenezca al usuario actual
             if not request.user.groups.filter(name='Oficial Bancario').exists():
                 if debtor_account.debtor.customer_id != request.user.username:
+                    LogTransferencia.objects.create(
+                        registro=f"TRANSFER_VIEW_{debtor_account_iban[:8]}",
+                        tipo_log='ERROR',
+                        contenido=f'Usuario {request.user.username} no tiene permiso para usar la cuenta {debtor_account_iban}'
+                    )
                     raise ValidationError('No tienes permiso para usar esta cuenta')
 
             # Validar saldo suficiente
@@ -781,29 +804,11 @@ def transfer_view(request):
             transfer_data = {
                 'payment_id': payment_id,
                 'debtor_account': debtor_account_iban,
+                'creditor_account': creditor_account_iban,
                 'instructed_amount': amount,
                 'currency': debtor_account.currency,
                 'description': description
             }
-
-            if transfer_type == 'internal':
-                # Transferencia entre cuentas propias
-                try:
-                    creditor_account = DebtorAccount.objects.get(iban=creditor_account_iban)
-                    if creditor_account.debtor.customer_id != request.user.username:
-                        raise ValidationError('La cuenta destino no pertenece al mismo titular')
-                    
-                    transfer_data['creditor_account'] = creditor_account_iban
-                except DebtorAccount.DoesNotExist:
-                    raise ValidationError('Cuenta destino no encontrada')
-
-            else:
-                # Transferencia externa
-                try:
-                    creditor_account = CreditorAccount.objects.get(iban=creditor_account_iban)
-                    transfer_data['creditor_account'] = creditor_account_iban
-                except CreditorAccount.DoesNotExist:
-                    raise ValidationError('Cuenta destino no encontrada')
 
             # Crear la transferencia
             transfer = TransferService.create_transfer(transfer_data)
@@ -821,6 +826,11 @@ def transfer_view(request):
         except ValidationError as e:
             messages.error(request, str(e))
         except Exception as e:
+            LogTransferencia.objects.create(
+                registro=f"TRANSFER_VIEW_ERROR",
+                tipo_log='ERROR',
+                contenido=f'Error inesperado: {str(e)}'
+            )
             messages.error(request, 'Error al procesar la transferencia')
             
     # GET: Mostrar formulario

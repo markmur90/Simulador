@@ -43,9 +43,9 @@ class TransferService:
             contenido=f'Iniciando validación de cuentas - Deudor: {debtor_account}, Acreedor: {creditor_account}'
         )
         
-        # Normalizar IBANs
-        debtor_account = ''.join(debtor_account.split()).upper()
-        creditor_account = ''.join(creditor_account.split()).upper()
+        # Normalizar IBANs - solo eliminar espacios y convertir a mayúsculas
+        debtor_account = debtor_account.replace(' ', '').upper()
+        creditor_account = creditor_account.replace(' ', '').upper()
         
         # Log después de normalización
         LogTransferencia.objects.create(
@@ -57,6 +57,11 @@ class TransferService:
         # Buscar cuenta deudora
         try:
             debit_acc = DebtorAccount.objects.select_related('debtor').get(iban=debtor_account)
+            LogTransferencia.objects.create(
+                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                tipo_log='DEBUG',
+                contenido=f'Cuenta de débito encontrada: {debit_acc.iban} - Deudor: {debit_acc.debtor.name}'
+            )
         except DebtorAccount.DoesNotExist:
             LogTransferencia.objects.create(
                 registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
@@ -67,23 +72,26 @@ class TransferService:
                 'debtor_account': 'Cuenta de débito no encontrada'
             })
         
-        # Log de éxito para cuenta deudora
-        LogTransferencia.objects.create(
-            registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-            tipo_log='DEBUG',
-            contenido=f'Cuenta de débito encontrada: {debit_acc.iban}'
-        )
-        
         # Buscar cuenta acreedora
         try:
             # Primero intentar encontrar como cuenta interna
             try:
                 credit_acc = DebtorAccount.objects.select_related('debtor').get(iban=creditor_account)
                 is_internal = True
+                LogTransferencia.objects.create(
+                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                    tipo_log='DEBUG',
+                    contenido=f'Cuenta de crédito encontrada (interna): {credit_acc.iban} - Deudor: {credit_acc.debtor.name}'
+                )
             except DebtorAccount.DoesNotExist:
                 # Si no es interna, buscar como cuenta externa
                 credit_acc = CreditorAccount.objects.select_related('creditor').get(iban=creditor_account)
                 is_internal = False
+                LogTransferencia.objects.create(
+                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                    tipo_log='DEBUG',
+                    contenido=f'Cuenta de crédito encontrada (externa): {credit_acc.iban} - Acreedor: {credit_acc.creditor.name}'
+                )
         except (DebtorAccount.DoesNotExist, CreditorAccount.DoesNotExist):
             LogTransferencia.objects.create(
                 registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
@@ -96,6 +104,11 @@ class TransferService:
 
         # Validar que el deudor tenga todos los datos necesarios
         if not debit_acc.debtor.name or not debit_acc.debtor.address:
+            LogTransferencia.objects.create(
+                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                tipo_log='ERROR',
+                contenido=f'Datos incompletos del deudor: {debit_acc.debtor.name}'
+            )
             raise ValidationError({
                 'debtor_account': 'Datos incompletos del deudor'
             })
@@ -103,11 +116,21 @@ class TransferService:
         # Validar que el acreedor tenga todos los datos necesarios
         if is_internal:
             if not credit_acc.debtor.name or not credit_acc.debtor.address:
+                LogTransferencia.objects.create(
+                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                    tipo_log='ERROR',
+                    contenido=f'Datos incompletos del deudor destino: {credit_acc.debtor.name}'
+                )
                 raise ValidationError({
                     'creditor_account': 'Datos incompletos del deudor destino'
                 })
         else:
             if not credit_acc.creditor.name or not credit_acc.creditor.address:
+                LogTransferencia.objects.create(
+                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
+                    tipo_log='ERROR',
+                    contenido=f'Datos incompletos del acreedor: {credit_acc.creditor.name}'
+                )
                 raise ValidationError({
                     'creditor_account': 'Datos incompletos del acreedor'
                 })
