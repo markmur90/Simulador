@@ -144,7 +144,7 @@ class TransferAdmin(admin.ModelAdmin):
             )
         }),
         ('Identificadores', {
-            'fields': ('payment_identification', 'client', 'kid', 'auth_id')
+            'fields': ('payment_identification', 'auth_id')
         }),
         ('Fechas', {
             'fields': ('created_at', 'updated_at')
