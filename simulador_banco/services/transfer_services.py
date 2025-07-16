@@ -201,70 +201,81 @@ class TransferService:
         # Validar saldo nuevamente
         cls.validate_balance(transfer.debtor_account, transfer.instructed_amount)
 
+        # Determinar si es transferencia interna
+        is_internal = isinstance(transfer.creditor_account, DebtorAccount)
+
         # Actualizar saldos
-        transfer.debtor_account.balance -= transfer.instructed_amount
-        transfer.debtor_account.save()
+        with transaction.atomic():
+            # Descontar de la cuenta origen
+            transfer.debtor_account.balance -= transfer.instructed_amount
+            transfer.debtor_account.save()
 
-        # Crear registro de movimiento
-        AccountMovement.objects.create(
-            account=transfer.debtor_account,
-            tipo='PAYMENT',
-            monto=transfer.instructed_amount,
-            descripcion=f'Transferencia a {transfer.creditor.name} - ID: {transfer.payment_id}'
-        )
+            # Registrar movimiento de salida
+            AccountMovement.objects.create(
+                account=transfer.debtor_account,
+                tipo='TRANSFER_OUT',
+                monto=transfer.instructed_amount,
+                descripcion=f'Transferencia enviada a {transfer.creditor.name} - ID: {transfer.payment_id}'
+            )
 
-        # Actualizar estado
-        transfer.status = 'ACCP'
-        
-        # Generar auth_id solo cuando se acepta la transferencia
-        if not transfer.auth_id:
-            transfer.auth_id = cls.generate_auth_id()
-            
-        transfer.save()
+            if is_internal:
+                # Para transferencias internas, actualizar la cuenta destino
+                creditor_account = transfer.creditor_account
+                creditor_account.balance += transfer.instructed_amount
+                creditor_account.save()
 
-        LogTransferencia.objects.create(
-            registro=transfer.payment_id,
-            tipo_log='TRANSFER',
-            contenido=f'Transferencia procesada: {transfer.payment_id} - Auth ID: {transfer.auth_id}'
-        )
+                # Registrar movimiento de entrada
+                AccountMovement.objects.create(
+                    account=creditor_account,
+                    tipo='TRANSFER_IN',
+                    monto=transfer.instructed_amount,
+                    descripcion=f'Transferencia recibida de {transfer.debtor.name} - ID: {transfer.payment_id}'
+                )
+
+                # Actualizar estado a completado
+                transfer.status = 'ACSC'
+            else:
+                # Para transferencias externas, iniciar proceso con API externa
+                try:
+                    # Aquí iría la lógica de comunicación con la API externa
+                    # Por ahora solo simulamos el proceso
+                    transfer.status = 'ACCP'
+                except Exception as e:
+                    # Si falla la API externa, revertir la transferencia
+                    transfer.debtor_account.balance += transfer.instructed_amount
+                    transfer.debtor_account.save()
+                    transfer.status = 'RJCT'
+                    raise ValidationError(f'Error al procesar transferencia externa: {str(e)}')
+
+            transfer.save()
+
+            # Registrar en el log
+            LogTransferencia.objects.create(
+                registro=transfer.payment_id,
+                tipo_log='PROCESS',
+                contenido=f'Transferencia procesada: {transfer.status}'
+            )
 
     @classmethod
-    def get_transfer_info(cls, payment_id: str) -> Dict:
+    def get_transfer_status(cls, payment_id: str) -> dict:
         """
-        Obtiene información detallada de una transferencia.
+        Obtiene el estado actual de una transferencia.
         
         Args:
-            payment_id: ID de la transferencia
+            payment_id: ID único de la transferencia
             
         Returns:
-            Dict: Información de la transferencia
-            
-        Raises:
-            ValidationError: Si la transferencia no existe
+            dict: Información del estado de la transferencia
         """
         try:
-            transfer = Transfer.objects.select_related(
-                'debtor', 'creditor',
-                'debtor_account', 'creditor_account',
-                'creditor_agent', 'payment_identification'
-            ).get(payment_id=payment_id)
+            transfer = Transfer.objects.get(payment_id=payment_id)
+            return {
+                'payment_id': transfer.payment_id,
+                'status': transfer.status,
+                'amount': str(transfer.instructed_amount),
+                'currency': transfer.currency,
+                'created_at': transfer.created_at.isoformat(),
+                'updated_at': transfer.updated_at.isoformat()
+            }
         except Transfer.DoesNotExist:
             raise ValidationError('Transferencia no encontrada')
-
-        return {
-            'payment_id': transfer.payment_id,
-            'status': transfer.status,
-            'auth_id': transfer.auth_id,
-            'amount': float(transfer.instructed_amount),
-            'currency': transfer.currency,
-            'debtor': {
-                'name': transfer.debtor.name,
-                'account': transfer.debtor_account.iban
-            },
-            'creditor': {
-                'name': transfer.creditor.name,
-                'account': transfer.creditor_account.iban
-            },
-            'created_at': transfer.created_at.isoformat(),
-            'updated_at': transfer.updated_at.isoformat()
-        }

@@ -1,37 +1,150 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Enviar Transferencia</title>
-  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
-</head>
-<body class="bg-light">
-  <div class="container mt-5">
-    <h2 class="mb-4">Iniciar Transferencia</h2>
-    {% if error %}
-      <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
-    <form method="POST">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label for="debtor_account_id" class="form-label">ID Cuenta Deudora</label>
-        <input type="text" class="form-control" id="debtor_account_id" name="debtor_account_id" required>
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Realizar Transferencia</h2>
+  
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
       </div>
-      <div class="mb-3">
-        <label for="creditor_account_id" class="form-label">ID Cuenta Acreedora</label>
-        <input type="text" class="form-control" id="creditor_account_id" name="creditor_account_id" required>
+    {% endfor %}
+  {% endif %}
+
+  <form method="post" class="needs-validation" novalidate>
+    {% csrf_token %}
+    
+    <!-- Tipo de transferencia -->
+    <div class="mb-3">
+      <label class="form-label">Tipo de Transferencia</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="transfer_type" id="internal" value="internal" checked>
+        <label class="form-check-label" for="internal">
+          Entre mis cuentas
+        </label>
       </div>
-      <div class="mb-3">
-        <label for="amount" class="form-label">Monto</label>
-        <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="transfer_type" id="external" value="external">
+        <label class="form-check-label" for="external">
+          A otra cuenta
+        </label>
       </div>
-      <div class="mb-3">
-        <label for="iban" class="form-label">IBAN</label>
-        <input type="text" class="form-control" id="iban" name="iban" required>
+    </div>
+
+    <!-- Cuenta origen -->
+    <div class="mb-3">
+      <label for="debtor_account_id" class="form-label">Cuenta Origen</label>
+      <select class="form-select" id="debtor_account_id" name="debtor_account_id" required>
+        <option value="">Seleccione una cuenta</option>
+        {% for account in debtor_accounts %}
+          <option value="{{ account.id }}">
+            {{ account.iban }} - {{ account.currency }} {{ account.balance }}
+          </option>
+        {% endfor %}
+      </select>
+      <div class="invalid-feedback">
+        Por favor seleccione una cuenta origen
       </div>
-      <button type="submit" class="btn btn-primary">Enviar Transferencia</button>
-    </form>
-  </div>
-</body>
-</html>
+    </div>
+
+    <!-- Cuenta destino (cambia según el tipo) -->
+    <div class="mb-3">
+      <label for="creditor_account_id" class="form-label">Cuenta Destino</label>
+      <select class="form-select" id="creditor_account_id" name="creditor_account_id" required>
+        <option value="">Seleccione una cuenta</option>
+      </select>
+      <div class="invalid-feedback">
+        Por favor seleccione una cuenta destino
+      </div>
+    </div>
+
+    <!-- Monto -->
+    <div class="mb-3">
+      <label for="amount" class="form-label">Monto</label>
+      <div class="input-group">
+        <input type="number" step="0.01" min="0.01" class="form-control" id="amount" name="amount" required>
+        <span class="input-group-text" id="currency-addon">EUR</span>
+      </div>
+      <div class="invalid-feedback">
+        Por favor ingrese un monto válido
+      </div>
+    </div>
+
+    <!-- Descripción -->
+    <div class="mb-3">
+      <label for="description" class="form-label">Descripción</label>
+      <textarea class="form-control" id="description" name="description" rows="2"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Realizar Transferencia</button>
+  </form>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const transferTypeInputs = document.querySelectorAll('input[name="transfer_type"]');
+  const creditorSelect = document.getElementById('creditor_account_id');
+  const debtorSelect = document.getElementById('debtor_account_id');
+  
+  // Datos de cuentas
+  const debtorAccounts = {{ debtor_accounts|safe }};
+  const creditorAccounts = {{ creditor_accounts|safe }};
+  
+  function updateCreditorAccounts() {
+    const transferType = document.querySelector('input[name="transfer_type"]:checked').value;
+    const selectedDebtorId = debtorSelect.value;
+    
+    // Limpiar select
+    creditorSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+    
+    if (transferType === 'internal') {
+      // Mostrar solo cuentas del mismo deudor
+      debtorAccounts.forEach(account => {
+        if (account.id !== parseInt(selectedDebtorId)) {
+          const option = new Option(
+            `${account.iban} - ${account.currency} ${account.balance}`,
+            account.id
+          );
+          creditorSelect.add(option);
+        }
+      });
+    } else {
+      // Mostrar cuentas de otros deudores
+      creditorAccounts.forEach(account => {
+        const option = new Option(
+          `${account.iban} - ${account.creditor_name}`,
+          account.id
+        );
+        creditorSelect.add(option);
+      });
+    }
+  }
+  
+  // Actualizar cuando cambia el tipo de transferencia
+  transferTypeInputs.forEach(input => {
+    input.addEventListener('change', updateCreditorAccounts);
+  });
+  
+  // Actualizar cuando cambia la cuenta origen
+  debtorSelect.addEventListener('change', updateCreditorAccounts);
+  
+  // Inicializar
+  updateCreditorAccounts();
+  
+  // Validación del formulario
+  const form = document.querySelector('form');
+  form.addEventListener('submit', function(event) {
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    form.classList.add('was-validated');
+  });
+});
+</script>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Estado de la Transferencia</h2>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <h5 class="card-title">Detalles de la Transferencia</h5>
+          <p class="card-text">
+            <strong>ID de Pago:</strong> {{ transfer.payment_id }}<br>
+            <strong>Monto:</strong> {{ transfer.instructed_amount }} {{ transfer.currency }}<br>
+            <strong>Fecha:</strong> {{ transfer.created_at|date:"d/m/Y H:i" }}<br>
+            <strong>Estado:</strong> 
+            <span class="badge 
+              {% if transfer.status == 'ACCP' %}bg-success
+              {% elif transfer.status == 'PDNG' %}bg-warning
+              {% elif transfer.status == 'RJCT' %}bg-danger
+              {% else %}bg-secondary{% endif %}">
+              {{ transfer.get_status_display }}
+            </span>
+          </p>
+        </div>
+        <div class="col-md-6">
+          <h5 class="card-title">Información de Cuentas</h5>
+          <p class="card-text">
+            <strong>Cuenta Origen:</strong><br>
+            {{ transfer.debtor_account.iban }}<br>
+            {{ transfer.debtor.name }}<br>
+            <br>
+            <strong>Cuenta Destino:</strong><br>
+            {{ transfer.creditor_account.iban }}<br>
+            {{ transfer.creditor.name }}
+          </p>
+        </div>
+      </div>
+
+      {% if transfer.status == 'PDNG' %}
+      <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle"></i>
+        Esta transferencia está pendiente de procesamiento.
+      </div>
+      {% elif transfer.status == 'RJCT' %}
+      <div class="alert alert-danger">
+        <i class="bi bi-x-circle"></i>
+        Esta transferencia fue rechazada.
+      </div>
+      {% elif transfer.status == 'ACCP' %}
+      <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i>
+        Esta transferencia fue aceptada y está siendo procesada.
+      </div>
+      {% elif transfer.status == 'ACSC' %}
+      <div class="alert alert-success">
+        <i class="bi bi-check-circle"></i>
+        Esta transferencia fue completada exitosamente.
+      </div>
+      {% endif %}
+
+      <div class="text-end mt-3">
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+          <i class="bi bi-arrow-left"></i> Volver al Dashboard
+        </a>
+        {% if transfer.status == 'PDNG' and perms.banco.can_process_transfer %}
+        <a href="{% url 'send_transfer_viewGPT4' transfer.payment_id %}" class="btn btn-primary">
+          <i class="bi bi-send"></i> Procesar Transferencia
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

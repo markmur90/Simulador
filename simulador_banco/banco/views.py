@@ -13,6 +13,7 @@ from .forms import (
 from django.http import JsonResponse, HttpResponse, FileResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 
 from .models import (
     Creditor,
@@ -24,6 +25,7 @@ from .models import (
     OficialBancario,
     OTPChallenge,
     PaymentIdentification,
+    Transfer,
 )
 from .forms import UserCreateWithRoleForm
 from django.utils.crypto import get_random_string
@@ -31,6 +33,10 @@ from services.transfer_services import TransferService
 from django.core.exceptions import ValidationError
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from decimal import Decimal
+import uuid
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 
 # Registros simples en memoria para OAuth y transferencias pendientes
 OAUTH_APPROVED = {}
@@ -54,18 +60,43 @@ def login_view(request):
 
 @login_required
 def dashboard_view(request):
-    saldo = 10000  # Simulado por ahora
-    user = request.user
-    template = "banco/dashboard_oficial.html"
-    if user.is_superuser:
-        template = "banco/dashboard_superuser.html"
-    elif user.groups.filter(name="Supervisor").exists():
-        template = "banco/dashboard_supervisor.html"
-    elif user.groups.filter(name="Gerente").exists():
-        template = "banco/dashboard_gerente.html"
-    elif user.groups.filter(name="Administrador").exists():
-        template = "banco/dashboard_administrador.html"
-    return render(request, template, {"saldo": saldo})
+    """Vista del dashboard con transferencias y cuentas"""
+    
+    # Obtener cuentas según el rol del usuario
+    if request.user.groups.filter(name='Oficial Bancario').exists():
+        debtor_accounts = DebtorAccount.objects.all()
+        transfers = Transfer.objects.all()
+    else:
+        debtor_accounts = DebtorAccount.objects.filter(debtor__user=request.user)
+        transfers = Transfer.objects.filter(
+            Q(debtor_account__in=debtor_accounts) |
+            Q(creditor_account__in=debtor_accounts)
+        )
+
+    # Ordenar transferencias por fecha
+    transfers = transfers.order_by('-created_at')
+
+    context = {
+        'debtor_accounts': debtor_accounts,
+        'transfers': transfers,
+        'total_balance': sum(account.balance for account in debtor_accounts),
+    }
+
+    # Renderizar plantilla según el rol
+    if request.user.is_superuser:
+        template = 'banco/dashboard_superuser.html'
+    elif request.user.groups.filter(name='Oficial Bancario').exists():
+        template = 'banco/dashboard_oficial_bancario.html'
+    elif request.user.groups.filter(name='Gerente').exists():
+        template = 'banco/dashboard_gerente.html'
+    elif request.user.groups.filter(name='Supervisor').exists():
+        template = 'banco/dashboard_supervisor.html'
+    elif request.user.groups.filter(name='Administrador').exists():
+        template = 'banco/dashboard_administrador.html'
+    else:
+        template = 'banco/dashboard.html'
+
+    return render(request, template, context)
 
 
 @login_required
@@ -695,3 +726,132 @@ def api_verify_otp(request):
         'status': transfer.status,
         'transfer_id': transfer.payment_id
     })
+
+@login_required
+def transfer_view(request):
+    """Vista para realizar transferencias internas y externas"""
+    if request.method == "POST":
+        try:
+            # Obtener datos del formulario
+            debtor_account_id = request.POST.get('debtor_account_id')
+            creditor_account_id = request.POST.get('creditor_account_id')
+            amount = Decimal(request.POST.get('amount', '0'))
+            description = request.POST.get('description', '')
+            transfer_type = request.POST.get('transfer_type')  # 'internal' o 'external'
+
+            # Validar datos básicos
+            if not all([debtor_account_id, creditor_account_id, amount]):
+                raise ValidationError('Todos los campos son requeridos')
+
+            if amount <= 0:
+                raise ValidationError('El monto debe ser mayor a 0')
+
+            # Obtener la cuenta deudora
+            try:
+                debtor_account = DebtorAccount.objects.get(id=debtor_account_id)
+            except DebtorAccount.DoesNotExist:
+                raise ValidationError('Cuenta deudora no encontrada')
+
+            # Verificar que la cuenta pertenezca al usuario actual
+            if not request.user.groups.filter(name='Oficial Bancario').exists():
+                if debtor_account.debtor.user != request.user:
+                    raise ValidationError('No tienes permiso para usar esta cuenta')
+
+            # Validar saldo suficiente
+            if debtor_account.balance < amount:
+                raise ValidationError('Saldo insuficiente')
+
+            # Generar payment_id único
+            payment_id = str(uuid.uuid4())
+
+            # Preparar datos para la transferencia
+            transfer_data = {
+                'payment_id': payment_id,
+                'debtor_account': debtor_account.iban,
+                'instructed_amount': amount,
+                'currency': debtor_account.currency,
+                'description': description
+            }
+
+            if transfer_type == 'internal':
+                # Transferencia entre cuentas propias
+                try:
+                    creditor_account = DebtorAccount.objects.get(id=creditor_account_id)
+                    if creditor_account.debtor != debtor_account.debtor:
+                        raise ValidationError('La cuenta destino no pertenece al mismo titular')
+                    
+                    transfer_data['creditor_account'] = creditor_account.iban
+                except DebtorAccount.DoesNotExist:
+                    raise ValidationError('Cuenta destino no encontrada')
+
+            else:
+                # Transferencia externa
+                try:
+                    creditor_account = CreditorAccount.objects.get(id=creditor_account_id)
+                    transfer_data['creditor_account'] = creditor_account.iban
+                except CreditorAccount.DoesNotExist:
+                    raise ValidationError('Cuenta destino no encontrada')
+
+            # Crear la transferencia
+            transfer = TransferService.create_transfer(transfer_data)
+
+            # Procesar inmediatamente si es interna
+            if transfer_type == 'internal':
+                TransferService.process_transfer(transfer)
+                messages.success(request, 'Transferencia interna realizada con éxito')
+            else:
+                # Para transferencias externas, iniciar el proceso de autorización
+                messages.info(request, 'Transferencia externa creada. Pendiente de autorización')
+
+            return redirect('dashboard')
+
+        except ValidationError as e:
+            messages.error(request, str(e))
+        except Exception as e:
+            messages.error(request, 'Error al procesar la transferencia')
+            
+    # GET: Mostrar formulario
+    context = {
+        'debtor_accounts': DebtorAccount.objects.filter(
+            debtor__user=request.user
+        ) if not request.user.groups.filter(name='Oficial Bancario').exists() else DebtorAccount.objects.all(),
+        'creditor_accounts': CreditorAccount.objects.all()
+    }
+    return render(request, 'banco/transfer_form.html', context)
+
+@login_required
+def transfer_status_view(request, payment_id):
+    """Vista para mostrar el estado de una transferencia"""
+    try:
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        
+        # Verificar permisos
+        if not request.user.groups.filter(name='Oficial Bancario').exists():
+            if transfer.debtor_account.debtor.user != request.user:
+                raise PermissionDenied
+        
+        return render(request, 'banco/transfer_status.html', {
+            'transfer': transfer
+        })
+    except Transfer.DoesNotExist:
+        messages.error(request, 'Transferencia no encontrada')
+        return redirect('dashboard')
+
+@login_required
+def api_transfer_status(request, payment_id):
+    """API para consultar el estado de una transferencia"""
+    try:
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        
+        # Verificar permisos
+        if not request.user.groups.filter(name='Oficial Bancario').exists():
+            if transfer.debtor_account.debtor.user != request.user:
+                return JsonResponse({'error': 'No autorizado'}, status=403)
+        
+        return JsonResponse(TransferService.get_transfer_status(payment_id))
+    except Transfer.DoesNotExist:
+        return JsonResponse({'error': 'Transferencia no encontrada'}, status=404)
+    except ValidationError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': 'Error interno'}, status=500)
