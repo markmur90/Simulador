@@ -9,7 +9,7 @@
   {% for u in users %}
     <tr>
       <td>{{ u.username }}</td>
-      <td>{{ u.groups.first.name if u.groups.first }}</td>
+      <td>{% if u.groups.first %}{{ u.groups.first.name }}{% endif %}</td>
       <td>{{ u.is_active }}</td>
       <td><a href="{% url 'user_edit' u.pk %}" class="btn btn-sm btn-secondary">Editar</a></td>
     </tr>
