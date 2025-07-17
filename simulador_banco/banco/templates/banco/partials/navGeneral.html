@@ -6,11 +6,10 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarsExample">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item"><a class="nav-link" href="{% url 'user_list' %}">Usuarios</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'list_debtorsGPT4' %}">Deudores</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'list_creditorsGPT4' %}">Acreedores</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'list_transferGPT4' %}">Transferencias</a></li>        
-        <li class="nav-item"><a class="nav-link" href="{% url 'transfer' %}">Transferencias</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'list_transferGPT4' %}">Listado</a></li>        
+        <li class="nav-item"><a class="nav-link" href="{% url 'transfer' %}">Generar</a></li>
         {% if user.is_superuser %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administración</a>
