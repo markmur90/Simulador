@@ -1,0 +1,600 @@
+"Revisa a fondo el proyecto Django proporcionado, que corresponde a un simulador bancario web  con las siguientes características clave: 
+
+    El sistema permite que los clientes ingresen mediante autenticación por usuario y contraseña , validando credenciales y generando un token de sesión seguro .
+    Antes de realizar transferencias, se implementa un challenge de OTP (One-Time Password)  como capa adicional de seguridad.
+    Una vez confirmada la transferencia, se ejecuta el proceso correspondiente y se devuelve una respuesta clara al cliente o API consumidora.
+    Incluye un dashboard administrativo  desde el cual se pueden crear y gestionar clientes, acreedores, transacciones y otros datos esenciales del sistema.
+    Debe recibir transferencias entrantes desde backends externos (por ejemplo, por Internet), procesándolas correctamente según lógica bancaria simulada.
+    Utiliza SQLite  como base de datos principal.
+    No utiliza REST Framework ni APIs RESTful; todo el frontend está construido con HTML y plantillas Django  de buen diseño, siguiendo estándares actuales de usabilidad y experiencia de usuario.
+        
+
+Para comprender mejor la estructura y comportamiento esperado de ciertas funcionalidades, toma como referencia los archivos JSON ubicados en la carpeta docs/swagger , los cuales describen esquemas y flujos lógicos similares a los que debería seguir el sistema. 
+
+Tu labor consiste en: 
+
+    Analizar exhaustivamente  el código actual: 
+        Verificar estructura del proyecto (aplicaciones, directorios, archivos).
+        Evaluar modelos de datos, vistas, formularios, URLs, templates, settings y seguridad.
+        Identificar errores, bugs, código redundante, malas prácticas, posibles vulnerabilidades de seguridad y puntos de mejora.
+        Comparar la implementación actual con los esquemas definidos en los archivos de docs/swagger para validar coherencia.
+            
+
+    Refactorizar completamente  el proyecto para dejarlo totalmente funcional, seguro, bien organizado y escalable, aplicando lo siguiente: 
+        Implementación correcta de autenticación y manejo de sesiones seguras.
+        Generación, envío y verificación de tokens OTP (pueden ser simulados si no hay integración real con SMS/email).
+        Lógica clara y segura para validar y procesar transferencias.
+        Dashboard intuitivo y seguro para la gestión de usuarios, acreedores y transacciones.
+        Recepción y procesamiento adecuado de transferencias entrantes desde sistemas externos (simuladas o reales).
+        Diseño limpio y moderno en las plantillas HTML, usando estándares actuales de UX/UI (sin frameworks frontend como React, solo HTML, CSS y JS básico si aplica).
+        Cumplimiento de buenas prácticas de seguridad: protección contra CSRF, XSS, inyecciones SQL, configuración segura de settings.py, etc.
+        Manejo correcto de errores, logs y mensajes de usuario claros.
+            
+
+    Realizar pruebas internas completas  de todas las funcionalidades antes de entregar el proyecto corregido: 
+        Pruebas manuales o automatizadas de inicio de sesión, autenticación multifactor (OTP), creación de clientes, transferencias, recepción de transacciones, etc.
+        Validación de que cada parte funciona correctamente tanto individualmente como en conjunto.
+        Asegúrate de que la funcionalidad implementada coincida con los flujos y estructuras definidas en los archivos JSON de docs/swagger.
+            
+
+    Documentar los cambios realizados , incluyendo: 
+        Explicación de qué partes se corrigieron y por qué.
+        Instrucciones claras para instalar, configurar y ejecutar el proyecto tras la refactorización.
+        Recomendaciones futuras si fuera necesario.
+            
+        
+
+Al finalizar, entrega el proyecto completamente funcional, probado y listo para ejecutarse localmente sin errores, con una interfaz limpia, segura y alineada a los estándares actuales." 
+
+
+
+Eres un ingeniero full-stack especializado en desarrollo web con Python, Django, frameworks de frontend (React/Vue/Angular) y consumo de APIs externas.
+Tu tarea es crear un sistema bancario completo que cumpla con los siguientes requisitos: 
+🧠 Requisitos del Sistema 
+1. Backend – Django  
+
+    Usar Django puro  (sin Django REST Framework, si se requiere).
+    Autenticación de usuarios (login/logout/registro).
+    Gestión de cuentas, transferencias y logs.
+    Base de datos local (SQLite o PostgreSQL).
+    Endpoints para el frontend (HTML/JS o API según sea necesario).
+     
+
+2. Frontend – Framework  
+
+    Usar React , Vue.js  o Angular  como framework principal.
+    Interfaz intuitiva para:
+        Iniciar sesión.
+        Ver saldo.
+        Realizar transferencias.
+        Ver historial de transacciones.
+        Recibir análisis inteligente de operaciones con GPT-4.
+         
+    Mostrar gráficos interactivos con Chart.js o D3.js.
+    Soporte para notificaciones en tiempo real (si aplica).
+     
+
+3. Integración con APIs Externas  
+
+    OpenAI GPT-4 : Analizar cada transferencia y mostrar explicación del comportamiento de la operación.
+    Telegram Bot API : Enviar notificación automática tras cada transferencia con detalles y QR escaneado.
+    Google Authenticator (TOTP) : Validar OTP antes de realizar transferencias sensibles.
+     
+
+4. Dashboard de Administrador  
+
+    Solo accesible por usuarios con rol admin .
+    Muestra:
+        Gráficos de transferencias diarias, montos por usuario, distribución geográfica.
+        Logs completos de todas las acciones realizadas.
+        Usuarios activos y sesiones activas.
+         
+    Filtros por fecha, tipo de cuenta, monto, etc.
+     
+
+5. Seguridad  
+
+    JWT o token-based authentication entre frontend y backend.
+    Refresco automático de tokens expirados.
+    Auditoría de acciones: quién hizo qué, cuándo y desde qué IP.
+    Roles de usuario: usuario, admin.
+     
+
+6. Logs Automáticos  
+
+    Guardar en base de datos:
+        Fecha/hora.
+        Usuario.
+        Acción realizada.
+        Detalles adicionales (monto, destino, resultado).
+        IP del cliente.
+         
+     
+📁 Estructura Sugerida del Proyecto 
+banco-sistema/
+├── backend/
+│   ├── manage.py
+│   ├── banco/
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── ...
+│   ├── usuarios/
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   └── templates/
+│   ├── transferencias/
+│   │   ├── models.py
+│   │   ├── views.py
+│   │   └── templates/
+│   ├── static/
+│   └── templates/
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── App.js
+│   │   ├── components/
+│   │   │   ├── Login.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── Transferencia.jsx
+│   │   │   └── Historial.jsx
+│   │   └── services/
+│   │       ├── auth.service.js
+│   │       ├── transferencia.service.js
+│   │       └── gpt.service.js
+│   ├── package.json
+│   └── ...
+├── docker-compose.yml (opcional)
+└── README.md
+
+🔌 APIs Externas a Consumir 
+Servicio,Funcionalidad
+Telegram Bot API,Notificar transferencias con mensajes personalizados y adjuntar imágenes (QR).
+OpenAI API (GPT-4),Analizar cada transferencia y generar una descripción inteligente.
+Google Authenticator (TOTP),Generar y validar códigos OTP en el backend.
+
+profile
+Qwen3-235B-A22B
+
+¡Perfecto! Entiendo que tu sistema bancario ahora debe incluir : 
+
+    ✅ Uso de APIs externas  (como Telegram, OpenAI GPT-4).
+    ✅ Uso de un framework para frontend  (por ejemplo: React, Vue.js o Angular).
+     
+
+Tu objetivo es tener una aplicación completa con: 
+
+    Backend en Django (sin REST Framework si lo deseas).
+    Frontend moderno usando un framework.
+    Integración con APIs externas.
+    Seguridad, autenticación y dashboard funcional.
+     
+
+✅ Prompt Optimizado – Sistema Bancario con Django + API Externa + Framework Frontend 
+
+    Prompt:  
+     
+
+Eres un ingeniero full-stack especializado en desarrollo web con Python, Django, frameworks de frontend (React/Vue/Angular) y consumo de APIs externas.
+Tu tarea es crear un sistema bancario completo que cumpla con los siguientes requisitos: 
+🧠 Requisitos del Sistema 
+1. Backend – Django  
+
+    Usar Django puro  (sin Django REST Framework, si se requiere).
+    Autenticación de usuarios (login/logout/registro).
+    Gestión de cuentas, transferencias y logs.
+    Base de datos local (SQLite o PostgreSQL).
+    Endpoints para el frontend (HTML/JS o API según sea necesario).
+     
+
+2. Frontend – Framework  
+
+    Dashboard & Simulador 
+
+        Python 3.8+
+        Librerías: Flask, requests, qrcode, zxingcpp, pillow, python-telegram-bot, openai, matplotlib, pandas
+     
+     
+
+3. Integración con APIs Externas  
+
+    OpenAI GPT-4 : Analizar cada transferencia y mostrar explicación del comportamiento de la operación.
+    Telegram Bot API : Enviar notificación automática tras cada transferencia con detalles y QR escaneado.
+    Google Authenticator (TOTP) : Validar OTP antes de realizar transferencias sensibles.
+     
+
+4. Dashboard de Administrador  
+
+    Solo accesible por usuarios con rol admin .
+    Muestra:
+        Gráficos de transferencias diarias, montos por usuario, distribución geográfica.
+        Logs completos de todas las acciones realizadas.
+        Usuarios activos y sesiones activas.
+         
+    Filtros por fecha, tipo de cuenta, monto, etc.
+     
+
+5. Seguridad  
+
+    JWT o token-based authentication entre frontend y backend.
+    Refresco automático de tokens expirados.
+    Auditoría de acciones: quién hizo qué, cuándo y desde qué IP.
+    Roles de usuario: usuario, admin.
+     
+
+6. Logs Automáticos  
+
+    Guardar en base de datos:
+        Fecha/hora.
+        Usuario.
+        Acción realizada.
+        Detalles adicionales (monto, destino, resultado).
+        IP del cliente.
+         
+     
+
+📁 Estructura Sugerida del Proyecto 
+ 
+simulador_banco/
+│
+├── backend/                          # API Spring Boot (Java)
+│   ├── pom.xml                       # Archivo Maven
+│   ├── src/
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── com.markmur.banco/
+│   │   │   │       ├── controller/
+│   │   │   │       │   ├── AuthController.java
+│   │   │   │       │   ├── TransferenciaController.java
+│   │   │   │       │   └── LogController.java
+│   │   │   │       ├── service/
+│   │   │   │       │   ├── JwtService.java
+│   │   │   │       │   ├── OtpService.java
+│   │   │   │       │   └── TelegramService.java
+│   │   │   │       ├── model/
+│   │   │   │       │   ├── Usuario.java
+│   │   │   │       │   └── Log.java
+│   │   │   │       ├── BancoApplication.java
+│   │   │   │       └── SecurityConfig.java
+│   │   │   └── resources/
+│   │   │       ├── application.properties
+│   │   │       └── data.sql          # Datos iniciales
+│   │   └── test/                     # Tests unitarios (opcional)
+│   └── mvnw                          # Script de ejecución Maven
+│
+├── dashboard/                        # Dashboard Flask + HTML
+│   ├── app.py                        # Servidor Flask
+│   ├── templates/
+│   │   └── dashboard.html            # Página principal con gráficos
+│   ├── static/
+│   │   └── style.css                 # Estilos CSS
+│   └── requirements.txt              # Requisitos Python
+│
+├── simulador/                        # Simulador Tkinter
+│   ├── app.py                        # GUI con Tkinter
+│   ├── config.py                     # Configuración
+│   └── qr_scanner.py                 # Escáner de QR
+│
+├── logs/                             # Logs automáticos
+│   └── banco_logs.log                # Registro de operaciones
+│
+├── scripts/
+│   ├── start_all.sh                  # Iniciar todo desde terminal
+│   ├── start_api.sh                  # Solo iniciar API
+│   └── start_dashboard.sh            # Solo iniciar dashboard
+│
+└── README.md                         # Guía rápida de instalación y uso
+ 
+✅ Funcionalidades Incluidas 
+Módulo,Características
+🔐 Autenticación JWT,"Login, Refresh Token, expiración automática"
+📱 Google Authenticator OTP,Generación de QR y validación TOTP
+📊 Dashboard Web,Gráficos interactivos de transferencias
+📋 Auditoría,Registros completos de acciones por usuario
+🧠 Análisis GPT-4,Análisis inteligente de transacciones sospechosas
+📬 Notificaciones por Telegram,Enviar mensajes y adjuntar imágenes
+📁 Logs Automáticos,Registro detallado de todas las operaciones
+🖥️ Simulador Tkinter,GUI sencilla con soporte de escaneo de QR
+ 
+🔌 APIs Externas a Consumir 
+Telegram Bot API
+	
+Notificar transferencias con mensajes personalizados y adjuntar imágenes (QR).
+OpenAI API (GPT-4)
+	
+Analizar cada transferencia y generar una descripción inteligente.
+Google Authenticator (TOTP)
+	
+Generar y validar códigos OTP en el backend.
+ 
+ 
+💻 Flujo de Uso del Sistema 
+
+    El usuario entra a /login → introduce credenciales.
+    Si es válido, inicia sesión y accede al dashboard.
+    Puede ver su saldo, historial y hacer transferencias.
+    Al hacer una transferencia sensible, se genera un código OTP.
+    Se muestra un QR que puede escanearse con Google Authenticator.
+    Se ingresa el código OTP y se valida.
+    Se realiza la transferencia y se envía notificación por Telegram.
+    Se analiza la operación con GPT-4 → resultado mostrado al usuario.
+    Todos los pasos quedan registrados en logs.
+
+📦 Librerías Necesarias 
+Backend (Django)
+pip install django qrcode google-auth python-telegram-bot openai python-jose[cryptography] bcrypt
+
+🎨 base.html – Plantilla Principal 
+Ubicación: templates/base.html 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Banco Seguro{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="{% static 'js/chart.min.js' %}"></script>
+</head>
+<body>
+    <header>
+        <h1>🏦 Banco Seguro</h1>
+        {% if user.is_authenticated %}
+            <nav>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'transferir' %}">Transferir</a>
+                <a href="{% url 'logout' %}">Cerrar Sesión</a>
+            </nav>
+        {% endif %}
+    </header>
+
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Banco Seguro. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
+
+🔐 Vista de Login (usuarios/views.py) 
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, logout
+from django.http import HttpResponse
+import requests
+import jwt
+from datetime import datetime
+
+def login_view(request):
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        # Simular llamada a la API
+        response = requests.post("http://localhost:8080/usuarios/login", json={"username": username, "password": password})
+        if response.status_code == 200:
+            data = response.json()
+            token = data["access_token"]
+            payload = jwt.decode(token, options={"verify_signature": False})
+
+            request.session["token"] = token
+            request.session["refresh_token"] = data["refresh_token"]
+            request.session["usuario"] = payload["sub"]
+
+            return redirect("dashboard")
+
+    return render(request, "usuarios/login.html")
+
+📊 Dashboard (usuarios/views.py) 
+from django.shortcuts import render
+from django.http import JsonResponse
+import requests
+
+def dashboard_view(request):
+    token = request.session.get("token")
+    if not token:
+        return redirect("login")
+
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get("http://localhost:8080/transferencias/historial", headers=headers)
+
+    transferencias = []
+    if response.status_code == 200:
+        transferencias = response.json()
+
+    return render(request, "usuarios/dashboard.html", {
+        "transferencias": transferencias
+    })
+
+💸 Vista de Transferencia (transferencias/views.py) 
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+import requests
+
+def transferir_view(request):
+    token = request.session.get("token")
+    if not token:
+        return redirect("login")
+
+    if request.method == "POST":
+        origen = request.POST.get("origen")
+        destino = request.POST.get("destino")
+        monto = request.POST.get("monto")
+
+        headers = {"Authorization": f"Bearer {token}"}
+        payload = {"origen": origen, "destino": destino, "monto": monto}
+
+        response = requests.post("http://localhost:8080/transferencias", json=payload, headers=headers)
+
+        if response.status_code == 403 and response.json().get("error") == "otp_required":
+            return redirect("confirmar_otp")
+
+        return redirect("dashboard")
+
+    return render(request, "transferencias/transferir.html")
+
+🔁 Confirmación OTP (usuarios/views.py) 
+def confirmar_otp_view(request):
+    if request.method == "POST":
+        otp = request.POST.get("otp")
+        username = request.session.get("usuario")
+
+        response = requests.post(f"http://localhost:8080/auth/validar-otp?username={username}&code={otp}")
+        if response.status_code == 200 and response.json():
+            return redirect("dashboard")
+
+    return render(request, "usuarios/confirmar_otp.html")
+
+📈 Gráficos Dinámicos en Template 
+usuarios/dashboard.html 
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2>📊 Transferencias Recientes</h2>
+<ul>
+    {% for t in transferencias %}
+        <li>{{ t.fecha }} - ${{ t.monto }} → {{ t.destino }}</li>
+    {% endfor %}
+</ul>
+
+<h2>📈 Gráfico de Transferencias</h2>
+<canvas id="grafico-transferencias" width="600" height="300"></canvas>
+<script>
+const ctx = document.getElementById('grafico-transferencias').getContext('2d');
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{% for t in fechas %}"{{ t }}"{% if not forloop.last %}, {% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Monto',
+            data: [{% for t in montos %}{{ t }}{% if not forloop.last %}, {% endif %}{% endfor %}],
+            borderColor: 'blue',
+            fill: false
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: { beginAtZero: true }
+        }
+    }
+});
+</script>
+{% endblock %}
+
+📄 Auditoría de Operaciones 
+logs/views.py 
+from django.shortcuts import render
+import requests
+
+def auditoria_view(request):
+    token = request.session.get("token")
+    headers = {"Authorization": f"Bearer {token}"}
+    response = requests.get("http://localhost:8080/auditoria", headers=headers)
+
+    logs = []
+    if response.status_code == 200:
+        logs = response.json()
+
+    return render(request, "logs/auditoria.html", {"logs": logs})
+
+📲 Notificaciones por Telegram 
+
+import requests
+
+def enviar_notificacion_telegram(mensaje, foto_path=None):
+    bot_token = "TU_BOT_TELEGRAM"
+    chat_id = "TU_CHAT_ID"
+
+    if foto_path:
+        url = f"https://api.telegram.org/bot{bot_token}/sendPhoto" 
+        with open(foto_path, "rb") as photo:
+            files = {'photo': photo}
+            data = {'chat_id': chat_id, 'caption': mensaje}
+            requests.post(url, data=data, files=files)
+    else:
+        url = f"https://api.telegram.org/bot{bot_token}/sendMessage" 
+        data = {'chat_id': chat_id, 'text': mensaje}
+        requests.post(url, data=data)
+
+🗂️ Registro de Logs Locales 
+logs/models.py 
+from django.db import models
+
+class Log(models.Model):
+    usuario = models.CharField(max_length=100)
+    accion = models.TextField()
+    fecha = models.DateTimeField(auto_now_add=True)
+    ip = models.CharField(max_length=100)
+    detalles = models.TextField(blank=True, null=True)
+
+
+# ==========================================
+Eres un ingeniero de software sénior especializado en arquitectura, desarrollo y mantenimiento de sistemas escalables. Tu misión es revisar completamente el repositorio del proyecto que voy a proporcionarte, con un nivel de detalle absoluto. No debes dejar ningún archivo sin analizar, desde la configuración inicial hasta los archivos de plantillas, scripts de despliegue, rutas, vistas, modelos, formularios, estilos, lógica de negocio, y cualquier otro componente relevante del sistema.
+
+Tu análisis debe incluir:
+
+1. ✅ Revisión completa del árbol de directorios:
+   - Identificar todas las carpetas y archivos relevantes.
+   - Detectar posibles inconsistencias en la organización del proyecto.
+   - Verificar si hay duplicados, archivos innecesarios o mal nombrados.
+
+2. 🔍 Análisis de consistencia entre modelos, vistas, formularios, URLs y plantillas:
+   - Para cada modelo existente:
+     - ¿Tiene un formulario asociado?
+     - ¿Existe una vista (view/controller) correspondiente?
+     - ¿Está mapeada su URL/ruta correctamente?
+     - ¿Posee una plantilla HTML (template) asociada?
+     - Si alguno de estos elementos falta, debes generar una versión funcional y coherente basada en buenas prácticas.
+   - Generar automáticamente código base para los componentes faltantes, respetando la arquitectura del proyecto y el estilo ya establecido.
+
+3. 📄 Diseño de muestra para plantillas faltantes:
+   - En caso de que falte una plantilla HTML, genera una interfaz funcional y semántica que permita al usuario interactuar con el modelo correspondiente.
+   - Usa Bootstrap u otro framework de diseño si es parte del stack del proyecto.
+   - Incluye campos dinámicos, mensajes de error, validaciones básicas, y navegación coherente.
+
+4. ⚙️ Configuración global del proyecto:
+   - Analiza los archivos de configuración (settings.py, .env, config.js, etc.).
+   - Verifica variables de entorno, bases de datos, middlewares, seguridad, internacionalización, caché, etc.
+   - Detectar configuraciones potencialmente inseguras o incorrectas.
+
+5. 📜 Scripts y automatizaciones:
+   - Revisa todos los scripts personalizados (manage.py, run.sh, deploy.sh, migrations, seeders, etc.).
+   - Evalúa si son ejecutables, seguros y cumplen su propósito.
+   - Proponer mejoras o corregir errores detectados.
+
+6. 🗂️ Estructura de plantillas y simuladores:
+   - Si el proyecto incluye un simulador o motor de renderizado, revisa las plantillas utilizadas.
+   - Asegúrate de que todas las vistas se integren correctamente.
+   - Completa o corrige cualquier template usado por el simulador para que sea funcional y visualmente correcto.
+
+7. 📊 Logs y salida del sistema:
+   - Si me proporcionas logs del sistema, úsalos para identificar errores específicos o warnings recurrentes.
+   - Relaciona esos errores con el código fuente para ofrecer correcciones precisas.
+
+8. 🔄 Integración y flujo de trabajo:
+   - Revisa si hay pruebas unitarias, integración continua, pipelines de CI/CD.
+   - Propón mejoras o implementa aquellas que falten si son relevantes.
+
+9. 🛡️ Seguridad:
+   - Detectar posibles agujeros de seguridad (SQL injection, XSS, CSRF, permisos, etc.).
+   - Ofrecer recomendaciones de hardening del proyecto.
+
+10. 📈 Escalabilidad:
+    - Evaluar si la arquitectura permite escalar el proyecto.
+    - Recomendar patrones de diseño o refactorizaciones que mejoren el rendimiento futuro.
+
+11. 📝 Documentación:
+    - Revisar si existe documentación interna (README.md, docstrings, comentarios, etc.).
+    - Sugerir puntos donde se debería mejorar o añadir documentación.
+
+12. 💡 Mejoras sugeridas:
+    - Después del análisis completo, ofrece una lista de mejoras técnicas, UX/UI, de rendimiento o arquitectónicas que elevarían la calidad del proyecto.
+
+Al finalizar, quiero que me entregues:
+- Un informe detallado del estado actual del proyecto.
+- Una lista de elementos incompletos o inconsistentes.
+- Código generado automáticamente para los componentes faltantes (formularios, vistas, URLs, plantillas).
+- Recomendaciones claras y priorizadas.
+- Archivos modificados o creados, listos para ser copiados al repositorio.
+
+Todo esto debe estar organizado de forma clara, modular y profesional. Tu objetivo es ayudarme a superar este proyecto 100 mil veces. No quiero solo encontrar errores; quiero que lo transformes en algo excepcional.

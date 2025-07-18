@@ -336,7 +336,7 @@ def _authenticate_jwt(request):
 def api_send_transfer(request):
     """
     POST /api/send-transfer
-    Procesa una nueva transferencia con validación OTP.
+    Procesa una nueva transferencia con validación OTP y análisis GPT-4.
     """
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
@@ -358,6 +358,26 @@ def api_send_transfer(request):
         # Obtener transferencia
         transfer = get_object_or_404(Transfer, payment_id=payment_id)
         
+        # Analizar con GPT-4
+        analysis = TransferAnalysisService.analyze_transfer(transfer)
+        
+        # Si el riesgo es ALTO o CRÍTICO, rechazar
+        if analysis.get('risk_level') in ['HIGH', 'CRITICAL']:
+            transfer.status = 'RJCT'
+            transfer.save()
+            
+            # Registrar rechazo
+            LogTransferencia.objects.create(
+                registro=payment_id,
+                tipo_log='ERROR',
+                contenido=f"Transferencia rechazada por alto riesgo: {analysis.get('explanation')}"
+            )
+            
+            return JsonResponse({
+                'error': 'Transferencia rechazada por riesgo elevado',
+                'analysis': analysis
+            }, status=400)
+        
         # Actualizar estado
         transfer = TransferService.update_transfer_status(
             transfer,
@@ -367,7 +387,8 @@ def api_send_transfer(request):
 
         return JsonResponse({
             'payment_id': transfer.payment_id,
-            'status': transfer.status
+            'status': transfer.status,
+            'analysis': analysis
         })
 
     except ValidationError as e:
@@ -904,3 +925,123 @@ def api_transfer_status(request, payment_id):
         return JsonResponse({'error': str(e)}, status=400)
     except Exception as e:
         return JsonResponse({'error': 'Error interno'}, status=500)
+
+@login_required
+def setup_totp(request):
+    """Vista para configurar TOTP con Google Authenticator."""
+    if request.method == 'POST':
+        code = request.POST.get('code')
+        if not code:
+            messages.error(request, 'Código requerido')
+            return redirect('setup_totp')
+            
+        # Verificar código temporal
+        secret = request.session.get('temp_totp_secret')
+        if not secret:
+            messages.error(request, 'Sesión expirada. Intente nuevamente.')
+            return redirect('setup_totp')
+            
+        if SecurityService.verify_totp(secret, code):
+            # Guardar secreto y activar TOTP
+            request.user.totp_secret = secret
+            request.user.totp_enabled = True
+            request.user.save(update_fields=['totp_secret', 'totp_enabled'])
+            
+            # Limpiar sesión
+            del request.session['temp_totp_secret']
+            messages.success(request, '¡Autenticación de dos factores activada!')
+            return redirect('dashboard')
+        else:
+            messages.error(request, 'Código inválido')
+            return redirect('setup_totp')
+            
+    # GET: generar nuevo secreto y QR
+    secret, qr_code = SecurityService.setup_totp(request.user)
+    request.session['temp_totp_secret'] = secret
+    
+    return render(request, 'banco/setup_totp.html', {
+        'qr_code': qr_code
+    })
+
+@csrf_exempt
+def api_login(request):
+    """
+    POST /api/login
+    Login con soporte para TOTP y refresh tokens.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+        
+    data = json.loads(request.body)
+    username = data.get('username')
+    password = data.get('password')
+    totp_code = data.get('totp_code')
+    
+    try:
+        user = OficialBancario.objects.get(username=username)
+        
+        # Verificar bloqueo
+        if user.account_locked:
+            return JsonResponse({
+                'error': 'Cuenta bloqueada. Contacte al administrador.'
+            }, status=401)
+            
+        # Verificar contraseña
+        if not user.check_password(password):
+            user.increment_failed_attempts()
+            return JsonResponse({'error': 'Credenciales inválidas'}, status=401)
+            
+        # Verificar TOTP si está habilitado
+        if user.totp_enabled:
+            if not totp_code:
+                return JsonResponse({
+                    'error': 'Código TOTP requerido',
+                    'totp_required': True
+                }, status=401)
+                
+            if not SecurityService.verify_totp(user.totp_secret, totp_code):
+                return JsonResponse({'error': 'Código TOTP inválido'}, status=401)
+                
+        # Generar tokens
+        tokens = SecurityService.generate_token_pair({
+            'id': user.id,
+            'username': user.username,
+            'role': user.role
+        })
+        
+        # Actualizar usuario
+        user.reset_failed_attempts()
+        user.last_login_ip = request.META.get('REMOTE_ADDR')
+        user.refresh_token = tokens['refresh_token']
+        user.save(update_fields=['last_login_ip', 'refresh_token'])
+        
+        return JsonResponse(tokens)
+        
+    except OficialBancario.DoesNotExist:
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def api_refresh_token(request):
+    """
+    POST /api/refresh
+    Refresca el access token usando un refresh token válido.
+    """
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+        
+    try:
+        data = json.loads(request.body)
+        refresh_token = data.get('refresh_token')
+        
+        if not refresh_token:
+            return JsonResponse({'error': 'refresh_token requerido'}, status=400)
+            
+        new_access_token = SecurityService.refresh_access_token(refresh_token)
+        return JsonResponse({'access_token': new_access_token})
+        
+    except ValidationError as e:
+        return JsonResponse({'error': str(e)}, status=401)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

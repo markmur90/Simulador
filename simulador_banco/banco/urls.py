@@ -81,3 +81,10 @@ urlpatterns += [
     path('api/transferencia/',     views.api_send_transfer,     name='api_send_transfer'),
     path('api/transferencia/verify/', views.api_verify_otp,     name='api_verify_otp'),
 ]
+
+# Autenticación mejorada
+urlpatterns += [
+    path('api/login', views.api_login, name='api_login'),
+    path('api/refresh', views.api_refresh_token, name='api_refresh'),
+    path('setup-totp/', views.setup_totp, name='setup_totp'),
+]

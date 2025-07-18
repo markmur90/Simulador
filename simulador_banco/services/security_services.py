@@ -1,70 +1,153 @@
 import secrets
 from datetime import datetime, timedelta
 from typing import Dict, Optional, Tuple
-
+import qrcode
+import io
+import base64
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 import jwt
 import pyotp
+from jose import JWTError, jwt as jose_jwt
 
-from banco.models import OTPChallenge, LogTransferencia
+from banco.models import OTPChallenge, LogTransferencia, OficialBancario
 
 class SecurityService:
     OTP_LENGTH = 6
     OTP_EXPIRY_MINUTES = 5
     JWT_ALGORITHM = 'HS256'
     MAX_OTP_ATTEMPTS = 3
+    ACCESS_TOKEN_EXPIRE_MINUTES = 30
+    REFRESH_TOKEN_EXPIRE_DAYS = 7
     
     @classmethod
-    def generate_jwt(cls, user_data: Dict, expiry_hours: int = 2) -> str:
+    def generate_token_pair(cls, user_data: Dict) -> Dict[str, str]:
         """
-        Genera un token JWT válido.
+        Genera un par de tokens JWT (access + refresh).
         
         Args:
             user_data: Diccionario con datos del usuario
-            expiry_hours: Horas hasta la expiración
             
         Returns:
-            str: Token JWT firmado
+            Dict con access_token y refresh_token
         """
-        payload = {
+        # Access token con vida corta
+        access_payload = {
             **user_data,
-            'exp': datetime.utcnow() + timedelta(hours=expiry_hours),
+            'exp': datetime.utcnow() + timedelta(minutes=cls.ACCESS_TOKEN_EXPIRE_MINUTES),
             'iat': datetime.utcnow(),
-            'jti': secrets.token_hex(16)
+            'type': 'access'
         }
         
-        return jwt.encode(
-            payload,
+        # Refresh token con vida larga
+        refresh_payload = {
+            'user_id': user_data.get('id'),
+            'exp': datetime.utcnow() + timedelta(days=cls.REFRESH_TOKEN_EXPIRE_DAYS),
+            'iat': datetime.utcnow(),
+            'type': 'refresh'
+        }
+        
+        access_token = jose_jwt.encode(
+            access_payload,
             settings.JWT_SECRET_KEY,
             algorithm=cls.JWT_ALGORITHM
         )
+        
+        refresh_token = jose_jwt.encode(
+            refresh_payload,
+            settings.JWT_REFRESH_SECRET_KEY,
+            algorithm=cls.JWT_ALGORITHM
+        )
+        
+        return {
+            'access_token': access_token,
+            'refresh_token': refresh_token,
+            'token_type': 'bearer'
+        }
 
     @classmethod
-    def verify_jwt(cls, token: str) -> Dict:
+    def refresh_access_token(cls, refresh_token: str) -> str:
         """
-        Verifica un token JWT y retorna su payload.
+        Genera un nuevo access token usando un refresh token válido.
         
         Args:
-            token: Token JWT a verificar
+            refresh_token: Token de refresco
             
         Returns:
-            Dict: Payload del token
+            str: Nuevo access token
             
         Raises:
-            ValidationError: Si el token es inválido
+            ValidationError: Si el refresh token es inválido
         """
         try:
-            return jwt.decode(
-                token,
-                settings.JWT_SECRET_KEY,
+            payload = jose_jwt.decode(
+                refresh_token,
+                settings.JWT_REFRESH_SECRET_KEY,
                 algorithms=[cls.JWT_ALGORITHM]
             )
-        except jwt.ExpiredSignatureError:
-            raise ValidationError('Token expirado')
-        except jwt.InvalidTokenError:
-            raise ValidationError('Token inválido')
+            
+            if payload.get('type') != 'refresh':
+                raise ValidationError('Token tipo inválido')
+                
+            user = OficialBancario.objects.get(id=payload.get('user_id'))
+            
+            return cls.generate_token_pair({
+                'id': user.id,
+                'username': user.username,
+                'role': user.role
+            })['access_token']
+            
+        except (JWTError, OficialBancario.DoesNotExist):
+            raise ValidationError('Refresh token inválido')
+
+    @classmethod
+    def setup_totp(cls, user: OficialBancario) -> Tuple[str, str]:
+        """
+        Configura TOTP para un usuario.
+        
+        Args:
+            user: Usuario para configurar TOTP
+            
+        Returns:
+            Tuple[str, str]: (secret_key, qr_code_base64)
+        """
+        # Generar secreto TOTP
+        secret = pyotp.random_base32()
+        
+        # Crear URI para QR
+        totp = pyotp.TOTP(secret)
+        provisioning_uri = totp.provisioning_uri(
+            user.username,
+            issuer_name="Simulador Bancario"
+        )
+        
+        # Generar QR
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(provisioning_uri)
+        qr.make(fit=True)
+        
+        # Convertir QR a base64
+        img_buffer = io.BytesIO()
+        qr.make_image(fill_color="black", back_color="white").save(img_buffer, format='PNG')
+        qr_base64 = base64.b64encode(img_buffer.getvalue()).decode()
+        
+        return secret, qr_base64
+
+    @classmethod
+    def verify_totp(cls, secret: str, code: str) -> bool:
+        """
+        Verifica un código TOTP.
+        
+        Args:
+            secret: Clave secreta TOTP
+            code: Código a verificar
+            
+        Returns:
+            bool: True si el código es válido
+        """
+        totp = pyotp.TOTP(secret)
+        return totp.verify(code)
 
     @classmethod
     def generate_otp_challenge(
@@ -166,24 +249,4 @@ class SecurityService:
             contenido=f'Challenge verificado: {challenge.challenge_id}'
         )
 
-        return challenge
-
-    @staticmethod
-    def generate_totp_secret() -> str:
-        """Genera una nueva clave secreta para TOTP."""
-        return pyotp.random_base32()
-
-    @staticmethod
-    def verify_totp(secret: str, code: str) -> bool:
-        """
-        Verifica un código TOTP.
-        
-        Args:
-            secret: Clave secreta TOTP
-            code: Código a verificar
-            
-        Returns:
-            bool: True si el código es válido
-        """
-        totp = pyotp.TOTP(secret)
-        return totp.verify(code) 
+        return challenge 
