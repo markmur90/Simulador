@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  h1.text-center { font-size: 2.5rem !important; }
+  .custom-card {
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #ffffff 0%, #f1f3f5 100%);
+    border: none;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  }
+  .custom-card-header {
+    background: linear-gradient(45deg, #343a40, #495057);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.3rem;
+    padding: 1rem 1.5rem;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+  .custom-card-body { padding: 1.5rem; }
+  .internal-fields, .external-fields { display: none; }
+  .internal-fields.active, .external-fields.active { display: block; }
+</style>
+
+<div class="container-fluid">
+  <h1 class="text-center mb-4 display-6 fw-bold">GPT4 Nueva Transferencia</h1>
+
+  <form method="post" class="needs-validation" novalidate>
+    {% csrf_token %}
+
+    <div class="card custom-card mb-4">
+      <div class="custom-card-header">Tipo de Transferencia</div>
+      <div class="card-body custom-card-body">
+        <div class="row g-3">
+          <div class="col-md-12">
+            <label for="id_transaction_type" class="form-label">Tipo de Transferencia</label>
+            {{ form.transaction_type }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card custom-card mb-4">
+      <div class="custom-card-header">Datos del Ordenante</div>
+      <div class="card-body custom-card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="id_debtor" class="form-label">Deudor</label>
+            {{ form.debtor }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_debtor_account" class="form-label">Cuenta del Deudor</label>
+            {{ form.debtor_account }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campos para transferencia externa -->
+    <div class="external-fields">
+      <div class="card custom-card mb-4">
+        <div class="custom-card-header">Datos del Beneficiario Externo</div>
+        <div class="card-body custom-card-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="id_creditor" class="form-label">Acreedor</label>
+              {{ form.creditor }}
+              <a href="{% url 'create_creditorGPT4' %}" class="btn btn-link">Crear nuevo acreedor</a>
+            </div>
+            <div class="col-md-4">
+              <label for="id_creditor_account" class="form-label">Cuenta del Acreedor</label>
+              {{ form.creditor_account }}
+              <a href="{% url 'create_creditor_accountGPT4' %}" class="btn btn-link">Crear nueva cuenta</a>
+            </div>
+            <div class="col-md-4">
+              <label for="id_creditor_agent" class="form-label">Agente del Acreedor</label>
+              {{ form.creditor_agent }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Campos para transferencia interna -->
+    <div class="internal-fields">
+      <div class="card custom-card mb-4">
+        <div class="custom-card-header">Datos del Beneficiario Interno</div>
+        <div class="card-body custom-card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="id_internal_creditor" class="form-label">Deudor Beneficiario</label>
+              {{ form.internal_creditor }}
+            </div>
+            <div class="col-md-6">
+              <label for="id_internal_creditor_account" class="form-label">Cuenta del Beneficiario</label>
+              {{ form.internal_creditor_account }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card custom-card mb-4">
+      <div class="custom-card-header">Información de la Transferencia</div>
+      <div class="card-body custom-card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label for="id_instructed_amount" class="form-label">Monto</label>
+            {{ form.instructed_amount }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_currency" class="form-label">Moneda</label>
+            {{ form.currency }}
+          </div>
+          <div class="col-md-4">
+            <label for="id_purpose_code" class="form-label">Código de Propósito</label>
+            {{ form.purpose_code }}
+          </div>
+        </div>
+        <div class="row g-3 mt-3">
+          <div class="col-md-6">
+            <label for="id_requested_execution_date" class="form-label">Fecha de Ejecución</label>
+            {{ form.requested_execution_date }}
+          </div>
+          <div class="col-md-6">
+            <label for="id_remittance_information_unstructured" class="form-label">Referencia</label>
+            {{ form.remittance_information_unstructured }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <a href="{% url 'dashboard' %}" class="btn btn-secondary me-2">
+        <i class="bi bi-house-door"></i> Dashboard
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-save"></i> Crear Transferencia
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const transactionType = document.getElementById('id_transaction_type');
+    const debtorSelect = document.getElementById('id_debtor');
+    const debtorAccountSelect = document.getElementById('id_debtor_account');
+    const internalCreditorSelect = document.getElementById('id_internal_creditor');
+    const internalCreditorAccountSelect = document.getElementById('id_internal_creditor_account');
+
+    function handleTransactionTypeChange(value) {
+        const internalFields = document.querySelector('.internal-fields');
+        const externalFields = document.querySelector('.external-fields');
+
+        if (value === 'INTERNAL') {
+            internalFields.classList.add('active');
+            externalFields.classList.remove('active');
+        } else {
+            internalFields.classList.remove('active');
+            externalFields.classList.add('active');
+        }
+    }
+
+    async function updateAccounts(debtorId, targetSelect) {
+        if (!debtorId) return;
+        
+        try {
+            const response = await fetch(`/api/get-debtor-accounts/?debtor_id=${debtorId}`);
+            const data = await response.json();
+            
+            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            data.accounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id;
+                option.textContent = `${account.iban} (Saldo: ${account.balance})`;
+                targetSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar las cuentas:', error);
+        }
+    }
+
+    // Event Listeners
+    transactionType.addEventListener('change', (e) => handleTransactionTypeChange(e.target.value));
+    debtorSelect.addEventListener('change', (e) => updateAccounts(e.target.value, debtorAccountSelect));
+    internalCreditorSelect.addEventListener('change', (e) => updateAccounts(e.target.value, internalCreditorAccountSelect));
+
+    // Inicializar estado
+    handleTransactionTypeChange(transactionType.value);
+});
+</script>
+{% endblock %} 

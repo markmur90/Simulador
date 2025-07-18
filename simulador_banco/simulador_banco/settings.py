@@ -11,10 +11,16 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import sys
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
+# Añadir el path del entorno virtual
+VIRTUALENV_PATH = os.path.expanduser('~/envSIM')
+if os.path.exists(VIRTUALENV_PATH):
+    VENV_SITE_PACKAGES = os.path.join(VIRTUALENV_PATH, 'lib', 'python3.13', 'site-packages')
+    sys.path.insert(0, VENV_SITE_PACKAGES)
 
 # Carga variables de entorno desde .env en el directorio raíz de proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent

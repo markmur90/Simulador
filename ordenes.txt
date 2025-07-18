@@ -1,0 +1,1 @@
+Necesito que revises que se guarde en base de datos aparte también que se envíe al cliente externo para que pueda ser verificado o en su defecto dime cuál es el proceso correcto y real que se mantiene cuando se hace la obtención de un OTP en photo tan y push

@@ -8,7 +8,19 @@
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item"><a class="nav-link" href="{% url 'list_debtorsGPT4' %}">Deudores</a></li>
         <li class="nav-item"><a class="nav-link" href="{% url 'list_creditorsGPT4' %}">Acreedores</a></li>
-        <li class="nav-item"><a class="nav-link" href="{% url 'list_transferGPT4' %}">Transferencias</a></li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="transferMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Transferencias
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="transferMenu">
+            <li><a class="dropdown-item" href="{% url 'list_transferGPT4' %}">Todas las Transferencias</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'list_transferGPT4' %}?tipo=INTERNAL">Transferencias Internas</a></li>
+            <li><a class="dropdown-item" href="{% url 'list_transferGPT4' %}?tipo=EXTERNAL">Transferencias Externas</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'create_transferGPT4' %}">Nueva Transferencia</a></li>
+          </ul>
+        </li>
         {% if user.is_superuser %}
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="adminMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administración</a>

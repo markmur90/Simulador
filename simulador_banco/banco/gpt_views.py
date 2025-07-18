@@ -1,15 +1,18 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic, View
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
+from django.http import JsonResponse
+from django.db import transaction
+import uuid
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
-    Transfer
+    Transfer, AccountMovement
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,
-    CreditorAgentForm, ClientIDForm, KidForm, TransferForm,
+    CreditorAgentForm, ClientIDForm, KidForm, TransferForm, TransferFormGPT4,
     DebtorUpdateForm
 )
 
@@ -176,3 +179,94 @@ class DebtorDeleteView(LoginRequiredMixin, generic.DeleteView):
     model = Debtor
     template_name = 'api/GPT4/delete_debtor.html'
     success_url = reverse_lazy('list_debtorsGPT4')
+
+
+class TransferCreateViewGPT4(LoginRequiredMixin, generic.CreateView):
+    model = Transfer
+    form_class = TransferFormGPT4
+    template_name = 'api/GPT4/create_transfer_gpt4.html'
+    success_url = reverse_lazy('list_transferGPT4')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['debtors'] = Debtor.objects.all()
+        return context
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            transfer = form.save(commit=False)
+            
+            # Generar payment_id único
+            transfer.payment_id = str(uuid.uuid4())
+            
+            # Si es transferencia interna, actualizar saldos
+            if transfer.transaction_type == 'INTERNAL':
+                debtor_account = transfer.debtor_account
+                creditor_account = transfer.internal_creditor_account
+                amount = transfer.instructed_amount
+
+                # Verificar saldo suficiente
+                if debtor_account.balance < amount:
+                    form.add_error(None, 'Saldo insuficiente en la cuenta de origen')
+                    return self.form_invalid(form)
+
+                # Crear movimientos de cuenta
+                AccountMovement.objects.create(
+                    account=debtor_account,
+                    tipo='PAYMENT',
+                    monto=amount
+                )
+                AccountMovement.objects.create(
+                    account=creditor_account,
+                    tipo='DEPOSIT',
+                    monto=amount
+                )
+
+                # Actualizar saldos
+                debtor_account.balance -= amount
+                creditor_account.balance += amount
+                debtor_account.save()
+                creditor_account.save()
+
+                # Marcar como completada
+                transfer.status = 'ACCC'
+            else:
+                # Para transferencias externas, mantener el flujo normal
+                transfer.status = 'PDNG'
+
+            transfer.save()
+            return redirect(self.success_url)
+
+def get_debtor_accounts(request):
+    debtor_id = request.GET.get('debtor_id')
+    accounts = DebtorAccount.objects.filter(debtor_id=debtor_id).values('id', 'iban', 'balance')
+    return JsonResponse({'accounts': list(accounts)})
+
+class TransferListViewGPT4(LoginRequiredMixin, generic.ListView):
+    model = Transfer
+    template_name = 'api/GPT4/list_transfer_gpt4.html'
+    context_object_name = 'transfers'
+    paginate_by = 20
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        transaction_type = self.request.GET.get('tipo')
+        if transaction_type:
+            queryset = queryset.filter(transaction_type=transaction_type)
+        return queryset.order_by('-created_at')
+
+class TransferDetailViewGPT4(LoginRequiredMixin, generic.DetailView):
+    model = Transfer
+    template_name = 'api/GPT4/transfer_detail_gpt4.html'
+    slug_field = 'payment_id'
+    slug_url_kwarg = 'payment_id'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        transfer = self.get_object()
+        if transfer.transaction_type == 'INTERNAL':
+            context['movements'] = AccountMovement.objects.filter(
+                account__in=[transfer.debtor_account, transfer.internal_creditor_account],
+                fecha__gte=transfer.created_at
+            ).order_by('fecha')
+        return context

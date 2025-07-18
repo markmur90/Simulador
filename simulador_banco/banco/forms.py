@@ -192,6 +192,91 @@ class TransferForm(BootstrapModelForm):
             }),
         }
 
+class TransferFormGPT4(forms.ModelForm):
+    class Meta:
+        model = Transfer
+        fields = [
+            'transaction_type',
+            'debtor',
+            'debtor_account',
+            'creditor',
+            'creditor_account',
+            'creditor_agent',
+            'internal_creditor',
+            'internal_creditor_account',
+            'instructed_amount',
+            'currency',
+            'purpose_code',
+            'requested_execution_date',
+            'remittance_information_unstructured',
+        ]
+        widgets = {
+            'requested_execution_date': forms.DateInput(attrs={'type': 'date'}),
+            'transaction_type': forms.Select(attrs={'class': 'form-select', 'onchange': 'handleTransactionTypeChange(this.value)'}),
+            'debtor': forms.Select(attrs={'class': 'form-select'}),
+            'debtor_account': forms.Select(attrs={'class': 'form-select'}),
+            'creditor': forms.Select(attrs={'class': 'form-select'}),
+            'creditor_account': forms.Select(attrs={'class': 'form-select'}),
+            'creditor_agent': forms.Select(attrs={'class': 'form-select'}),
+            'internal_creditor': forms.Select(attrs={'class': 'form-select'}),
+            'internal_creditor_account': forms.Select(attrs={'class': 'form-select'}),
+            'currency': forms.Select(attrs={'class': 'form-select'}),
+            'purpose_code': forms.Select(attrs={'class': 'form-select'}),
+            'instructed_amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'remittance_information_unstructured': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['transaction_type'].required = True
+        self.fields['debtor'].required = True
+        self.fields['debtor_account'].required = True
+        
+        # Campos para transferencia externa
+        self.fields['creditor'].required = False
+        self.fields['creditor_account'].required = False
+        self.fields['creditor_agent'].required = False
+        
+        # Campos para transferencia interna
+        self.fields['internal_creditor'].required = False
+        self.fields['internal_creditor_account'].required = False
+
+        # Campos comunes
+        self.fields['instructed_amount'].required = True
+        self.fields['currency'].required = True
+        self.fields['requested_execution_date'].required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        transaction_type = cleaned_data.get('transaction_type')
+        
+        if transaction_type == 'INTERNAL':
+            # Validar campos requeridos para transferencia interna
+            if not cleaned_data.get('internal_creditor'):
+                self.add_error('internal_creditor', 'Este campo es requerido para transferencias internas')
+            if not cleaned_data.get('internal_creditor_account'):
+                self.add_error('internal_creditor_account', 'Este campo es requerido para transferencias internas')
+                
+            # Limpiar campos de transferencia externa
+            cleaned_data['creditor'] = None
+            cleaned_data['creditor_account'] = None
+            cleaned_data['creditor_agent'] = None
+            
+        else:  # EXTERNAL
+            # Validar campos requeridos para transferencia externa
+            if not cleaned_data.get('creditor'):
+                self.add_error('creditor', 'Este campo es requerido para transferencias externas')
+            if not cleaned_data.get('creditor_account'):
+                self.add_error('creditor_account', 'Este campo es requerido para transferencias externas')
+            if not cleaned_data.get('creditor_agent'):
+                self.add_error('creditor_agent', 'Este campo es requerido para transferencias externas')
+                
+            # Limpiar campos de transferencia interna
+            cleaned_data['internal_creditor'] = None
+            cleaned_data['internal_creditor_account'] = None
+            
+        return cleaned_data
+
 class AccountMovementForm(BootstrapModelForm):
     class Meta:
         model = AccountMovement
