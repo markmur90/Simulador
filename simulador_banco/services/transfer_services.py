@@ -1,7 +1,7 @@
 import random
 import datetime
 from decimal import Decimal
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
@@ -15,300 +15,195 @@ from banco.models import (
 )
 
 class TransferService:
-    REQUIRED_FIELDS = [
-        'payment_id', 'debtor_account', 'creditor_account',
-        'instructed_amount', 'currency'
-    ]
-
-    @classmethod
-    def validate_transfer_data(cls, data: Dict) -> None:
-        """Valida los datos de la transferencia."""
-        # Validar campos requeridos
-        missing = [f for f in cls.REQUIRED_FIELDS if f not in data]
-        if missing:
-            raise ValidationError(f'Campos requeridos faltantes: {", ".join(missing)}')
-
-        # Validar montos
-        amount = data.get('instructed_amount')
-        if not amount or Decimal(str(amount)) <= 0:
-            raise ValidationError('El monto debe ser mayor a 0')
-
-    @classmethod
-    def validate_accounts(cls, debtor_account: str, creditor_account: str) -> tuple:
-        """Valida y retorna las cuentas de débito y crédito."""
-        # Log para depuración inicial
-        LogTransferencia.objects.create(
-            registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-            tipo_log='DEBUG',
-            contenido=f'Iniciando validación de cuentas - Deudor: {debtor_account}, Acreedor: {creditor_account}'
-        )
-        
-        # Normalizar IBANs - solo eliminar espacios y convertir a mayúsculas
-        debtor_account = debtor_account.replace(' ', '').upper()
-        creditor_account = creditor_account.replace(' ', '').upper()
-        
-        # Log después de normalización
-        LogTransferencia.objects.create(
-            registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-            tipo_log='DEBUG',
-            contenido=f'IBANs normalizados - Deudor: {debtor_account}, Acreedor: {creditor_account}'
-        )
-        
-        # Buscar cuenta deudora
-        try:
-            debit_acc = DebtorAccount.objects.select_related('debtor').get(iban=debtor_account)
-            LogTransferencia.objects.create(
-                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                tipo_log='DEBUG',
-                contenido=f'Cuenta de débito encontrada: {debit_acc.iban} - Deudor: {debit_acc.debtor.name}'
-            )
-        except DebtorAccount.DoesNotExist:
-            LogTransferencia.objects.create(
-                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                tipo_log='ERROR',
-                contenido=f'Cuenta de débito no encontrada para IBAN: {debtor_account}'
-            )
-            raise ValidationError({
-                'debtor_account': 'Cuenta de débito no encontrada'
-            })
-        
-        # Buscar cuenta acreedora
-        try:
-            # Primero intentar encontrar como cuenta interna
-            try:
-                credit_acc = DebtorAccount.objects.select_related('debtor').get(iban=creditor_account)
-                is_internal = True
-                LogTransferencia.objects.create(
-                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                    tipo_log='DEBUG',
-                    contenido=f'Cuenta de crédito encontrada (interna): {credit_acc.iban} - Deudor: {credit_acc.debtor.name}'
-                )
-            except DebtorAccount.DoesNotExist:
-                # Si no es interna, buscar como cuenta externa
-                credit_acc = CreditorAccount.objects.select_related('creditor').get(iban=creditor_account)
-                is_internal = False
-                LogTransferencia.objects.create(
-                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                    tipo_log='DEBUG',
-                    contenido=f'Cuenta de crédito encontrada (externa): {credit_acc.iban} - Acreedor: {credit_acc.creditor.name}'
-                )
-        except (DebtorAccount.DoesNotExist, CreditorAccount.DoesNotExist):
-            LogTransferencia.objects.create(
-                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                tipo_log='ERROR',
-                contenido=f'Cuenta de crédito no encontrada para IBAN: {creditor_account}'
-            )
-            raise ValidationError({
-                'creditor_account': 'Cuenta de crédito no encontrada'
-            })
-
-        # Validar que el deudor tenga todos los datos necesarios
-        if not debit_acc.debtor.name or not debit_acc.debtor.address:
-            LogTransferencia.objects.create(
-                registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                tipo_log='ERROR',
-                contenido=f'Datos incompletos del deudor: {debit_acc.debtor.name}'
-            )
-            raise ValidationError({
-                'debtor_account': 'Datos incompletos del deudor'
-            })
-
-        # Validar que el acreedor tenga todos los datos necesarios
-        if is_internal:
-            if not credit_acc.debtor.name or not credit_acc.debtor.address:
-                LogTransferencia.objects.create(
-                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                    tipo_log='ERROR',
-                    contenido=f'Datos incompletos del deudor destino: {credit_acc.debtor.name}'
-                )
-                raise ValidationError({
-                    'creditor_account': 'Datos incompletos del deudor destino'
-                })
-        else:
-            if not credit_acc.creditor.name or not credit_acc.creditor.address:
-                LogTransferencia.objects.create(
-                    registro=f"DEBUG_VALIDATE_{debtor_account[:8]}",
-                    tipo_log='ERROR',
-                    contenido=f'Datos incompletos del acreedor: {credit_acc.creditor.name}'
-                )
-                raise ValidationError({
-                    'creditor_account': 'Datos incompletos del acreedor'
-                })
-
-        return debit_acc, credit_acc
-
-    @classmethod
-    def validate_balance(cls, account: DebtorAccount, amount: Decimal) -> None:
-        """Valida que la cuenta tenga saldo suficiente."""
-        if account.balance < amount:
-            raise ValidationError({
-                'instructed_amount': 'Saldo insuficiente'
-            })
-
-    @classmethod
-    def generate_auth_id(cls) -> str:
-        """Genera un ID de autorización único."""
-        return f"AUTH_{secrets.token_hex(8).upper()}"
+    """Servicio para gestionar transferencias bancarias."""
 
     @classmethod
     @transaction.atomic
-    def create_transfer(cls, data: Dict) -> Transfer:
+    def create_internal_transfer(cls, origin_account: DebtorAccount, 
+                               destination_account: DebtorAccount,
+                               amount: Decimal,
+                               description: str = None) -> Transfer:
         """
-        Crea una nueva transferencia.
+        Crea y procesa una transferencia entre cuentas de deudores.
         
         Args:
-            data: Diccionario con los datos de la transferencia
+            origin_account: Cuenta de origen
+            destination_account: Cuenta de destino
+            amount: Monto a transferir
+            description: Descripción opcional
             
         Returns:
-            Transfer: Objeto de transferencia creado
+            Transfer: Transferencia creada y procesada
             
         Raises:
-            ValidationError: Si los datos son inválidos
+            ValidationError: Si hay errores de validación
         """
-        # Validar datos básicos
-        cls.validate_transfer_data(data)
-
-        # Validar y obtener cuentas
-        debit_acc, credit_acc = cls.validate_accounts(
-            data['debtor_account'],
-            data['creditor_account']
+        # Validaciones básicas
+        if origin_account.id == destination_account.id:
+            raise ValidationError("No se puede transferir a la misma cuenta")
+            
+        if origin_account.currency != destination_account.currency:
+            raise ValidationError("Las monedas deben coincidir")
+            
+        if amount <= 0:
+            raise ValidationError("El monto debe ser mayor a 0")
+            
+        # Validar saldo con lock
+        origin_account = DebtorAccount.objects.select_for_update().get(pk=origin_account.pk)
+        if origin_account.balance < amount:
+            raise ValidationError("Saldo insuficiente")
+            
+        # Crear identificadores
+        payment_id = str(uuid.uuid4())
+        payment_identification = PaymentIdentification.objects.create(
+            end_to_end_id=str(uuid.uuid4()),
+            instruction_id=str(uuid.uuid4())
         )
-
-        # Validar saldo
-        amount = Decimal(str(data['instructed_amount']))
-        cls.validate_balance(debit_acc, amount)
-
-        # Crear identificación de pago
-        payment_id = PaymentIdentification.objects.create(
-            end_to_end_id=data.get('end_to_end_id', uuid.uuid4().hex),
-            instruction_id=data.get('instruction_id', uuid.uuid4().hex)
-        )
-
-        # Determinar si es una transferencia interna
-        is_internal = isinstance(credit_acc, DebtorAccount)
-
-        # Obtener o crear agente acreedor por defecto
-        default_agent = CreditorAgent.objects.first() or CreditorAgent.objects.create(
-            bic="DEUTDEFF",
-            financial_institution_id="BANKDEFF"
-        )
-
+        
         # Crear transferencia
         transfer = Transfer.objects.create(
-            payment_id=data['payment_id'],
-            debtor=debit_acc.debtor,
-            creditor=credit_acc.debtor if is_internal else credit_acc.creditor,
-            debtor_account=debit_acc,
-            creditor_account=credit_acc if not is_internal else None,
-            creditor_agent=data.get('creditor_agent', default_agent),
+            payment_id=payment_id,
+            debtor=origin_account.debtor,
+            creditor=destination_account.debtor,
+            debtor_account=origin_account,
+            creditor_account=None,  # No se usa para transferencias internas
+            creditor_agent=CreditorAgent.objects.first(),
             instructed_amount=amount,
-            currency=data.get('currency', 'EUR'),
-            purpose_code=data.get('purpose_code', 'GDSV'),
-            requested_execution_date=data.get('requested_execution_date', timezone.now().date()),
-            remittance_information_unstructured=data.get('description', ''),
-            payment_identification=payment_id,
+            currency=origin_account.currency,
+            purpose_code='GDSV',
+            requested_execution_date=timezone.now().date(),
+            payment_identification=payment_identification,
+            remittance_information_unstructured=description,
             status='PDNG'
         )
-
-        LogTransferencia.objects.create(
-            registro=transfer.payment_id,
-            tipo_log='TRANSFER',
-            contenido=f'Transferencia creada: {transfer.payment_id} - {"Interna" if is_internal else "Externa"}'
+        
+        # Crear movimientos
+        AccountMovement.objects.create(
+            account=origin_account,
+            tipo='PAYMENT',
+            monto=amount,
+            descripcion=f'Transferencia a {destination_account.debtor.name} - {description or ""}'.strip()
         )
-
+        
+        AccountMovement.objects.create(
+            account=destination_account,
+            tipo='DEPOSIT',
+            monto=amount,
+            descripcion=f'Transferencia de {origin_account.debtor.name} - {description or ""}'.strip()
+        )
+        
+        # Actualizar estado
+        transfer.status = 'ACCP'
+        transfer.save()
+        
+        # Registrar en log
+        LogTransferencia.objects.create(
+            registro=payment_id,
+            tipo_log='TRANSFER',
+            contenido=f'Transferencia interna procesada exitosamente'
+        )
+        
         return transfer
 
     @classmethod
     @transaction.atomic
-    def process_transfer(cls, transfer: Transfer) -> None:
+    def create_external_transfer(cls, origin_account: DebtorAccount,
+                               destination_account: CreditorAccount,
+                               amount: Decimal,
+                               description: str = None) -> Transfer:
         """
-        Procesa una transferencia existente.
+        Crea una transferencia a una cuenta de acreedor.
         
         Args:
-            transfer: Objeto de transferencia a procesar
+            origin_account: Cuenta de origen
+            destination_account: Cuenta de destino (acreedor)
+            amount: Monto a transferir
+            description: Descripción opcional
+            
+        Returns:
+            Transfer: Transferencia creada
+            
+        Raises:
+            ValidationError: Si hay errores de validación
         """
-        # Validar estado
-        if transfer.status not in ['PDNG', 'ACWP']:
-            raise ValidationError(f'Estado inválido para procesar: {transfer.status}')
-
-        # Validar saldo nuevamente
-        cls.validate_balance(transfer.debtor_account, transfer.instructed_amount)
-
-        # Determinar si es transferencia interna
-        is_internal = isinstance(transfer.creditor_account, DebtorAccount)
-
-        # Actualizar saldos
-        with transaction.atomic():
-            # Descontar de la cuenta origen
-            transfer.debtor_account.balance -= transfer.instructed_amount
-            transfer.debtor_account.save()
-
-            # Registrar movimiento de salida
-            AccountMovement.objects.create(
-                account=transfer.debtor_account,
-                tipo='TRANSFER_OUT',
-                monto=transfer.instructed_amount,
-                descripcion=f'Transferencia enviada a {transfer.creditor.name} - ID: {transfer.payment_id}'
-            )
-
-            if is_internal:
-                # Para transferencias internas, actualizar la cuenta destino
-                creditor_account = transfer.creditor_account
-                creditor_account.balance += transfer.instructed_amount
-                creditor_account.save()
-
-                # Registrar movimiento de entrada
-                AccountMovement.objects.create(
-                    account=creditor_account,
-                    tipo='TRANSFER_IN',
-                    monto=transfer.instructed_amount,
-                    descripcion=f'Transferencia recibida de {transfer.debtor.name} - ID: {transfer.payment_id}'
-                )
-
-                # Actualizar estado a completado
-                transfer.status = 'ACSC'
-            else:
-                # Para transferencias externas, iniciar proceso con API externa
-                try:
-                    # Aquí iría la lógica de comunicación con la API externa
-                    # Por ahora solo simulamos el proceso
-                    transfer.status = 'ACCP'
-                except Exception as e:
-                    # Si falla la API externa, revertir la transferencia
-                    transfer.debtor_account.balance += transfer.instructed_amount
-                    transfer.debtor_account.save()
-                    transfer.status = 'RJCT'
-                    raise ValidationError(f'Error al procesar transferencia externa: {str(e)}')
-
-            transfer.save()
-
-            # Registrar en el log
-            LogTransferencia.objects.create(
-                registro=transfer.payment_id,
-                tipo_log='PROCESS',
-                contenido=f'Transferencia procesada: {transfer.status}'
-            )
+        # Validaciones
+        if origin_account.currency != destination_account.currency:
+            raise ValidationError("Las monedas deben coincidir")
+            
+        if amount <= 0:
+            raise ValidationError("El monto debe ser mayor a 0")
+            
+        # Validar saldo con lock
+        origin_account = DebtorAccount.objects.select_for_update().get(pk=origin_account.pk)
+        if origin_account.balance < amount:
+            raise ValidationError("Saldo insuficiente")
+            
+        # Crear identificadores
+        payment_id = str(uuid.uuid4())
+        payment_identification = PaymentIdentification.objects.create(
+            end_to_end_id=str(uuid.uuid4()),
+            instruction_id=str(uuid.uuid4())
+        )
+        
+        # Crear transferencia
+        transfer = Transfer.objects.create(
+            payment_id=payment_id,
+            debtor=origin_account.debtor,
+            creditor=destination_account.creditor,
+            debtor_account=origin_account,
+            creditor_account=destination_account,
+            creditor_agent=CreditorAgent.objects.first(),
+            instructed_amount=amount,
+            currency=origin_account.currency,
+            purpose_code='GDSV',
+            requested_execution_date=timezone.now().date(),
+            payment_identification=payment_identification,
+            remittance_information_unstructured=description,
+            status='PDNG'
+        )
+        
+        # Crear movimiento de salida
+        AccountMovement.objects.create(
+            account=origin_account,
+            tipo='PAYMENT',
+            monto=amount,
+            descripcion=f'Transferencia a {destination_account.creditor.name} - {description or ""}'.strip()
+        )
+        
+        # Registrar en log
+        LogTransferencia.objects.create(
+            registro=payment_id,
+            tipo_log='TRANSFER',
+            contenido=f'Transferencia externa creada'
+        )
+        
+        return transfer
 
     @classmethod
-    def get_transfer_status(cls, payment_id: str) -> dict:
+    def get_transfer_status(cls, payment_id: str) -> Dict:
         """
         Obtiene el estado actual de una transferencia.
         
         Args:
-            payment_id: ID único de la transferencia
+            payment_id: ID de la transferencia
             
         Returns:
-            dict: Información del estado de la transferencia
+            Dict con el estado actual
         """
         try:
-            transfer = Transfer.objects.get(payment_id=payment_id)
+            transfer = Transfer.objects.select_related(
+                'debtor', 'creditor', 'debtor_account', 'creditor_account'
+            ).get(payment_id=payment_id)
+            
             return {
                 'payment_id': transfer.payment_id,
                 'status': transfer.status,
                 'amount': str(transfer.instructed_amount),
                 'currency': transfer.currency,
+                'debtor': transfer.debtor.name,
+                'creditor': transfer.creditor.name,
                 'created_at': transfer.created_at.isoformat(),
                 'updated_at': transfer.updated_at.isoformat()
             }
         except Transfer.DoesNotExist:
-            raise ValidationError('Transferencia no encontrada')
+            raise ValidationError(f"Transferencia {payment_id} no encontrada")

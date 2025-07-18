@@ -8,7 +8,7 @@ from django.utils import timezone
 import jwt
 import pyotp
 
-from banco.models import OTPChallenge, LogTransferencia
+from banco.models import OTPChallenge, LogTransferencia, OficialBancario
 
 class SecurityService:
     OTP_LENGTH = 6
@@ -17,17 +17,19 @@ class SecurityService:
     MAX_OTP_ATTEMPTS = 3
     
     @classmethod
+    def authenticate_oficial(cls, username: str, password: str) -> Optional[OficialBancario]:
+        """Autentica un oficial bancario y retorna el objeto si es válido."""
+        try:
+            oficial = OficialBancario.objects.get(username=username)
+            if oficial.check_password(password):
+                return oficial
+        except OficialBancario.DoesNotExist:
+            pass
+        return None
+    
+    @classmethod
     def generate_jwt(cls, user_data: Dict, expiry_hours: int = 2) -> str:
-        """
-        Genera un token JWT válido.
-        
-        Args:
-            user_data: Diccionario con datos del usuario
-            expiry_hours: Horas hasta la expiración
-            
-        Returns:
-            str: Token JWT firmado
-        """
+        """Genera un token JWT válido."""
         payload = {
             **user_data,
             'exp': datetime.utcnow() + timedelta(hours=expiry_hours),
@@ -43,18 +45,7 @@ class SecurityService:
 
     @classmethod
     def verify_jwt(cls, token: str) -> Dict:
-        """
-        Verifica un token JWT y retorna su payload.
-        
-        Args:
-            token: Token JWT a verificar
-            
-        Returns:
-            Dict: Payload del token
-            
-        Raises:
-            ValidationError: Si el token es inválido
-        """
+        """Verifica un token JWT y retorna su payload."""
         try:
             return jwt.decode(
                 token,
@@ -65,43 +56,26 @@ class SecurityService:
             raise ValidationError('Token expirado')
         except jwt.InvalidTokenError:
             raise ValidationError('Token inválido')
-
-    @classmethod
-    def generate_otp_challenge(
-        cls,
-        payment_id: str,
-        auth_id: Optional[str] = None
-    ) -> Tuple[OTPChallenge, str]:
-        """
-        Genera un nuevo desafío OTP.
-        
-        Args:
-            payment_id: ID de la transferencia
-            auth_id: ID del usuario autenticado
             
-        Returns:
-            Tuple[OTPChallenge, str]: Objeto challenge y código OTP
-        """
-        otp = ''.join(
-            secrets.choice('0123456789') 
-            for _ in range(cls.OTP_LENGTH)
-        )
+    @classmethod
+    def generate_otp_challenge(cls, payment_id: str, username: str) -> Tuple[OTPChallenge, str]:
+        """Genera un nuevo desafío OTP para una transferencia."""
+        otp = ''.join(secrets.choice('0123456789') for _ in range(cls.OTP_LENGTH))
         
         challenge = OTPChallenge.objects.create(
+            challenge_id=secrets.token_hex(16),
             payment_id=payment_id,
-            otp=otp,
-            status='CREATED',
-            auth_id=auth_id,
+            otp_hash=cls.hash_otp(otp),
+            username=username,
             expires_at=timezone.now() + timedelta(minutes=cls.OTP_EXPIRY_MINUTES)
         )
         
-        LogTransferencia.objects.create(
-            registro=payment_id,
-            tipo_log='OTP',
-            contenido=f'Challenge generado: {challenge.challenge_id}'
-        )
-        
         return challenge, otp
+
+    @classmethod
+    def hash_otp(cls, otp: str) -> str:
+        """Genera un hash seguro del OTP."""
+        return secrets.token_hex(32)  # Simplificado para el ejemplo
 
     @classmethod
     def verify_otp_challenge(

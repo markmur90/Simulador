@@ -48,6 +48,7 @@ PENDING_TRANSFERS = {}
 #     return JsonResponse({"error": "Funcionalidad deshabilitada"}, status=501)
 
 def login_view(request):
+    """Vista de login web."""
     if request.method == "POST":
         username = request.POST["username"]
         password = request.POST["password"]
@@ -61,8 +62,7 @@ def login_view(request):
 
 @login_required
 def dashboard_view(request):
-    """Vista del dashboard con transferencias y cuentas"""
-    
+    """Vista unificada del dashboard."""
     # Obtener cuentas según el rol del usuario
     if request.user.groups.filter(name='Oficial Bancario').exists():
         debtor_accounts = DebtorAccount.objects.select_related('debtor').all()
@@ -70,33 +70,22 @@ def dashboard_view(request):
             'debtor', 'creditor', 'debtor_account', 'creditor_account'
         ).all()
     else:
-        # Buscar el deudor asociado al usuario
         try:
             debtor = Debtor.objects.get(customer_id=request.user.username)
             debtor_accounts = DebtorAccount.objects.filter(debtor=debtor)
-            
-            # Obtener todas las transferencias donde el usuario es deudor o acreedor
-            transfers = Transfer.objects.select_related(
-                'debtor', 'creditor', 'debtor_account', 'creditor_account'
-            ).filter(
-                Q(debtor=debtor) |  # Usuario como deudor
-                Q(creditor=debtor)   # Usuario como acreedor en transferencia interna
-            )
+            transfers = Transfer.objects.filter(
+                Q(debtor=debtor) | Q(creditor__name=debtor.name)
+            ).select_related('debtor', 'creditor')
         except Debtor.DoesNotExist:
-            # Si el usuario no tiene un deudor asociado, mostrar listas vacías
-            debtor_accounts = DebtorAccount.objects.none()
-            transfers = Transfer.objects.none()
-
-    # Ordenar transferencias por fecha
-    transfers = transfers.order_by('-created_at')
+            debtor_accounts = []
+            transfers = []
 
     context = {
         'debtor_accounts': debtor_accounts,
         'transfers': transfers,
-        'total_balance': sum(account.balance for account in debtor_accounts),
     }
 
-    # Renderizar plantilla según el rol
+    # Seleccionar plantilla según rol
     if request.user.is_superuser:
         template = 'banco/dashboard_superuser.html'
     elif request.user.groups.filter(name='Oficial Bancario').exists():
@@ -289,33 +278,27 @@ ALGORITHM = 'HS256'
 
 
 @csrf_exempt
-def login_api_simulador(request):
-    """
-    POST /api/login/
-    --- Login de OficialBancario y creación de JWT válido
-    Body: { "username": "...", "password": "..." }
-    Response: { "token": "..." }
-    """
+def api_login(request):
+    """Vista unificada para login API/JWT."""
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
-
-    data = json.loads(request.body)
-    username = data.get('username')
-    password = data.get('password')
-
+    
     try:
-        oficial = OficialBancario.objects.get(username=username)
-        if not oficial.check_password(password):
+        data = json.loads(request.body.decode())
+        username = data.get('username')
+        password = data.get('password')
+        
+        oficial = SecurityService.authenticate_oficial(username, password)
+        if not oficial:
             return JsonResponse({'error': 'Credenciales inválidas'}, status=401)
-    except OficialBancario.DoesNotExist:
-        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
-
-    payload = {
-        'usuario': username,
-        'exp': datetime.utcnow() + timedelta(hours=2)
-    }
-    token = jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
-    return JsonResponse({'token': token})
+            
+        token = SecurityService.generate_jwt({'usuario': username})
+        return JsonResponse({'token': token})
+        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'JSON inválido'}, status=400)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 def _authenticate_jwt(request):
@@ -764,130 +747,81 @@ def api_verify_otp(request):
 
 @login_required
 def transfer_view(request):
-    """Vista para realizar transferencias internas y externas"""
+    """Vista unificada para transferencias internas y externas."""
     if request.method == "POST":
         try:
-            # Obtener y normalizar datos del formulario
-            debtor_account_iban = request.POST.get('debtor_account_iban', '').replace(' ', '').upper()
-            creditor_account_iban = request.POST.get('creditor_account_iban', '').replace(' ', '').upper()
-            amount = Decimal(request.POST.get('amount', '0'))
-            description = request.POST.get('description', '')
-            transfer_type = request.POST.get('transfer_type')  # 'internal' o 'external'
-
-            # Log para depuración
-            LogTransferencia.objects.create(
-                registro=f"TRANSFER_VIEW_{debtor_account_iban[:8]}",
-                tipo_log='DEBUG',
-                contenido=f'Datos recibidos - Deudor: {debtor_account_iban}, Acreedor: {creditor_account_iban}, Tipo: {transfer_type}'
-            )
-
+            # Obtener datos del formulario
+            transfer_type = request.POST.get("transfer_type")
+            origin_account_id = request.POST.get("origin_account")
+            destination_account_id = request.POST.get("destination_account")
+            amount = Decimal(request.POST.get("amount", "0"))
+            description = request.POST.get("description")
+            
             # Validar datos básicos
-            if not all([debtor_account_iban, creditor_account_iban, amount]):
-                raise ValidationError('Todos los campos son requeridos')
-
+            if not all([transfer_type, origin_account_id, destination_account_id, amount]):
+                raise ValidationError("Todos los campos son requeridos")
+                
             if amount <= 0:
-                raise ValidationError('El monto debe ser mayor a 0')
-
-            # Obtener la cuenta deudora
-            try:
-                debtor_account = DebtorAccount.objects.select_related('debtor').get(iban=debtor_account_iban)
-                LogTransferencia.objects.create(
-                    registro=f"TRANSFER_VIEW_{debtor_account_iban[:8]}",
-                    tipo_log='DEBUG',
-                    contenido=f'Cuenta deudora encontrada: {debtor_account.iban} - Deudor: {debtor_account.debtor.name}'
+                raise ValidationError("El monto debe ser mayor a 0")
+                
+            # Obtener cuenta origen
+            origin_account = get_object_or_404(DebtorAccount, id=origin_account_id)
+            
+            # Validar que la cuenta origen pertenezca al usuario
+            if not request.user.is_staff:  # Si no es staff
+                if not origin_account.debtor.user == request.user:
+                    raise PermissionDenied("No tienes permiso para usar esta cuenta")
+            
+            # Procesar según tipo de transferencia
+            if transfer_type == "internal":
+                # Transferencia entre deudores
+                destination_account = get_object_or_404(DebtorAccount, id=destination_account_id)
+                transfer = TransferService.create_internal_transfer(
+                    origin_account=origin_account,
+                    destination_account=destination_account,
+                    amount=amount,
+                    description=description
                 )
-            except DebtorAccount.DoesNotExist:
-                LogTransferencia.objects.create(
-                    registro=f"TRANSFER_VIEW_{debtor_account_iban[:8]}",
-                    tipo_log='ERROR',
-                    contenido=f'Cuenta deudora no encontrada: {debtor_account_iban}'
-                )
-                raise ValidationError('Cuenta deudora no encontrada')
-
-            # Verificar que la cuenta pertenezca al usuario actual
-            if not request.user.groups.filter(name='Oficial Bancario').exists():
-                if debtor_account.debtor.customer_id != request.user.username:
-                    LogTransferencia.objects.create(
-                        registro=f"TRANSFER_VIEW_{debtor_account_iban[:8]}",
-                        tipo_log='ERROR',
-                        contenido=f'Usuario {request.user.username} no tiene permiso para usar la cuenta {debtor_account_iban}'
-                    )
-                    raise ValidationError('No tienes permiso para usar esta cuenta')
-
-            # Validar saldo suficiente
-            if debtor_account.balance < amount:
-                raise ValidationError('Saldo insuficiente')
-
-            # Generar payment_id único
-            payment_id = str(uuid.uuid4())
-
-            # Preparar datos para la transferencia
-            transfer_data = {
-                'payment_id': payment_id,
-                'debtor_account': debtor_account_iban,
-                'creditor_account': creditor_account_iban,
-                'instructed_amount': amount,
-                'currency': debtor_account.currency,
-                'description': description
-            }
-
-            # Crear la transferencia
-            transfer = TransferService.create_transfer(transfer_data)
-
-            # Procesar inmediatamente si es interna
-            if transfer_type == 'internal':
-                TransferService.process_transfer(transfer)
-                messages.success(request, 'Transferencia interna realizada con éxito')
+                messages.success(request, "Transferencia interna realizada con éxito")
             else:
-                # Para transferencias externas, iniciar el proceso de autorización
-                messages.info(request, 'Transferencia externa creada. Pendiente de autorización')
-
-            return redirect('dashboard')
-
-        except ValidationError as e:
+                # Transferencia a acreedor
+                destination_account = get_object_or_404(CreditorAccount, id=destination_account_id)
+                transfer = TransferService.create_external_transfer(
+                    origin_account=origin_account,
+                    destination_account=destination_account,
+                    amount=amount,
+                    description=description
+                )
+                messages.success(request, "Transferencia externa creada y pendiente de autorización")
+            
+            return redirect('transfer_status', payment_id=transfer.payment_id)
+            
+        except (ValidationError, PermissionDenied) as e:
             messages.error(request, str(e))
         except Exception as e:
+            messages.error(request, "Error procesando la transferencia")
             LogTransferencia.objects.create(
-                registro=f"TRANSFER_VIEW_ERROR",
-                tipo_log='ERROR',
-                contenido=f'Error inesperado: {str(e)}'
+                registro="ERROR",
+                tipo_log="ERROR",
+                contenido=f"Error en transferencia: {str(e)}"
             )
-            messages.error(request, 'Error al procesar la transferencia')
-            
+    
     # GET: Mostrar formulario
-    # Obtener cuentas del deudor según el rol del usuario
-    if request.user.groups.filter(name='Oficial Bancario').exists():
+    # Obtener cuentas según el rol del usuario
+    if request.user.is_staff:
         debtor_accounts = DebtorAccount.objects.select_related('debtor').all()
     else:
         try:
-            debtor = Debtor.objects.get(customer_id=request.user.username)
+            debtor = Debtor.objects.get(user=request.user)
             debtor_accounts = DebtorAccount.objects.filter(debtor=debtor)
         except Debtor.DoesNotExist:
-            debtor_accounts = DebtorAccount.objects.none()
+            debtor_accounts = []
     
-    # Obtener cuentas de acreedores
-    creditor_accounts = CreditorAccount.objects.select_related('creditor').all()
-    
-    # Preparar datos para el template
     context = {
-        'debtor_accounts': [
-            {
-                'iban': account.iban,
-                'currency': account.currency,
-                'balance': float(account.balance),
-                'debtor_name': account.debtor.name
-            } for account in debtor_accounts
-        ],
-        'creditor_accounts': [
-            {
-                'iban': account.iban,
-                'currency': account.currency,
-                'creditor_name': account.creditor.name
-            } for account in creditor_accounts
-        ]
+        'debtor_accounts': debtor_accounts,
+        'creditor_accounts': CreditorAccount.objects.select_related('creditor').all()
     }
-    
-    return render(request, 'banco/transfer_form.html', context)
+    return render(request, "banco/transfer_form.html", context)
 
 @login_required
 def transfer_status_view(request, payment_id):
@@ -962,65 +896,6 @@ def setup_totp(request):
     return render(request, 'banco/setup_totp.html', {
         'qr_code': qr_code
     })
-
-@csrf_exempt
-def api_login(request):
-    """
-    POST /api/login
-    Login con soporte para TOTP y refresh tokens.
-    """
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Método no permitido'}, status=405)
-        
-    data = json.loads(request.body)
-    username = data.get('username')
-    password = data.get('password')
-    totp_code = data.get('totp_code')
-    
-    try:
-        user = OficialBancario.objects.get(username=username)
-        
-        # Verificar bloqueo
-        if user.account_locked:
-            return JsonResponse({
-                'error': 'Cuenta bloqueada. Contacte al administrador.'
-            }, status=401)
-            
-        # Verificar contraseña
-        if not user.check_password(password):
-            user.increment_failed_attempts()
-            return JsonResponse({'error': 'Credenciales inválidas'}, status=401)
-            
-        # Verificar TOTP si está habilitado
-        if user.totp_enabled:
-            if not totp_code:
-                return JsonResponse({
-                    'error': 'Código TOTP requerido',
-                    'totp_required': True
-                }, status=401)
-                
-            if not SecurityService.verify_totp(user.totp_secret, totp_code):
-                return JsonResponse({'error': 'Código TOTP inválido'}, status=401)
-                
-        # Generar tokens
-        tokens = SecurityService.generate_token_pair({
-            'id': user.id,
-            'username': user.username,
-            'role': user.role
-        })
-        
-        # Actualizar usuario
-        user.reset_failed_attempts()
-        user.last_login_ip = request.META.get('REMOTE_ADDR')
-        user.refresh_token = tokens['refresh_token']
-        user.save(update_fields=['last_login_ip', 'refresh_token'])
-        
-        return JsonResponse(tokens)
-        
-    except OficialBancario.DoesNotExist:
-        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
 
 @csrf_exempt
 def api_refresh_token(request):

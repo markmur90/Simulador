@@ -3,6 +3,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.core.files.base import ContentFile
 from django.utils import timezone
 import uuid
+from django.core.exceptions import ValidationError
+from django.db import transaction
 
 class OficialBancario(models.Model):
     username = models.CharField(max_length=50, unique=True)
@@ -200,20 +202,40 @@ class AccountMovement(models.Model):
     fecha = models.DateTimeField(auto_now_add=True)
     descripcion = models.CharField(max_length=200, blank=True, null=True)
 
+    class Meta:
+        db_table = 'sim_account_movement'
+        ordering = ['-fecha']
+        verbose_name = 'Movimiento de Cuenta'
+        verbose_name_plural = 'Movimientos de Cuenta'
+
+    def clean(self):
+        """Validar que haya saldo suficiente para pagos."""
+        if self.tipo == self.PAYMENT and not self.pk:
+            if self.account.balance < self.monto:
+                raise ValidationError('Saldo insuficiente para realizar el pago')
+
     def save(self, *args, **kwargs):
-        if not self.pk:
-            if self.tipo == self.DEPOSIT:
-                self.account.balance += self.monto
-            else:
-                self.account.balance -= self.monto
-            self.account.save()
-        super().save(*args, **kwargs)
+        """Actualizar saldo de la cuenta al crear el movimiento."""
+        self.clean()
+        if not self.pk:  # Solo al crear
+            with transaction.atomic():
+                # Obtener la cuenta con lock
+                account = DebtorAccount.objects.select_for_update().get(pk=self.account.pk)
+                
+                # Actualizar saldo
+                if self.tipo == self.DEPOSIT:
+                    account.balance += self.monto
+                else:  # PAYMENT
+                    account.balance -= self.monto
+                    
+                # Guardar cuenta y movimiento
+                account.save(update_fields=['balance'])
+                super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.account} {self.tipo} {self.monto}"
-
-    class Meta:
-        app_label = 'banco'
+        return f"{self.get_tipo_display()} de {self.monto} en {self.account.iban}"
 
 
 class Creditor(Party):

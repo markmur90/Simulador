@@ -25,44 +25,30 @@ def analyze_transfer(transfer: Transfer) -> str:
         f"hacia {transfer.creditor.name}."
     )
 
-    # Envolver la llamada asíncrona en ``asyncio.run`` para no usar
-    # ``await`` directamente dentro del worker de Celery
-    async def _do_chat():
-        return await openai.ChatCompletion.acreate(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}]
-        )
-
     try:
+        # Envolver la llamada asíncrona en ``asyncio.run`` para no usar
+        # ``await`` directamente dentro del worker de Celery
+        async def _do_chat():
+            return await openai.ChatCompletion.acreate(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}]
+            )
+
         resp = asyncio.run(_do_chat())
         return resp.choices[0].message.content.strip()
     except Exception:
         return "Sin análisis disponible"
 
 
-def send_telegram_notification(message: str) -> None:
-    """Envía un mensaje por Telegram si están configuradas las credenciales."""
-    token = getattr(settings, "TELEGRAM_BOT_TOKEN", None)
-    chat_id = getattr(settings, "TELEGRAM_CHAT_ID", None)
-    if not (token and chat_id):
-        return
-    try:
-        Bot(token=token).send_message(chat_id=chat_id, text=message)
-    except Exception:
-        # Podríamos loguear el error para auditoría
-        pass
-
-
 @shared_task
 def process_transfer_task(transfer_id: int):
     """
-    A los 5 minutos, procesa la transferencia:
+    Procesa una transferencia pendiente:
      1) Verifica fondos
-     2) Descuenta el monto del DebtorAccount.balance
-     3) Registra el movimiento en la cuenta
-     4) Actualiza status a 'ACCP' o 'RJCT'
-     5) Notifica a la API externa
-     6) Realiza análisis con OpenAI y notifica por Telegram
+     2) Registra el movimiento de salida
+     3) Actualiza status
+     4) Notifica a la API externa
+     5) Realiza análisis con OpenAI y notifica por Telegram
     """
     try:
         transfer = (
@@ -90,56 +76,59 @@ def process_transfer_task(transfer_id: int):
             # Registrar el intento fallido
             AccountMovement.objects.create(
                 account=acct,
-                tipo='TRANSFER_FAILED',
+                tipo='PAYMENT',
                 monto=transfer.instructed_amount,
                 descripcion=f'Transferencia rechazada por fondos insuficientes: {transfer.payment_id}'
             )
             return
 
-        # 2) Descontar y actualizar
-        # acct.balance -= transfer.instructed_amount
-        # acct.save(update_fields=['balance'])
-        
-        # Solo crear el movimiento y dejar que él actualice el balance:
+        # 2) Registrar movimiento de salida
         AccountMovement.objects.create(
             account=acct,
-            tipo='TRANSFER_OUT',
+            tipo='PAYMENT',
             monto=transfer.instructed_amount,
             descripcion=f'Transferencia enviada a {transfer.creditor.name} - ID: {transfer.payment_id}'
         )
 
-        # 3) Registrar el movimiento
-        AccountMovement.objects.create(
-            account=acct,
-            tipo='TRANSFER_OUT',
-            monto=transfer.instructed_amount,
-            descripcion=f'Transferencia enviada a {transfer.creditor.name} - ID: {transfer.payment_id}'
-        )
-
-        # 4) Marcar como ejecutada
+        # 3) Actualizar estado
         transfer.status = 'ACCP'
         transfer.save(update_fields=['status'])
 
-    # 5) Notificar a la API externa
-    payload = {
-        "payment_id": transfer.payment_id,
-        "status": transfer.status,
-        "debtor_account": acct.iban,
-        "amount": str(transfer.instructed_amount),
-        "current_balance": str(acct.balance)  # Incluir saldo actual
-    }
-    try:
-        requests.post(
-            settings.SIMULATOR_NOTIFY_URL,
-            json=payload,
-            timeout=5
+        # 4) Registrar en el log
+        LogTransferencia.objects.create(
+            registro=transfer.payment_id,
+            tipo_log='TRANSFER',
+            contenido=f'Transferencia procesada exitosamente'
         )
-    except requests.RequestException:
-        # Podríamos reintentar o loguear el fallo
-        pass
 
-    # 6) Análisis y notificación
-    analysis = analyze_transfer(transfer)
-    send_telegram_notification(
-        f"Transferencia {transfer.payment_id}: {analysis}\nSaldo actual: {acct.balance} {transfer.currency}"
-    )
+        # 5) Notificar por Telegram si está configurado
+        if hasattr(settings, 'TELEGRAM_BOT_TOKEN') and hasattr(settings, 'TELEGRAM_CHAT_ID'):
+            try:
+                bot = Bot(token=settings.TELEGRAM_BOT_TOKEN)
+                message = (
+                    f"🔄 Nueva transferencia procesada\n"
+                    f"ID: {transfer.payment_id}\n"
+                    f"De: {transfer.debtor.name}\n"
+                    f"A: {transfer.creditor.name}\n"
+                    f"Monto: {transfer.instructed_amount} {transfer.currency}\n"
+                    f"Estado: {transfer.status}"
+                )
+                asyncio.run(bot.send_message(
+                    chat_id=settings.TELEGRAM_CHAT_ID,
+                    text=message
+                ))
+            except Exception as e:
+                # No fallar si la notificación falla
+                print(f"Error enviando notificación Telegram: {e}")
+
+        # 6) Realizar análisis con OpenAI
+        try:
+            analysis = analyze_transfer(transfer)
+            if analysis != "Sin análisis disponible":
+                LogTransferencia.objects.create(
+                    registro=transfer.payment_id,
+                    tipo_log='ANALYSIS',
+                    contenido=analysis
+                )
+        except Exception as e:
+            print(f"Error realizando análisis OpenAI: {e}")
