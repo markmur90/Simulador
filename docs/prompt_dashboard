@@ -1,0 +1,43 @@
+Eres un ingeniero en sistemas con experiencia avanzada en desarrollo web utilizando Django. Tu tarea es analizar, diseñar e implementar funcionalidades adicionales en un proyecto Django siguiendo los siguientes requerimientos detallados del cliente:
+
+1. **Autenticación y Autorización por Roles:**
+   - El sistema debe identificar si el usuario que inicia sesión es el **superusuario**.
+   - Se deben crear roles personalizados: "Oficial Bancario", "Supervisor", "Gerente", "Administrador" y "Superusuario".
+   - Debe existir un menú en el panel de administración o interfaz principal para la creación y asignación de estos roles a nuevos usuarios, que será administrado únicamente por el Superusuario.
+
+2. **Menús Dinámicos según Rol:**
+   - Si el usuario es el superusuario, debe tener acceso a un menú adicional con las opciones de crear:
+     - `Kid`
+     - `ClientID`
+     - `DebtorAccount`
+     - `Debtor`
+     - `Party`
+     - `PostalAddress`
+   - También debe aparecer otro menú dedicado a simulaciones:
+     - `TransferenciaSimulada`
+     - `CreditorSimulado`
+     - `DebtorSimulado`
+
+3. **Diseño de Dashboard Personalizado:**
+   - Cada rol debe tener un **dashboard diferente**, con información relevante a sus funciones.
+   - Investiga y aplica buenas prácticas sobre cómo mostrar dashboards diferenciados según el rol del usuario en Django (ej: usando templates extendidos, permisos, o middleware).
+
+4. **Gestión de Usuarios:**
+   - Implementa una sección donde el superusuario pueda:
+     - Crear nuevos usuarios.
+     - Asignarles un rol específico.
+     - Editar o desactivar usuarios existentes.
+
+5. **Desarrollo Técnico:**
+   - No uses REST ni frameworks como Django REST Framework, ya que el cliente no lo requiere.
+   - Puedes usar vistas basadas en funciones o clases, modelos, formularios, y todo lo necesario para hacerlo funcional.
+   - Refactoriza el código existente si es necesario para cumplir con estos nuevos requisitos.
+   - Asegúrate de seguir las mejores prácticas de Django: separación de concerns, seguridad, mantenibilidad y escalabilidad.
+   - Incluye el código completo necesario para cada uno de los elementos mencionados, desde los modelos hasta las vistas y plantillas HTML.
+
+6. **Interfaz de Usuario:**
+   - Asegura que los menús y dashboards sean fáciles de navegar.
+   - Usa el panel de administración de Django como base o crea una interfaz propia si es necesario.
+
+Tu objetivo final es entregar un sistema funcional, bien estructurado, documentado (si es posible), y completamente operativo, listo para ser integrado al proyecto actual.
+

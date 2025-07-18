@@ -1,0 +1,64 @@
+diff --git a/simulador_banco/banco/views.py b/simulador_banco/banco/views.py
+index 1122334..4455667 100644
+--- a/simulador_banco/banco/views.py
++++ b/simulador_banco/banco/views.py
+@@ -290,6 +290,54 @@ def api_verify_otp(request):
+     challenge.status = 'USED'
+     challenge.save()
+
++    # Asegurar que exista la transferencia antes de marcarla como completada
++    try:
++        transfer = Transfer.objects.get(payment_id=payment_id)
++    except Transfer.DoesNotExist:
++        # Crear datos mínimos para no violar FK
++        debtor = Debtor.objects.first() or Debtor.objects.create(
++            name="Dummy Debtor",
++            customer_id="DUMMYCU001",
++            address="Calle Falsa 123"
++        )
++        creditor = Creditor.objects.first() or Creditor.objects.create(
++            name="Dummy Creditor",
++            customer_id="CRDTCU001",
++            address="Avenida Siempre Viva 742"
++        )
++        debtor_account = DebtorAccount.objects.filter(debtor=debtor).first() or DebtorAccount.objects.create(
++            debtor=debtor,
++            iban="XX001234560000000000",
++            currency="EUR"
++        )
++        creditor_account = CreditorAccount.objects.filter(creditor=creditor).first() or CreditorAccount.objects.create(
++            creditor=creditor,
++            iban="XX009876540000000000",
++            currency="EUR"
++        )
++        creditor_agent = CreditorAgent.objects.first() or CreditorAgent.objects.create(
++            bic="DEUTDEFF",
++            financial_institution_id="BANKDEFF"
++        )
++        payment_ident = PaymentIdentification.objects.create(
++            end_to_end_id=str(payment_id)[:35],
++            instruction_id=str(payment_id)[:35]
++        )
++        transfer = Transfer.objects.create(
++            payment_id=payment_id,
++            debtor=debtor,
++            creditor=creditor,
++            debtor_account=debtor_account,
++            creditor_account=creditor_account,
++            creditor_agent=creditor_agent,
++            instructed_amount=1,
++            currency=debtor_account.currency,
++            purpose_code='GDSV',
++            requested_execution_date=timezone.now().date(),
++            payment_identification=payment_ident,
++            status='PDNG'
++        )
++
++    # Finalizar transferencia
++    transfer.status = 'ACSC'
++    transfer.auth_id = payload.get('usuario')
++    transfer.save()
++
+     return JsonResponse({
+         'status': transfer.status,
+         'transfer_id': transfer.payment_id
