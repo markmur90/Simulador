@@ -77,7 +77,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'banco.apps.BancoConfig',
-    'django_bootstrap5',
+    # 'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -179,15 +179,67 @@ LOGIN_URL = '/login/'
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '[{asctime}] [{levelname}] [{name}] {message}',
+            'style': '{',
+            'datefmt': '%Y-%m-%d %H:%M:%S'
+        },
+        'simple': {
+            'format': '[{levelname}] {message}',
+            'style': '{'
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'simple',
         },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'logs/simulador.log',
+            'formatter': 'verbose',
+        },
+        'security_file': {
+            'class': 'logging.FileHandler',
+            'filename': 'logs/security.log',
+            'formatter': 'verbose',
+        },
+        'transfer_file': {
+            'class': 'logging.FileHandler',
+            'filename': 'logs/transfers.log',
+            'formatter': 'verbose',
+        },
+        'telegram_file': {
+            'class': 'logging.FileHandler',
+            'filename': 'logs/telegram.log',
+            'formatter': 'verbose',
+        }
     },
     'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        'banco.security': {
+            'handlers': ['console', 'security_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'banco.transfers': {
+            'handlers': ['console', 'transfer_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'banco.telegram': {
+            'handlers': ['console', 'telegram_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
         'simulador_banco.middleware.allow_internal_network': {
-            'handlers': ['console'],
+            'handlers': ['console', 'security_file'],
             'level': 'WARNING',
+            'propagate': False,
         },
     },
 }

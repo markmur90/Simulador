@@ -279,22 +279,34 @@ ALGORITHM = 'HS256'
 
 @csrf_exempt
 def api_login(request):
-    """Vista unificada para login API/JWT."""
+    """
+    POST /api/login
+    Autentica un usuario y devuelve un token JWT
+    """
     if request.method != 'POST':
         return JsonResponse({'error': 'Método no permitido'}, status=405)
-    
+        
     try:
         data = json.loads(request.body.decode())
         username = data.get('username')
         password = data.get('password')
         
-        oficial = SecurityService.authenticate_oficial(username, password)
-        if not oficial:
+        if not username or not password:
+            return JsonResponse({'error': 'Credenciales incompletas'}, status=400)
+            
+        oficial = OficialBancario.objects.get(username=username)
+        if not oficial.check_password(password):
             return JsonResponse({'error': 'Credenciales inválidas'}, status=401)
             
-        token = SecurityService.generate_jwt({'usuario': username})
+        payload = {
+            'usuario': username,
+            'exp': datetime.now(timezone.utc) + timedelta(hours=2)
+        }
+        token = jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
         return JsonResponse({'token': token})
         
+    except OficialBancario.DoesNotExist:
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
     except json.JSONDecodeError:
         return JsonResponse({'error': 'JSON inválido'}, status=400)
     except Exception as e:
@@ -756,11 +768,11 @@ def transfer_view(request):
             destination_account_id = request.POST.get("destination_account")
             amount = Decimal(request.POST.get("amount", "0"))
             description = request.POST.get("description")
-            
+
             # Validar datos básicos
             if not all([transfer_type, origin_account_id, destination_account_id, amount]):
                 raise ValidationError("Todos los campos son requeridos")
-                
+
             if amount <= 0:
                 raise ValidationError("El monto debe ser mayor a 0")
                 
@@ -805,7 +817,7 @@ def transfer_view(request):
                 tipo_log="ERROR",
                 contenido=f"Error en transferencia: {str(e)}"
             )
-    
+            
     # GET: Mostrar formulario
     # Obtener cuentas según el rol del usuario
     if request.user.is_staff:

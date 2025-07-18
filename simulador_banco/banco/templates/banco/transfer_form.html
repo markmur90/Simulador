@@ -96,7 +96,7 @@
     </div>
 
     <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary">Realizar Transferencia</button>
+    <button type="submit" class="btn btn-primary">Realizar Transferencia</button>
       <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancelar</a>
     </div>
   </form>
@@ -150,13 +150,13 @@ document.addEventListener('DOMContentLoaded', function() {
   // Manejar cambio de cuenta origen
   originSelect.addEventListener('change', updateDestinationFields);
 
-  // Validación del formulario
+// Validación del formulario
   form.addEventListener('submit', function(e) {
-    if (!form.checkValidity()) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-    form.classList.add('was-validated');
+  if (!form.checkValidity()) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  form.classList.add('was-validated');
   });
 
   // Inicializar estado
