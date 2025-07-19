@@ -155,6 +155,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const internalCreditorSelect = document.getElementById('id_internal_creditor');
     const internalCreditorAccountSelect = document.getElementById('id_internal_creditor_account');
 
+    // Establecer el tipo inicial si se proporciona en la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialType = urlParams.get('tipo');
+    if (initialType && ['INTERNAL', 'EXTERNAL'].includes(initialType)) {
+        transactionType.value = initialType;
+    }
+
     function handleTransactionTypeChange(value) {
         const internalFields = document.querySelector('.internal-fields');
         const externalFields = document.querySelector('.external-fields');

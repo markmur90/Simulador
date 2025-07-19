@@ -45,6 +45,7 @@ urlpatterns = [
     path('api/GPT4/transferencias/', TransferListViewGPT4.as_view(), name='list_transferGPT4'),
     path('api/GPT4/transferencias/nueva/', TransferCreateViewGPT4.as_view(), name='create_transferGPT4'),
     path('api/GPT4/transferencias/<str:payment_id>/', TransferDetailViewGPT4.as_view(), name='transfer_detailGPT4'),
+    path('api/GPT4/transferencias/<str:payment_id>/pdf/', gpt_views.descargar_pdfGPT4, name='descargar_pdfGPT4'),
     path('api/get-debtor-accounts/', get_debtor_accounts, name='get_debtor_accounts'),
     # En urls.py
     path('api/GPT4/transferencias/<str:payment_id>/enviar/', 
