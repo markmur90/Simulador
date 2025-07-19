@@ -185,8 +185,7 @@ class TransferCreateViewGPT4(LoginRequiredMixin, generic.CreateView):
     model = Transfer
     form_class = TransferFormGPT4
     template_name = 'api/GPT4/create_transfer_gpt4.html'
-    success_url = reverse_lazy('list_transferGPT4')
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['debtors'] = Debtor.objects.all()
@@ -235,7 +234,13 @@ class TransferCreateViewGPT4(LoginRequiredMixin, generic.CreateView):
                 transfer.status = 'PDNG'
 
             transfer.save()
-            return redirect(self.success_url)
+            
+            # Redirigir a la vista de envío para transferencias externas
+            if transfer.transaction_type == 'EXTERNAL':
+                return redirect('send_transfer_viewGPT4', payment_id=transfer.payment_id)
+            else:
+                # Para transferencias internas, ir directamente al detalle
+                return redirect('transfer_detailGPT4', payment_id=transfer.payment_id)
 
 def get_debtor_accounts(request):
     debtor_id = request.GET.get('debtor_id')
@@ -270,3 +275,35 @@ class TransferDetailViewGPT4(LoginRequiredMixin, generic.DetailView):
                 fecha__gte=transfer.created_at
             ).order_by('fecha')
         return context
+
+class TransferSendViewGPT4(LoginRequiredMixin, View):
+    template_name = 'api/GPT4/send_transfer.html'
+
+    def get(self, request, payment_id):
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        return render(request, self.template_name, {'transfer': transfer})
+
+    def post(self, request, payment_id):
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        
+        if transfer.transaction_type == 'INTERNAL':
+            # Las transferencias internas ya están procesadas
+            return redirect('transfer_detailGPT4', payment_id=payment_id)
+        
+        try:
+            # Aquí iría la lógica de envío de transferencia externa
+            transfer_service = TransferService()
+            result = transfer_service.send_transfer(transfer)
+            
+            if result.get('status') == 'success':
+                transfer.status = 'ACSP'  # En proceso
+                transfer.save()
+                messages.success(request, 'Transferencia enviada correctamente')
+                return redirect('transfer_detailGPT4', payment_id=payment_id)
+            else:
+                messages.error(request, 'Error al enviar la transferencia: ' + result.get('message', 'Error desconocido'))
+                
+        except Exception as e:
+            messages.error(request, f'Error al procesar la transferencia: {str(e)}')
+        
+        return render(request, self.template_name, {'transfer': transfer})

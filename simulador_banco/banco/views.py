@@ -653,3 +653,5 @@ def api_verify_otp(request):
         'status': transfer.status,
         'transfer_id': transfer.payment_id
     })
+
+
