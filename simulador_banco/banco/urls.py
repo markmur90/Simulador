@@ -7,7 +7,8 @@ from . import views
 from . import gpt_views
 from .gpt_views import (
     TransferListViewGPT4, TransferCreateViewGPT4,
-    TransferDetailViewGPT4, get_debtor_accounts
+    TransferDetailViewGPT4, get_debtor_accounts,
+    TransferSendViewGPT4  # Añadiendo la vista faltante
 )
 
 urlpatterns = [
