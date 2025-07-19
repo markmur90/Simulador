@@ -2,16 +2,17 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic, View
 from django.shortcuts import redirect, get_object_or_404, render
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse
 from django.db import transaction
+from django.contrib import messages
 import uuid
-from django.http import FileResponse
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from io import BytesIO
 from django.utils import timezone
 
+from services.transfer_services import TransferService
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
     Transfer, AccountMovement
@@ -308,20 +309,19 @@ class TransferSendViewGPT4(LoginRequiredMixin, View):
         
         try:
             # Aquí iría la lógica de envío de transferencia externa
-            # transfer_service = TransferService() # This line was commented out in the original file
-            # result = transfer_service.send_transfer(transfer) # This line was commented out in the original file
+            transfer_service = TransferService()
+            result = transfer_service.send_transfer(transfer)
             
-            # if result.get('status') == 'success': # This line was commented out in the original file
-            #     transfer.status = 'ACSP'  # En proceso # This line was commented out in the original file
-            #     transfer.save() # This line was commented out in the original file
-            #     messages.success(request, 'Transferencia enviada correctamente') # This line was commented out in the original file
-            #     return redirect('transfer_detailGPT4', payment_id=payment_id) # This line was commented out in the original file
-            # else: # This line was commented out in the original file
-            #     messages.error(request, 'Error al enviar la transferencia: ' + result.get('message', 'Error desconocido')) # This line was commented out in the original file
+            if result.get('status') == 'success':
+                transfer.status = 'ACSP'  # En proceso
+                transfer.save()
+                messages.success(request, 'Transferencia enviada correctamente')
+                return redirect('transfer_detailGPT4', payment_id=payment_id)
+            else:
+                messages.error(request, 'Error al enviar la transferencia: ' + result.get('message', 'Error desconocido'))
                 
         except Exception as e:
-            # messages.error(request, f'Error al procesar la transferencia: {str(e)}') # This line was commented out in the original file
-            pass # This line was commented out in the original file
+            messages.error(request, f'Error al procesar la transferencia: {str(e)}')
         
         return render(request, self.template_name, {'transfer': transfer})
 
