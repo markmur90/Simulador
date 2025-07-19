@@ -13,12 +13,10 @@
             Transferencias
           </a>
           <ul class="dropdown-menu" aria-labelledby="transferMenu">
-            <li><a class="dropdown-item" href="{% url 'list_transferGPT4' %}">Todas las Transferencias</a></li>
+            <li><a class="dropdown-item" href="{% url 'list_transferGPT4' %}">Lista de Transferencias</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{% url 'create_transferGPT4' %}?tipo=INTERNAL">Nueva Transferencia Interna</a></li>
-            <li><a class="dropdown-item" href="{% url 'create_transferGPT4' %}?tipo=EXTERNAL">Nueva Transferencia Externa</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{% url 'create_transferGPT4' %}">Nueva Transferencia</a></li>
+            <li><a class="dropdown-item" href="{% url 'create_transferGPT4' %}">Nueva Transferencia Externa</a></li>
+            <li><a class="dropdown-item" href="{% url 'create_transfer_internaGPT4' %}">Nueva Transferencia Interna</a></li>
           </ul>
         </li>
         {% if user.is_superuser %}

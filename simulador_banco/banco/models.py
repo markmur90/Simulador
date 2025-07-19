@@ -3,7 +3,6 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.core.files.base import ContentFile
 from django.utils import timezone
 import uuid
-from django.db import transaction
 
 class OficialBancario(models.Model):
     username = models.CharField(max_length=50, unique=True)
@@ -55,9 +54,10 @@ from django.utils import timezone
 from django.conf import settings
 from cryptography.fernet import Fernet, InvalidToken
 from django.utils.encoding import force_bytes, force_str
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 import uuid
 from decimal import Decimal
-from django.core.exceptions import ValidationError
 
 # ------------------------------------------------------------------------------
 # UTILIDADES DE CIFRADO (sin cambios)
@@ -146,6 +146,10 @@ class Account(models.Model):
         max_length=3, default='EUR',
         validators=[currency_validator]
     )
+    balance = models.DecimalField(
+        max_digits=18, decimal_places=2,
+        default=Decimal('0.00'),
+    )
     
     class Meta:
         abstract = True
@@ -169,17 +173,13 @@ class DebtorAccount(Account):
         Debtor, on_delete=models.CASCADE,
         related_name='accounts'
     )
-    balance = models.DecimalField(
-        max_digits=18, decimal_places=2,
-        default=Decimal('0.00'),
-    )
 
     class Meta(Account.Meta):
         db_table = 'sim_debtor_account'
         app_label = 'banco'
 
 class AccountMovement(models.Model):
-    """Movimientos de saldo para cuentas reales."""
+    """Movimientos de saldo para cuentas."""
 
     DEPOSIT = 'DEPOSIT'
     PAYMENT = 'PAYMENT'
@@ -188,14 +188,24 @@ class AccountMovement(models.Model):
         (PAYMENT, 'Pago'),
     ]
 
-    account = models.ForeignKey(
-        DebtorAccount,
-        on_delete=models.CASCADE,
-        related_name='movimientos'
-    )
+    # Campos para GenericForeignKey
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    account = GenericForeignKey('content_type', 'object_id')
+
     tipo = models.CharField(max_length=10, choices=TYPE_CHOICES)
     monto = models.DecimalField(max_digits=12, decimal_places=2)
     fecha = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if isinstance(self.account, (DebtorAccount, CreditorAccount)):
+                if self.tipo == self.DEPOSIT:
+                    self.account.balance += self.monto
+                else:
+                    self.account.balance -= self.monto
+                self.account.save()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.account} {self.tipo} {self.monto}"
@@ -282,24 +292,12 @@ class Transfer(models.Model):
         ('PDNG', 'Pendiente'),
     ]
 
-    TRANSACTION_TYPE_CHOICES = [
-        ('INTERNAL', 'Transferencia Interna'),
-        ('EXTERNAL', 'Transferencia Externa'),
-    ]
-
     payment_id = models.CharField(max_length=36, unique=True, db_index=True)
-    transaction_type = models.CharField(
-        max_length=8,
-        choices=TRANSACTION_TYPE_CHOICES,
-        default='EXTERNAL'
-    )
     debtor = models.ForeignKey('Debtor', on_delete=models.PROTECT, related_name='transfers')
-    creditor = models.ForeignKey('Creditor', on_delete=models.PROTECT, related_name='transfers', null=True, blank=True)
-    internal_creditor = models.ForeignKey('Debtor', on_delete=models.PROTECT, related_name='received_transfers', null=True, blank=True)
-    debtor_account = models.ForeignKey('DebtorAccount', on_delete=models.PROTECT, related_name='sent_transfers')
-    creditor_account = models.ForeignKey('CreditorAccount', on_delete=models.PROTECT, null=True, blank=True)
-    internal_creditor_account = models.ForeignKey('DebtorAccount', on_delete=models.PROTECT, related_name='received_transfers', null=True, blank=True)
-    creditor_agent = models.ForeignKey('CreditorAgent', on_delete=models.PROTECT, null=True, blank=True)
+    creditor = models.ForeignKey('Creditor', on_delete=models.PROTECT, related_name='transfers')
+    debtor_account = models.ForeignKey('DebtorAccount', on_delete=models.PROTECT)
+    creditor_account = models.ForeignKey('CreditorAccount', on_delete=models.PROTECT)
+    creditor_agent = models.ForeignKey('CreditorAgent', on_delete=models.PROTECT)
     instructed_amount = models.DecimalField(
         max_digits=18, decimal_places=2,
         validators=[MinValueValidator(0.01)]
@@ -318,77 +316,6 @@ class Transfer(models.Model):
     auth_id = models.CharField(max_length=100, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
-
-    def clean(self):
-        if self.transaction_type == 'INTERNAL':
-            if not self.internal_creditor or not self.internal_creditor_account:
-                raise ValidationError('Para transferencias internas se requiere un deudor y cuenta destino')
-            if self.creditor or self.creditor_account or self.creditor_agent:
-                raise ValidationError('Las transferencias internas no deben tener datos de acreedor externo')
-        else:  # EXTERNAL
-            if not self.creditor or not self.creditor_account or not self.creditor_agent:
-                raise ValidationError('Para transferencias externas se requieren datos del acreedor')
-            if self.internal_creditor or self.internal_creditor_account:
-                raise ValidationError('Las transferencias externas no deben tener datos de deudor interno')
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        
-        with transaction.atomic():
-            # Obtener el estado anterior si existe
-            old_instance = None
-            if self.pk:
-                old_instance = Transfer.objects.select_for_update().get(pk=self.pk)
-                old_status = old_instance.status if old_instance else None
-            else:
-                old_status = None
-            
-            # Si es una transferencia interna que cambia a ACCC
-            if (self.transaction_type == 'INTERNAL' and 
-                self.status == 'ACCC' and 
-                (old_status is None or old_status != 'ACCC')):
-                
-                # Obtener las cuentas con bloqueo
-                debtor_account = DebtorAccount.objects.select_for_update().get(pk=self.debtor_account.pk)
-                creditor_account = DebtorAccount.objects.select_for_update().get(pk=self.internal_creditor_account.pk)
-                
-                if debtor_account.balance < self.instructed_amount:
-                    raise ValidationError('Saldo insuficiente en la cuenta de origen')
-                
-                # Actualizar saldos
-                debtor_account.balance -= self.instructed_amount
-                creditor_account.balance += self.instructed_amount
-                debtor_account.save()
-                creditor_account.save()
-                
-                # Crear movimientos
-                AccountMovement.objects.create(
-                    account=debtor_account,
-                    tipo='PAYMENT',
-                    monto=self.instructed_amount
-                )
-                AccountMovement.objects.create(
-                    account=creditor_account,
-                    tipo='DEPOSIT',
-                    monto=self.instructed_amount
-                )
-            
-            # Si es una transferencia externa que cambia a ACCP
-            elif (self.transaction_type == 'EXTERNAL' and 
-                  self.status == 'ACCP' and 
-                  (old_status is None or old_status != 'ACCP')):
-                
-                # Obtener la cuenta con bloqueo
-                debtor_account = DebtorAccount.objects.select_for_update().get(pk=self.debtor_account.pk)
-                
-                if debtor_account.balance < self.instructed_amount:
-                    raise ValidationError('Saldo insuficiente en la cuenta de origen')
-                
-                # Reservar el saldo
-                debtor_account.balance -= self.instructed_amount
-                debtor_account.save()
-            
-            super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'sim_transfer'

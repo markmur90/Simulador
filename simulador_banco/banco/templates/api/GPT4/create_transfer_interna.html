@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+  .custom-card {
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #ffffff 0%, #f1f3f5 100%);
+    border: none;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  }
+  .custom-card-header {
+    background: linear-gradient(45deg, #343a40, #495057);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.3rem;
+    padding: 1rem 1.5rem;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+  .custom-card-body { padding: 1.5rem; }
+  .balance-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+  }
+</style>
+
+<div class="container-fluid">
+  <h1 class="text-center mb-4">Nueva Transferencia Interna</h1>
+
+  <form method="post" class="needs-validation" novalidate>
+    {% csrf_token %}
+
+    <div class="row">
+      <!-- Cuenta Origen -->
+      <div class="col-md-6">
+        <div class="card custom-card mb-4">
+          <div class="custom-card-header">Cuenta Origen</div>
+          <div class="card-body custom-card-body">
+            <div class="mb-3">
+              <label for="id_debtor_origen" class="form-label">Deudor Origen</label>
+              {{ form.debtor_origen }}
+            </div>
+            <div class="mb-3">
+              <label for="id_cuenta_origen" class="form-label">Cuenta Origen</label>
+              {{ form.cuenta_origen }}
+              <div id="balance_origen" class="balance-info"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cuenta Destino -->
+      <div class="col-md-6">
+        <div class="card custom-card mb-4">
+          <div class="custom-card-header">Cuenta Destino</div>
+          <div class="card-body custom-card-body">
+            <div class="mb-3">
+              <label for="id_debtor_destino" class="form-label">Deudor Destino</label>
+              {{ form.debtor_destino }}
+            </div>
+            <div class="mb-3">
+              <label for="id_cuenta_destino" class="form-label">Cuenta Destino</label>
+              {{ form.cuenta_destino }}
+              <div id="balance_destino" class="balance-info"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalles de la Transferencia -->
+    <div class="card custom-card mb-4">
+      <div class="custom-card-header">Detalles de la Transferencia</div>
+      <div class="card-body custom-card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="id_monto" class="form-label">Monto a Transferir</label>
+              {{ form.monto }}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="id_concepto" class="form-label">Concepto</label>
+              {{ form.concepto }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+      <a href="{% url 'dashboard' %}" class="btn btn-secondary me-2">
+        <i class="bi bi-arrow-left"></i> Volver
+      </a>
+      <button type="submit" class="btn btn-primary">
+        <i class="bi bi-send"></i> Realizar Transferencia
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const debtorOrigenSelect = document.getElementById('id_debtor_origen');
+    const cuentaOrigenSelect = document.getElementById('id_cuenta_origen');
+    const debtorDestinoSelect = document.getElementById('id_debtor_destino');
+    const cuentaDestinoSelect = document.getElementById('id_cuenta_destino');
+    const balanceOrigenDiv = document.getElementById('balance_origen');
+    const balanceDestinoDiv = document.getElementById('balance_destino');
+
+    async function updateAccounts(debtorId, targetSelect, balanceDiv) {
+        if (!debtorId) {
+            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            balanceDiv.textContent = '';
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/api/get-accounts-by-debtor/?debtor_id=${debtorId}`);
+            const data = await response.json();
+            
+            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            data.accounts.forEach(account => {
+                const option = document.createElement('option');
+                option.value = account.id;
+                option.textContent = `${account.iban} (${account.currency})`;
+                option.dataset.balance = account.balance;
+                option.dataset.currency = account.currency;
+                targetSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error al cargar las cuentas:', error);
+            targetSelect.innerHTML = '<option value="">Error al cargar las cuentas</option>';
+        }
+    }
+
+    function updateBalanceInfo(select, balanceDiv) {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption && selectedOption.dataset.balance) {
+            balanceDiv.textContent = `Saldo disponible: ${selectedOption.dataset.balance} ${selectedOption.dataset.currency}`;
+        } else {
+            balanceDiv.textContent = '';
+        }
+    }
+
+    // Event Listeners
+    debtorOrigenSelect.addEventListener('change', (e) => {
+        updateAccounts(e.target.value, cuentaOrigenSelect, balanceOrigenDiv);
+    });
+
+    debtorDestinoSelect.addEventListener('change', (e) => {
+        updateAccounts(e.target.value, cuentaDestinoSelect, balanceDestinoDiv);
+    });
+
+    cuentaOrigenSelect.addEventListener('change', () => {
+        updateBalanceInfo(cuentaOrigenSelect, balanceOrigenDiv);
+    });
+
+    cuentaDestinoSelect.addEventListener('change', () => {
+        updateBalanceInfo(cuentaDestinoSelect, balanceDestinoDiv);
+    });
+});
+</script>
+{% endblock %} 

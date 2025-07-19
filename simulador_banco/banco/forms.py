@@ -15,8 +15,14 @@ class BootstrapModelForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             if not isinstance(field.widget, forms.CheckboxInput):
-                classes = field.widget.attrs.get("class", "")
-                field.widget.attrs["class"] = (classes + " form-control").strip()
+                field.widget.attrs.update({
+                    'class': 'form-control',
+                    'placeholder': field.label
+                })
+            else:
+                field.widget.attrs.update({
+                    'class': 'form-check-input'
+                })
 
 
 class DebtorForm(BootstrapModelForm):
@@ -192,91 +198,6 @@ class TransferForm(BootstrapModelForm):
             }),
         }
 
-class TransferFormGPT4(forms.ModelForm):
-    class Meta:
-        model = Transfer
-        fields = [
-            'transaction_type',
-            'debtor',
-            'debtor_account',
-            'creditor',
-            'creditor_account',
-            'creditor_agent',
-            'internal_creditor',
-            'internal_creditor_account',
-            'instructed_amount',
-            'currency',
-            'purpose_code',
-            'requested_execution_date',
-            'remittance_information_unstructured',
-        ]
-        widgets = {
-            'requested_execution_date': forms.DateInput(attrs={'type': 'date'}),
-            'transaction_type': forms.Select(attrs={'class': 'form-select', 'onchange': 'handleTransactionTypeChange(this.value)'}),
-            'debtor': forms.Select(attrs={'class': 'form-select'}),
-            'debtor_account': forms.Select(attrs={'class': 'form-select'}),
-            'creditor': forms.Select(attrs={'class': 'form-select'}),
-            'creditor_account': forms.Select(attrs={'class': 'form-select'}),
-            'creditor_agent': forms.Select(attrs={'class': 'form-select'}),
-            'internal_creditor': forms.Select(attrs={'class': 'form-select'}),
-            'internal_creditor_account': forms.Select(attrs={'class': 'form-select'}),
-            'currency': forms.Select(attrs={'class': 'form-select'}),
-            'purpose_code': forms.Select(attrs={'class': 'form-select'}),
-            'instructed_amount': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
-            'remittance_information_unstructured': forms.TextInput(attrs={'class': 'form-control'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['transaction_type'].required = True
-        self.fields['debtor'].required = True
-        self.fields['debtor_account'].required = True
-        
-        # Campos para transferencia externa
-        self.fields['creditor'].required = False
-        self.fields['creditor_account'].required = False
-        self.fields['creditor_agent'].required = False
-        
-        # Campos para transferencia interna
-        self.fields['internal_creditor'].required = False
-        self.fields['internal_creditor_account'].required = False
-
-        # Campos comunes
-        self.fields['instructed_amount'].required = True
-        self.fields['currency'].required = True
-        self.fields['requested_execution_date'].required = True
-
-    def clean(self):
-        cleaned_data = super().clean()
-        transaction_type = cleaned_data.get('transaction_type')
-        
-        if transaction_type == 'INTERNAL':
-            # Validar campos requeridos para transferencia interna
-            if not cleaned_data.get('internal_creditor'):
-                self.add_error('internal_creditor', 'Este campo es requerido para transferencias internas')
-            if not cleaned_data.get('internal_creditor_account'):
-                self.add_error('internal_creditor_account', 'Este campo es requerido para transferencias internas')
-                
-            # Limpiar campos de transferencia externa
-            cleaned_data['creditor'] = None
-            cleaned_data['creditor_account'] = None
-            cleaned_data['creditor_agent'] = None
-            
-        else:  # EXTERNAL
-            # Validar campos requeridos para transferencia externa
-            if not cleaned_data.get('creditor'):
-                self.add_error('creditor', 'Este campo es requerido para transferencias externas')
-            if not cleaned_data.get('creditor_account'):
-                self.add_error('creditor_account', 'Este campo es requerido para transferencias externas')
-            if not cleaned_data.get('creditor_agent'):
-                self.add_error('creditor_agent', 'Este campo es requerido para transferencias externas')
-                
-            # Limpiar campos de transferencia interna
-            cleaned_data['internal_creditor'] = None
-            cleaned_data['internal_creditor_account'] = None
-            
-        return cleaned_data
-
 class AccountMovementForm(BootstrapModelForm):
     class Meta:
         model = AccountMovement
@@ -324,3 +245,88 @@ class UserCreateWithRoleForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("username",)
+
+class TransferInternaForm(BootstrapModelForm):
+    """Formulario específico para transferencias entre deudores"""
+    debtor_origen = forms.ModelChoiceField(
+        queryset=Debtor.objects.all(),
+        label='Deudor Origen',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    cuenta_origen = forms.ModelChoiceField(
+        queryset=DebtorAccount.objects.none(),
+        label='Cuenta Origen',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    debtor_destino = forms.ModelChoiceField(
+        queryset=Debtor.objects.all(),
+        label='Deudor Destino',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    cuenta_destino = forms.ModelChoiceField(
+        queryset=DebtorAccount.objects.none(),
+        label='Cuenta Destino',
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    
+    monto = forms.DecimalField(
+        max_digits=18,
+        decimal_places=2,
+        label='Monto a Transferir',
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+    
+    concepto = forms.CharField(
+        max_length=140,
+        label='Concepto de la Transferencia',
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingrese el concepto de la transferencia'
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Si hay un deudor origen seleccionado, filtrar sus cuentas
+        if 'debtor_origen' in self.data:
+            try:
+                debtor_id = int(self.data.get('debtor_origen'))
+                self.fields['cuenta_origen'].queryset = DebtorAccount.objects.filter(debtor_id=debtor_id)
+            except (ValueError, TypeError):
+                pass
+        # Si hay un deudor destino seleccionado, filtrar sus cuentas
+        if 'debtor_destino' in self.data:
+            try:
+                debtor_id = int(self.data.get('debtor_destino'))
+                self.fields['cuenta_destino'].queryset = DebtorAccount.objects.filter(debtor_id=debtor_id)
+            except (ValueError, TypeError):
+                pass
+
+    def clean(self):
+        cleaned_data = super().clean()
+        cuenta_origen = cleaned_data.get('cuenta_origen')
+        cuenta_destino = cleaned_data.get('cuenta_destino')
+        monto = cleaned_data.get('monto')
+
+        if cuenta_origen and cuenta_destino and monto:
+            # Validar que no sea la misma cuenta
+            if cuenta_origen == cuenta_destino:
+                raise forms.ValidationError('No se puede transferir a la misma cuenta')
+            
+            # Validar saldo suficiente
+            if cuenta_origen.balance < monto:
+                raise forms.ValidationError('Saldo insuficiente en la cuenta origen')
+            
+            # Validar que las cuentas sean de la misma moneda
+            if cuenta_origen.currency != cuenta_destino.currency:
+                raise forms.ValidationError('Las cuentas deben ser de la misma moneda')
+
+        return cleaned_data
+
+    class Meta:
+        model = Transfer
+        fields = []  # No usamos campos directos del modelo

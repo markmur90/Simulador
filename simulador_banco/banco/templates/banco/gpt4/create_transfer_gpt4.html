@@ -26,10 +26,43 @@
   .custom-card-body { padding: 1.5rem; }
   .internal-fields, .external-fields { display: none; }
   .internal-fields.active, .external-fields.active { display: block; }
+  .help-text {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 0.25rem;
+  }
+  .btn-link {
+    padding: 0;
+    font-size: 0.875rem;
+  }
+  .error-feedback {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
 </style>
 
 <div class="container-fluid">
   <h1 class="text-center mb-4 display-6 fw-bold">GPT4 Nueva Transferencia</h1>
+
+  {% if messages %}
+  <div class="messages mb-4">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger mb-4">
+    {% for error in form.non_field_errors %}
+    <p class="mb-0">{{ error }}</p>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   <form method="post" class="needs-validation" novalidate>
     {% csrf_token %}
@@ -41,6 +74,16 @@
           <div class="col-md-12">
             <label for="id_transaction_type" class="form-label">Tipo de Transferencia</label>
             {{ form.transaction_type }}
+            {% if form.transaction_type.errors %}
+            <div class="error-feedback">
+              {% for error in form.transaction_type.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Seleccione "Interna" para transferir entre clientes del banco o "Externa" para transferir a otros bancos.
+            </div>
           </div>
         </div>
       </div>
@@ -51,12 +94,32 @@
       <div class="card-body custom-card-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label for="id_debtor" class="form-label">Deudor</label>
+            <label for="id_debtor" class="form-label">Cliente Ordenante</label>
             {{ form.debtor }}
+            {% if form.debtor.errors %}
+            <div class="error-feedback">
+              {% for error in form.debtor.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Seleccione el cliente que realizará la transferencia.
+            </div>
           </div>
           <div class="col-md-6">
-            <label for="id_debtor_account" class="form-label">Cuenta del Deudor</label>
+            <label for="id_debtor_account" class="form-label">Cuenta del Ordenante</label>
             {{ form.debtor_account }}
+            {% if form.debtor_account.errors %}
+            <div class="error-feedback">
+              {% for error in form.debtor_account.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Seleccione la cuenta desde la que se realizará la transferencia.
+            </div>
           </div>
         </div>
       </div>
@@ -69,19 +132,48 @@
         <div class="card-body custom-card-body">
           <div class="row g-3">
             <div class="col-md-4">
-              <label for="id_creditor" class="form-label">Acreedor</label>
+              <label for="id_creditor" class="form-label">Beneficiario</label>
               {{ form.creditor }}
-              <a href="{% url 'create_creditorGPT4' %}" class="btn btn-link">Crear nuevo acreedor</a>
+              {% if form.creditor.errors %}
+              <div class="error-feedback">
+                {% for error in form.creditor.errors %}
+                {{ error }}
+                {% endfor %}
+              </div>
+              {% endif %}
+              <div class="help-text">
+                Seleccione el beneficiario externo o 
+                <a href="{% url 'create_creditorGPT4' %}" class="btn-link" target="_blank">cree uno nuevo</a>
+              </div>
             </div>
             <div class="col-md-4">
-              <label for="id_creditor_account" class="form-label">Cuenta del Acreedor</label>
+              <label for="id_creditor_account" class="form-label">Cuenta del Beneficiario</label>
               {{ form.creditor_account }}
-              <a href="{% url 'create_creditor_accountGPT4' %}" class="btn btn-link">Crear nueva cuenta</a>
+              {% if form.creditor_account.errors %}
+              <div class="error-feedback">
+                {% for error in form.creditor_account.errors %}
+                {{ error }}
+                {% endfor %}
+              </div>
+              {% endif %}
+              <div class="help-text">
+                Seleccione la cuenta del beneficiario o 
+                <a href="{% url 'create_creditor_accountGPT4' %}" class="btn-link" target="_blank">cree una nueva</a>
+              </div>
             </div>
             <div class="col-md-4">
-              <label for="id_creditor_agent" class="form-label">Agente del Acreedor</label>
+              <label for="id_creditor_agent" class="form-label">Banco del Beneficiario</label>
               {{ form.creditor_agent }}
-              <a href="{% url 'create_creditor_agentGPT4' %}" class="btn btn-link">Crear nuevo agente</a>
+              {% if form.creditor_agent.errors %}
+              <div class="error-feedback">
+                {% for error in form.creditor_agent.errors %}
+                {{ error }}
+                {% endfor %}
+              </div>
+              {% endif %}
+              <div class="help-text">
+                Seleccione el banco del beneficiario.
+              </div>
             </div>
           </div>
         </div>
@@ -97,10 +189,30 @@
             <div class="col-md-6">
               <label for="id_internal_creditor" class="form-label">Cliente Beneficiario</label>
               {{ form.internal_creditor }}
+              {% if form.internal_creditor.errors %}
+              <div class="error-feedback">
+                {% for error in form.internal_creditor.errors %}
+                {{ error }}
+                {% endfor %}
+              </div>
+              {% endif %}
+              <div class="help-text">
+                Seleccione el cliente del banco que recibirá la transferencia.
+              </div>
             </div>
             <div class="col-md-6">
               <label for="id_internal_creditor_account" class="form-label">Cuenta del Beneficiario</label>
               {{ form.internal_creditor_account }}
+              {% if form.internal_creditor_account.errors %}
+              <div class="error-feedback">
+                {% for error in form.internal_creditor_account.errors %}
+                {{ error }}
+                {% endfor %}
+              </div>
+              {% endif %}
+              <div class="help-text">
+                Seleccione la cuenta donde se recibirá la transferencia.
+              </div>
             </div>
           </div>
         </div>
@@ -114,24 +226,74 @@
           <div class="col-md-4">
             <label for="id_instructed_amount" class="form-label">Monto</label>
             {{ form.instructed_amount }}
+            {% if form.instructed_amount.errors %}
+            <div class="error-feedback">
+              {% for error in form.instructed_amount.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Ingrese el monto a transferir.
+            </div>
           </div>
           <div class="col-md-4">
             <label for="id_currency" class="form-label">Moneda</label>
             {{ form.currency }}
+            {% if form.currency.errors %}
+            <div class="error-feedback">
+              {% for error in form.currency.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Seleccione la moneda de la transferencia.
+            </div>
           </div>
           <div class="col-md-4">
             <label for="id_purpose_code" class="form-label">Código de Propósito</label>
             {{ form.purpose_code }}
+            {% if form.purpose_code.errors %}
+            <div class="error-feedback">
+              {% for error in form.purpose_code.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Seleccione el propósito de la transferencia.
+            </div>
           </div>
         </div>
         <div class="row g-3 mt-3">
           <div class="col-md-6">
             <label for="id_requested_execution_date" class="form-label">Fecha de Ejecución</label>
             {{ form.requested_execution_date }}
+            {% if form.requested_execution_date.errors %}
+            <div class="error-feedback">
+              {% for error in form.requested_execution_date.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Seleccione la fecha en que se ejecutará la transferencia.
+            </div>
           </div>
           <div class="col-md-6">
             <label for="id_remittance_information_unstructured" class="form-label">Referencia</label>
             {{ form.remittance_information_unstructured }}
+            {% if form.remittance_information_unstructured.errors %}
+            <div class="error-feedback">
+              {% for error in form.remittance_information_unstructured.errors %}
+              {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
+            <div class="help-text">
+              Ingrese una referencia o descripción para la transferencia.
+            </div>
           </div>
         </div>
       </div>
@@ -155,15 +317,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const debtorAccountSelect = document.getElementById('id_debtor_account');
     const internalCreditorSelect = document.getElementById('id_internal_creditor');
     const internalCreditorAccountSelect = document.getElementById('id_internal_creditor_account');
-    const creditorSelect = document.getElementById('id_creditor');
-    const creditorAccountSelect = document.getElementById('id_creditor_account');
 
     // Establecer el tipo inicial si se proporciona en la URL
     const urlParams = new URLSearchParams(window.location.search);
     const initialType = urlParams.get('tipo');
     if (initialType && ['INTERNAL', 'EXTERNAL'].includes(initialType)) {
         transactionType.value = initialType;
-        handleTransactionTypeChange(initialType);
     }
 
     function handleTransactionTypeChange(value) {
@@ -173,15 +332,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (value === 'INTERNAL') {
             internalFields.classList.add('active');
             externalFields.classList.remove('active');
-            // Limpiar campos externos
-            if (creditorSelect) creditorSelect.value = '';
-            if (creditorAccountSelect) creditorAccountSelect.value = '';
         } else {
             internalFields.classList.remove('active');
             externalFields.classList.add('active');
-            // Limpiar campos internos
-            if (internalCreditorSelect) internalCreditorSelect.value = '';
-            if (internalCreditorAccountSelect) internalCreditorAccountSelect.value = '';
         }
     }
 
@@ -210,11 +363,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Event Listeners
     transactionType.addEventListener('change', (e) => handleTransactionTypeChange(e.target.value));
-    debtorSelect.addEventListener('change', (e) => updateAccounts(e.target.value, debtorAccountSelect));
+    debtorSelect.addEventListener('change', (e) => {
+        updateAccounts(e.target.value, debtorAccountSelect);
+        // Actualizar la lista de beneficiarios internos excluyendo al deudor seleccionado
+        const options = internalCreditorSelect.options;
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === e.target.value) {
+                options[i].disabled = true;
+                if (options[i].selected) {
+                    internalCreditorSelect.value = '';
+                    internalCreditorAccountSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+                }
+            } else {
+                options[i].disabled = false;
+            }
+        }
+    });
     internalCreditorSelect.addEventListener('change', (e) => updateAccounts(e.target.value, internalCreditorAccountSelect));
 
     // Inicializar estado
     handleTransactionTypeChange(transactionType.value);
+    if (debtorSelect.value) {
+        updateAccounts(debtorSelect.value, debtorAccountSelect);
+    }
 });
 </script>
 {% endblock %} 

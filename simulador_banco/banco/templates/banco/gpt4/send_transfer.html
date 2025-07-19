@@ -1,0 +1,76 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Enviar Transferencia</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5>Detalles de la Transferencia</h5>
+                    <table class="table">
+                        <tr>
+                            <th>ID de Pago:</th>
+                            <td>{{ transfer.payment_id }}</td>
+                        </tr>
+                        <tr>
+                            <th>Monto:</th>
+                            <td>{{ transfer.instructed_amount }} {{ transfer.currency }}</td>
+                        </tr>
+                        <tr>
+                            <th>Estado:</th>
+                            <td>{{ transfer.get_status_display }}</td>
+                        </tr>
+                        <tr>
+                            <th>Fecha de Ejecución:</th>
+                            <td>{{ transfer.requested_execution_date }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5>Información del Beneficiario</h5>
+                    <table class="table">
+                        <tr>
+                            <th>Acreedor:</th>
+                            <td>{{ transfer.creditor.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Cuenta:</th>
+                            <td>{{ transfer.creditor_account.iban }}</td>
+                        </tr>
+                        <tr>
+                            <th>Banco:</th>
+                            <td>{{ transfer.creditor_agent.name }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+                <div class="d-flex justify-content-end">
+                    <a href="{% url 'list_transferGPT4' %}" class="btn btn-secondary me-2">
+                        <i class="bi bi-arrow-left"></i> Volver
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send"></i> Enviar Transferencia
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

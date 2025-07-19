@@ -11,16 +11,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
-import sys
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
-
-# Añadir el path del entorno virtual
-VIRTUALENV_PATH = os.path.expanduser('~/envSIM')
-if os.path.exists(VIRTUALENV_PATH):
-    VENV_SITE_PACKAGES = os.path.join(VIRTUALENV_PATH, 'lib', 'python3.13', 'site-packages')
-    sys.path.insert(0, VENV_SITE_PACKAGES)
 
 # Carga variables de entorno desde .env en el directorio raíz de proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -67,9 +60,7 @@ SIMULADOR_TOKEN_URL  = os.getenv('SIMULADOR_TOKEN_URL',  'http://localhost:3000/
 SIMULADOR_VERIFY_URL = os.getenv('SIMULADOR_VERIFY_URL', 'http://localhost:3000/api/transferencia/verify/')
 JWT_SECRET_KEY       = os.getenv('JWT_SECRET_KEY',       'Ptf8454Jd55')
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.admin',
@@ -78,7 +69,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'banco.apps.BancoConfig',
-    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -115,7 +105,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'simulador_banco.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -125,7 +114,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -145,7 +133,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -156,7 +143,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
@@ -193,10 +179,7 @@ LOGGING = {
     },
 }
 
-# Integraciones
-TELEGRAM_BOT_TOKEN = get_env('TELEGRAM_BOT_TOKEN', '7881009139:AAH1mokuP0AjmCbd_tN3VJIxVkG7Fq95j5o')
-TELEGRAM_CHAT_ID = get_env('TELEGRAM_CHAT_ID', '769077177')
-
+# OpenAI API Key
 OPENAI_API_KEY = get_env('OPENAI_API_KEY', '')
 TOTP_SECRET = get_env('TOTP_SECRET', '')
 

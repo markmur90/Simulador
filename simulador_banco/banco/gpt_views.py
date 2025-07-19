@@ -1,25 +1,19 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic, View
-from django.shortcuts import redirect, get_object_or_404, render
-from django.http import JsonResponse, FileResponse
-from django.db import transaction
-from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
+from django.http import JsonResponse
 import uuid
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from io import BytesIO
 from django.utils import timezone
+from django.db import transaction
 
-from services.transfer_services import TransferService
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
-    Transfer, AccountMovement
+    Transfer, AccountMovement, LogTransferencia
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,
-    CreditorAgentForm, ClientIDForm, KidForm, TransferForm, TransferFormGPT4,
+    CreditorAgentForm, ClientIDForm, KidForm, TransferForm, TransferInternaForm,
     DebtorUpdateForm
 )
 
@@ -188,213 +182,90 @@ class DebtorDeleteView(LoginRequiredMixin, generic.DeleteView):
     success_url = reverse_lazy('list_debtorsGPT4')
 
 
-class TransferCreateViewGPT4(LoginRequiredMixin, generic.CreateView):
-    model = Transfer
-    form_class = TransferFormGPT4
-    template_name = 'api/GPT4/create_transfer_gpt4.html'
-    
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['debtors'] = Debtor.objects.all()
-        # Añadir el tipo de transferencia al contexto
-        context['tipo'] = self.request.GET.get('tipo', '')
-        return context
+class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
+    template_name = 'api/GPT4/create_transfer_interna.html'
+    form_class = TransferInternaForm
+    success_url = reverse_lazy('list_transferGPT4')
 
-    def get_initial(self):
-        initial = super().get_initial()
-        # Establecer el tipo de transferencia inicial basado en el parámetro de la URL
-        tipo = self.request.GET.get('tipo')
-        if tipo in ['INTERNAL', 'EXTERNAL']:
-            initial['transaction_type'] = tipo
-        return initial
+    def get_debtor_accounts(self, debtor_id):
+        """Obtener las cuentas de un deudor específico"""
+        return DebtorAccount.objects.filter(debtor_id=debtor_id)
 
     def form_valid(self, form):
-        with transaction.atomic():
-            transfer = form.save(commit=False)
-            
-            # Generar payment_id único
-            transfer.payment_id = str(uuid.uuid4())
-            
-            # Si es transferencia interna, actualizar saldos
-            if transfer.transaction_type == 'INTERNAL':
-                debtor_account = transfer.debtor_account
-                creditor_account = transfer.internal_creditor_account
-                amount = transfer.instructed_amount
+        # Obtener los datos del formulario
+        cuenta_origen = form.cleaned_data['cuenta_origen']
+        cuenta_destino = form.cleaned_data['cuenta_destino']
+        monto = form.cleaned_data['monto']
+        concepto = form.cleaned_data['concepto']
 
-                # Verificar saldo suficiente
-                if debtor_account.balance < amount:
-                    form.add_error(None, 'Saldo insuficiente en la cuenta de origen')
-                    return self.form_invalid(form)
+        try:
+            # Iniciar transacción para asegurar la integridad
+            with transaction.atomic():
+                # Crear la transferencia
+                transfer = Transfer.objects.create(
+                    payment_id=str(uuid.uuid4()),
+                    debtor=cuenta_origen.debtor,
+                    debtor_account=cuenta_origen,
+                    creditor=cuenta_destino.debtor,  # Usamos el deudor destino como acreedor
+                    creditor_account=cuenta_destino,  # Usamos la cuenta destino como cuenta acreedora
+                    instructed_amount=monto,
+                    currency=cuenta_origen.currency,
+                    purpose_code='OTHR',  # Código para transferencias internas
+                    requested_execution_date=timezone.now().date(),
+                    remittance_information_unstructured=concepto,
+                    status='ACSC'  # Completada exitosamente
+                )
 
-                # Crear movimientos de cuenta
+                # Crear movimiento de débito en cuenta origen
                 AccountMovement.objects.create(
-                    account=debtor_account,
+                    account=cuenta_origen,
                     tipo='PAYMENT',
-                    monto=amount
+                    monto=monto
                 )
+
+                # Crear movimiento de crédito en cuenta destino
                 AccountMovement.objects.create(
-                    account=creditor_account,
+                    account=cuenta_destino,
                     tipo='DEPOSIT',
-                    monto=amount
+                    monto=monto
                 )
 
-                # Actualizar saldos
-                debtor_account.balance -= amount
-                creditor_account.balance += amount
-                debtor_account.save()
-                creditor_account.save()
+                # Registrar en el log
+                LogTransferencia.objects.create(
+                    registro=transfer.payment_id,
+                    tipo_log='TRANSFER',
+                    contenido=f'Transferencia interna exitosa de {cuenta_origen.iban} a {cuenta_destino.iban} por {monto} {cuenta_origen.currency}'
+                )
 
-                # Marcar como completada
-                transfer.status = 'ACCC'
-            else:
-                # Para transferencias externas, mantener el flujo normal
-                transfer.status = 'PDNG'
+        except Exception as e:
+            # Si algo falla, registrar el error
+            LogTransferencia.objects.create(
+                registro=str(uuid.uuid4()),
+                tipo_log='ERROR',
+                contenido=f'Error en transferencia interna: {str(e)}'
+            )
+            form.add_error(None, f'Error al procesar la transferencia: {str(e)}')
+            return self.form_invalid(form)
 
-            transfer.save()
-            
-            # Redirigir a la vista de envío para transferencias externas
-            if transfer.transaction_type == 'EXTERNAL':
-                return redirect('send_transfer_viewGPT4', payment_id=transfer.payment_id)
-            else:
-                # Para transferencias internas, ir directamente al detalle
-                return redirect('transfer_detailGPT4', payment_id=transfer.payment_id)
-
-def get_debtor_accounts(request):
-    debtor_id = request.GET.get('debtor_id')
-    accounts = DebtorAccount.objects.filter(debtor_id=debtor_id).values('id', 'iban', 'balance')
-    return JsonResponse({'accounts': list(accounts)})
-
-class TransferListViewGPT4(LoginRequiredMixin, generic.ListView):
-    model = Transfer
-    template_name = 'api/GPT4/list_transfer_gpt4.html'
-    context_object_name = 'transfers'
-    paginate_by = 20
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        transaction_type = self.request.GET.get('tipo')
-        if transaction_type:
-            queryset = queryset.filter(transaction_type=transaction_type)
-        return queryset.order_by('-created_at')
-
-class TransferDetailViewGPT4(LoginRequiredMixin, generic.DetailView):
-    model = Transfer
-    template_name = 'api/GPT4/transfer_detail_gpt4.html'
-    slug_field = 'payment_id'
-    slug_url_kwarg = 'payment_id'
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        transfer = self.get_object()
-        if transfer.transaction_type == 'INTERNAL':
-            context['movements'] = AccountMovement.objects.filter(
-                account__in=[transfer.debtor_account, transfer.internal_creditor_account],
-                fecha__gte=transfer.created_at
-            ).order_by('fecha')
+        context['title'] = 'Nueva Transferencia Interna'
         return context
 
-class TransferSendViewGPT4(LoginRequiredMixin, View):
-    template_name = 'api/GPT4/send_transfer.html'
-
-    def get(self, request, payment_id):
-        transfer = get_object_or_404(Transfer, payment_id=payment_id)
-        return render(request, self.template_name, {'transfer': transfer})
-
-    def post(self, request, payment_id):
-        transfer = get_object_or_404(Transfer, payment_id=payment_id)
-        
-        if transfer.transaction_type == 'INTERNAL':
-            # Las transferencias internas ya están procesadas
-            return redirect('transfer_detailGPT4', payment_id=payment_id)
-        
-        try:
-            # Aquí iría la lógica de envío de transferencia externa
-            transfer_service = TransferService()
-            result = transfer_service.send_transfer(transfer)
-            
-            if result.get('status') == 'success':
-                transfer.status = 'ACSP'  # En proceso
-                transfer.save()
-                messages.success(request, 'Transferencia enviada correctamente')
-                return redirect('transfer_detailGPT4', payment_id=payment_id)
-            else:
-                messages.error(request, 'Error al enviar la transferencia: ' + result.get('message', 'Error desconocido'))
-                
-        except Exception as e:
-            messages.error(request, f'Error al procesar la transferencia: {str(e)}')
-        
-        return render(request, self.template_name, {'transfer': transfer})
-
-def descargar_pdfGPT4(request, payment_id):
-    """Genera un PDF con los detalles de la transferencia."""
-    # Obtener la transferencia
-    transfer = get_object_or_404(Transfer, payment_id=payment_id)
+def get_accounts_by_debtor(request):
+    """Vista para obtener las cuentas de un deudor vía AJAX"""
+    debtor_id = request.GET.get('debtor_id')
+    if not debtor_id:
+        return JsonResponse({'accounts': []})
     
-    # Crear el buffer de memoria para el PDF
-    buffer = BytesIO()
+    accounts = DebtorAccount.objects.filter(debtor_id=debtor_id)
+    accounts_data = [{
+        'id': account.id,
+        'iban': account.iban,
+        'balance': str(account.balance),
+        'currency': account.currency
+    } for account in accounts]
     
-    # Crear el PDF
-    p = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
-    
-    # Título
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(50, height - 50, "Detalle de Transferencia")
-    
-    # Subtítulo con el tipo de transferencia
-    p.setFont("Helvetica-Bold", 12)
-    tipo = "Interna" if transfer.transaction_type == 'INTERNAL' else "Externa"
-    p.drawString(50, height - 80, f"Transferencia {tipo}")
-    
-    # Información de la transferencia
-    p.setFont("Helvetica", 12)
-    y = height - 120
-    
-    # Detalles comunes
-    details = [
-        ("Payment ID:", transfer.payment_id),
-        ("Estado:", transfer.get_status_display()),
-        ("Deudor:", transfer.debtor.name),
-        ("Cuenta Deudor:", transfer.debtor_account.iban),
-    ]
-    
-    # Detalles específicos según el tipo de transferencia
-    if transfer.transaction_type == 'INTERNAL':
-        details.extend([
-            ("Beneficiario:", transfer.internal_creditor.name if transfer.internal_creditor else "N/A"),
-            ("Cuenta Beneficiario:", transfer.internal_creditor_account.iban if transfer.internal_creditor_account else "N/A"),
-        ])
-    else:
-        details.extend([
-            ("Acreedor:", transfer.creditor.name if transfer.creditor else "N/A"),
-            ("Cuenta Acreedor:", transfer.creditor_account.iban if transfer.creditor_account else "N/A"),
-            ("Agente Acreedor:", transfer.creditor_agent.bic if transfer.creditor_agent else "N/A"),
-        ])
-    
-    # Resto de detalles comunes
-    details.extend([
-        ("Importe:", f"{transfer.instructed_amount} {transfer.currency}"),
-        ("Fecha de Ejecución:", transfer.requested_execution_date.strftime("%d/%m/%Y")),
-        ("Referencia:", transfer.remittance_information_unstructured or "N/A"),
-        ("Creado:", transfer.created_at.strftime("%d/%m/%Y %H:%M")),
-        ("Código de Propósito:", transfer.purpose_code),
-    ])
-    
-    # Dibujar los detalles
-    for label, value in details:
-        p.drawString(50, y, f"{label} {value}")
-        y -= 25
-    
-    # Agregar pie de página
-    p.setFont("Helvetica-Italic", 8)
-    p.drawString(50, 50, f"Generado el {timezone.now().strftime('%d/%m/%Y %H:%M:%S')}")
-    
-    # Finalizar el PDF
-    p.showPage()
-    p.save()
-    
-    # Preparar el archivo para descarga
-    buffer.seek(0)
-    filename = f"transferencia_{transfer.payment_id}_{timezone.now().strftime('%Y%m%d_%H%M')}.pdf"
-    
-    return FileResponse(buffer, as_attachment=True, filename=filename)
+    return JsonResponse({'accounts': accounts_data})

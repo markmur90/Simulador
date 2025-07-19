@@ -5,11 +5,6 @@ from banco.api_login import login_api_simulador
 
 from . import views
 from . import gpt_views
-from .gpt_views import (
-    TransferListViewGPT4, TransferCreateViewGPT4,
-    TransferDetailViewGPT4, get_debtor_accounts,
-    TransferSendViewGPT4  # Añadiendo la vista faltante
-)
 
 urlpatterns = [
     path('', views.login_view, name='login'),
@@ -41,16 +36,6 @@ urlpatterns = [
     path('usuarios/nuevo/', views.user_create, name='user_create'),
     path('usuarios/<int:pk>/editar/', views.user_edit, name='user_edit'),
 
-    # Nuevas URLs para transferencias GPT4
-    path('api/GPT4/transferencias/', TransferListViewGPT4.as_view(), name='list_transferGPT4'),
-    path('api/GPT4/transferencias/nueva/', TransferCreateViewGPT4.as_view(), name='create_transferGPT4'),
-    path('api/GPT4/transferencias/<str:payment_id>/', TransferDetailViewGPT4.as_view(), name='transfer_detailGPT4'),
-    path('api/GPT4/transferencias/<str:payment_id>/pdf/', gpt_views.descargar_pdfGPT4, name='descargar_pdfGPT4'),
-    path('api/get-debtor-accounts/', get_debtor_accounts, name='get_debtor_accounts'),
-    # En urls.py
-    path('api/GPT4/transferencias/<str:payment_id>/enviar/', 
-        TransferSendViewGPT4.as_view(), 
-        name='send_transfer_viewGPT4'),
     # Movimientos y estados reales
     path('cuentas/<int:account_id>/deposito/', views.account_movement_create, {'tipo': 'DEPOSIT'}, name='deposito_cuenta'),
     path('cuentas/<int:account_id>/pago/', views.account_movement_create, {'tipo': 'PAYMENT'}, name='pago_cuenta'),
@@ -86,6 +71,14 @@ urlpatterns = [
     path('gpt4/transferencias/nuevo/', gpt_views.TransferCreateView.as_view(), name='create_transferGPT4'),
     path('gpt4/transferencias/<str:payment_id>/', gpt_views.TransferDetailView.as_view(), name='transfer_detailGPT4'),
     path('gpt4/transferencias/<str:payment_id>/editar/', gpt_views.TransferUpdateView.as_view(), name='edit_transferGPT4'),
+    
+    # URLs para transferencias internas
+    path('gpt4/transferencias/interna/nueva/', 
+         gpt_views.TransferInternaCreateView.as_view(), 
+         name='create_transfer_internaGPT4'),
+    path('api/get-accounts-by-debtor/', 
+         gpt_views.get_accounts_by_debtor, 
+         name='get_accounts_by_debtor'),
 ]
 
 urlpatterns += [

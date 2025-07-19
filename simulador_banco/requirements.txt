@@ -14,7 +14,6 @@ click-repl
 cryptography
 distro
 Django
-django-bootstrap5
 django-environ
 djangorestframework
 django-stubs
@@ -41,7 +40,6 @@ pytest
 pytest-django
 python-dateutil
 python-dotenv
-python-telegram-bot
 pytz
 qrcode
 requests
