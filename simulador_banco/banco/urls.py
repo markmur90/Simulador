@@ -76,7 +76,8 @@ urlpatterns = [
     path('gpt4/transferencias/<str:payment_id>/enviar/', gpt_views.send_transfer_view_gpt4, name='send_transfer_viewGPT4'),
     path('gpt4/transferencias/<str:payment_id>/enviar-simulador/', gpt_views.send_transfer_simulator_view_gpt4, name='send_transfer_simulator_viewGPT4'),
     path('gpt4/transferencias/<str:payment_id>/enviar-banco/', gpt_views.send_transfer_conexion_view_gpt4, name='send_transfer_conexion_viewGPT4'),
-    
+    path('gpt4/transferencias/<str:payment_id>/verificar/', gpt_views.TransferSCAView.as_view(), name='transfer_sca'),
+
     # URLs para transferencias internas
     path('gpt4/transferencias/interna/nueva/', 
          gpt_views.TransferInternaCreateView.as_view(), 

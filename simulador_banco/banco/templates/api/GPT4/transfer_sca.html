@@ -1,51 +1,158 @@
 {% extends 'base.html' %}
-{% block title %}Autorización SCA{% endblock %}
+
 {% block content %}
 <style>
-  h1.text-center { font-size: 2.5rem !important; }
-  .custom-card { border-radius: 1rem; box-shadow: 0 8px 20px rgba(0,0,0,0.1); background: linear-gradient(135deg,#fff 0%,#f1f3f5 100%); border:none; transition:transform 0.3s,box-shadow 0.3s; }
-  .custom-card:hover { transform:translateY(-5px); box-shadow:0 12px 24px rgba(0,0,0,0.15); }
-  .custom-card-header { background:linear-gradient(45deg,#343a40,#495057); color:#fff; font-weight:600; font-size:1.3rem; padding:1rem 1.5rem; border-top-left-radius:1rem; border-top-right-radius:1rem; }
-  .custom-card-body { padding:1.5rem; }
-  .log-content::-webkit-scrollbar { width:6px; }
-  .log-content::-webkit-scrollbar-thumb { background-color:rgba(0,0,0,0.3); border-radius:3px; }
-  .log-content { scrollbar-width:thin; scrollbar-color:rgba(0,0,0,0.3) transparent; }
+  .custom-card {
+    border-radius: 1rem;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #ffffff 0%, #f1f3f5 100%);
+    border: none;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .custom-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  }
+  .custom-card-header {
+    background: linear-gradient(45deg, #343a40, #495057);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.3rem;
+    padding: 1rem 1.5rem;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+  .custom-card-body { padding: 1.5rem; }
+  .otp-input {
+    letter-spacing: 0.5em;
+    text-align: center;
+    font-size: 1.5em;
+  }
+  .transfer-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  .transfer-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #198754;
+  }
 </style>
 
-<div class="container-fluid mt-4">
-  <div class="card custom-card mb-4">
-    <div class="custom-card-header d-flex justify-content-between align-items-center">
-      <h2 class="mb-0">Segundo Factor – {{ transfer.payment_id }}</h2>
-      <div>
-        <a href="{% url 'transfer_detailGPT4' transfer.payment_id %}" class="btn btn-outline-secondary">
-          <i class="bi bi-x-circle"></i> Cancelar
+<div class="container-fluid">
+  <h1 class="text-center mb-4">Verificación de Transferencia</h1>
+
+  {% if messages %}
+  <div class="messages mb-4">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card custom-card mb-4">
+        <div class="custom-card-header">Detalles de la Transferencia</div>
+        <div class="card-body custom-card-body">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h5>Origen</h5>
+              <div class="transfer-info">
+                <p class="mb-1"><strong>Cliente:</strong> {{ transfer.debtor.name }}</p>
+                <p class="mb-1"><strong>Cuenta:</strong> {{ transfer.debtor_account.iban }}</p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h5>Destino</h5>
+              <div class="transfer-info">
+                <p class="mb-1"><strong>Beneficiario:</strong> {{ transfer.creditor.name }}</p>
+                <p class="mb-1"><strong>Cuenta:</strong> {{ transfer.creditor_account.iban }}</p>
+                <p class="mb-1"><strong>Banco:</strong> {{ transfer.creditor_agent.bic }}</p>
+              </div>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col-12 text-center">
+              <h5>Monto</h5>
+              <div class="transfer-amount">
+                {{ transfer.instructed_amount }} {{ transfer.currency }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% if otp_challenge %}
+      <div class="card custom-card">
+        <div class="custom-card-header">Verificación OTP</div>
+        <div class="card-body custom-card-body">
+          <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            <div class="mb-4">
+              <p class="text-center">
+                Por favor, ingrese el código OTP que ha recibido para verificar esta transferencia.
+              </p>
+              <div class="form-group">
+                <input type="text" 
+                       name="otp" 
+                       class="form-control otp-input" 
+                       maxlength="6" 
+                       pattern="\d{6}" 
+                       required
+                       placeholder="000000"
+                       autocomplete="off">
+                <div class="invalid-feedback">
+                  Por favor ingrese un código OTP válido de 6 dígitos.
+                </div>
+              </div>
+            </div>
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-shield-check"></i> Verificar Transferencia
+              </button>
+              <a href="{% url 'transfer_detailGPT4' payment_id=transfer.payment_id %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Cancelar
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+      {% else %}
+      <div class="alert alert-warning">
+        No se encontró un desafío OTP válido para esta transferencia.
+        <a href="{% url 'transfer_detailGPT4' payment_id=transfer.payment_id %}" class="alert-link">
+          Volver a los detalles de la transferencia
         </a>
       </div>
-    </div>
-    <div class="card-body custom-card-body">
-      {% if mensaje_error %}
-        <div class="alert alert-danger mb-4">{{ mensaje_error }}</div>
       {% endif %}
-      {% if request.session.photo_tan_img %}
-        <img src="data:image/png;base64,{{ request.session.photo_tan_img }}" class="img-fluid mb-3"/>
-      {% endif %}
-      <form method="post">
-        {% csrf_token %}
-        <div class="row g-3 mb-3">
-          <div class="col-md-6">
-            <label for="{{ form.action.id_for_label }}" class="form-label">Acción</label>
-            {{ form.action }}
-          </div>
-          <div class="col-md-6">
-            <label for="{{ form.otp.id_for_label }}" class="form-label">Código OTP</label>
-            {{ form.otp }}
-          </div>
-        </div>
-        <div class="d-flex justify-content-end">
-          <button type="submit" class="btn btn-success">Procesar SCA</button>
-        </div>
-      </form>
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const otpInput = document.querySelector('input[name="otp"]');
+
+    if (otpInput) {
+        // Solo permitir números
+        otpInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Validación del formulario
+        form.addEventListener('submit', function(e) {
+            if (!this.checkValidity()) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        });
+    }
+});
+</script>
 {% endblock %}

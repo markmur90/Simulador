@@ -121,6 +121,93 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
     def get_success_url(self):
         return reverse_lazy('transfer_detailGPT4', kwargs={'payment_id': self.object.payment_id})
 
+    def form_valid(self, form):
+        try:
+            with transaction.atomic():
+                # Validar saldo suficiente
+                debtor_account = form.cleaned_data['debtor_account']
+                amount = form.cleaned_data['instructed_amount']
+                
+                if debtor_account.balance < amount:
+                    if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'error': 'Saldo insuficiente en la cuenta origen'
+                        }, status=400)
+                    form.add_error(None, 'Saldo insuficiente en la cuenta origen')
+                    return self.form_invalid(form)
+
+                # Preparar datos para TransferService
+                transfer_data = {
+                    'debtor': form.cleaned_data['debtor'],
+                    'debtor_account_id': debtor_account.id,
+                    'creditor': form.cleaned_data['creditor'],
+                    'creditor_account': form.cleaned_data['creditor_account'],
+                    'creditor_agent': form.cleaned_data['creditor_agent'],
+                    'instructed_amount': amount,
+                    'currency': form.cleaned_data['currency'],
+                    'purpose_code': form.cleaned_data['purpose_code'],
+                    'requested_execution_date': form.cleaned_data['requested_execution_date'],
+                    'remittance_information_unstructured': form.cleaned_data['remittance_information_unstructured'],
+                }
+
+                # Usar TransferService para procesar la transferencia
+                from services.transfer_services import TransferService
+                self.object = TransferService.ingest_transfer(transfer_data)
+
+                if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    response_data = {
+                        'status': 'success',
+                        'payment_id': self.object.payment_id,
+                    }
+                    
+                    # Si la transferencia requiere OTP, incluir la información necesaria
+                    if self.object.status == 'PDNG':
+                        response_data.update({
+                            'otp_required': True,
+                            'redirect_url': reverse_lazy('transfer_sca', kwargs={'payment_id': self.object.payment_id})
+                        })
+                    else:
+                        response_data.update({
+                            'redirect_url': self.get_success_url()
+                        })
+                    
+                    return JsonResponse(response_data)
+
+                # Si la transferencia requiere OTP, redirigir a la página de verificación
+                if self.object.status == 'PDNG':
+                    messages.info(self.request, 'Se requiere verificación OTP para completar la transferencia')
+                    return redirect('transfer_sca', payment_id=self.object.payment_id)
+                
+                messages.success(self.request, 'Transferencia SEPA creada exitosamente')
+                return super().form_valid(form)
+
+        except Exception as e:
+            # Si algo falla, registrar el error
+            error_id = str(uuid.uuid4())
+            LogTransferencia.objects.create(
+                registro=error_id,
+                tipo_log='ERROR',
+                contenido=f'Error al crear transferencia SEPA: {str(e)}'
+            )
+            if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'error': 'Error al procesar la transferencia: ' + str(e)
+                }, status=500)
+            messages.error(self.request, f'Error al procesar la transferencia: {str(e)}')
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'error': 'Datos de formulario inválidos',
+                'errors': form.errors
+            }, status=400)
+        return super().form_invalid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Nueva Transferencia Interna'
+        return context
 
 class TransferDetailView(LoginRequiredMixin, generic.DetailView):
     model = Transfer
@@ -203,152 +290,6 @@ class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
     def get_debtor_accounts(self, debtor_id):
         """Obtener las cuentas de un deudor específico"""
         return DebtorAccount.objects.filter(debtor_id=debtor_id)
-
-    def form_valid(self, form):
-        try:
-            with transaction.atomic():
-                # Obtener los datos del formulario
-                cuenta_origen = form.cleaned_data['cuenta_origen']
-                cuenta_destino = form.cleaned_data['cuenta_destino']
-                monto = form.cleaned_data['monto']
-                concepto = form.cleaned_data['concepto']
-                deudor_destino = cuenta_destino.debtor
-
-                # Validar que las cuentas sean diferentes
-                if cuenta_origen == cuenta_destino:
-                    if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return JsonResponse({
-                            'error': 'No se puede transferir a la misma cuenta'
-                        }, status=400)
-                    form.add_error(None, 'No se puede transferir a la misma cuenta')
-                    return self.form_invalid(form)
-
-                # Validar saldo suficiente
-                if cuenta_origen.balance < monto:
-                    if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return JsonResponse({
-                            'error': 'Saldo insuficiente en la cuenta origen'
-                        }, status=400)
-                    form.add_error(None, 'Saldo insuficiente en la cuenta origen')
-                    return self.form_invalid(form)
-
-                # Generar payment_id
-                payment_id = str(uuid.uuid4())
-                
-                # Crear PaymentIdentification
-                payment_identification = PaymentIdentification.objects.create(
-                    end_to_end_id=f'E2E-{payment_id[:8]}',
-                    instruction_id=f'INST-{payment_id[:8]}'
-                )
-
-                # Crear o obtener un Creditor basado en el Debtor destino
-                creditor, created = Creditor.objects.get_or_create(
-                    name=deudor_destino.name,
-                    defaults={
-                        'address': PostalAddress.objects.create(
-                            country=deudor_destino.address.country,
-                            street=deudor_destino.address.street,
-                            city=deudor_destino.address.city
-                        )
-                    }
-                )
-
-                # Crear o obtener CreditorAccount basada en la DebtorAccount destino
-                creditor_account, created = CreditorAccount.objects.get_or_create(
-                    creditor=creditor,
-                    iban=cuenta_destino.iban,
-                    defaults={
-                        'currency': cuenta_destino.currency
-                    }
-                )
-
-                # Crear o obtener CreditorAgent para transferencias internas
-                creditor_agent, created = CreditorAgent.objects.get_or_create(
-                    bic='INTERNALBIC',
-                    defaults={
-                        'financial_institution_id': 'INTERNAL001',
-                        'other_information': 'Agente para transferencias internas'
-                    }
-                )
-                
-                # Crear la transferencia
-                self.object = Transfer.objects.create(
-                    payment_id=payment_id,
-                    debtor=cuenta_origen.debtor,
-                    debtor_account=cuenta_origen,
-                    creditor=creditor,  # Usamos el creditor creado
-                    creditor_account=creditor_account,  # Usamos la cuenta creditor creada
-                    creditor_agent=creditor_agent,  # Agregamos el agente financiero interno
-                    instructed_amount=monto,
-                    currency=cuenta_origen.currency,
-                    purpose_code='OTHR',  # Código para transferencias internas
-                    requested_execution_date=timezone.now().date(),
-                    remittance_information_unstructured=concepto,
-                    status='ACSC',  # Completada exitosamente
-                    payment_identification=payment_identification
-                )
-
-                # Crear movimiento de débito en cuenta origen
-                AccountMovement.objects.create(
-                    account=cuenta_origen,
-                    tipo='PAYMENT',
-                    monto=monto
-                )
-
-                # Crear movimiento de crédito en cuenta destino
-                AccountMovement.objects.create(
-                    account=cuenta_destino,
-                    tipo='DEPOSIT',
-                    monto=monto
-                )
-
-                # Registrar en el log
-                LogTransferencia.objects.create(
-                    registro=self.object.payment_id,
-                    tipo_log='TRANSFER',
-                    contenido=f'Transferencia interna exitosa de {cuenta_origen.iban} a {cuenta_destino.iban} por {monto} {cuenta_origen.currency}'
-                )
-
-                if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                    return JsonResponse({
-                        'status': 'success',
-                        'payment_id': self.object.payment_id,
-                        'message': 'Transferencia realizada con éxito'
-                    })
-                    
-                messages.success(self.request, 'Transferencia interna realizada con éxito')
-                return super().form_valid(form)
-
-        except Exception as e:
-            # Si algo falla, registrar el error
-            error_id = str(uuid.uuid4())
-            LogTransferencia.objects.create(
-                registro=error_id,
-                tipo_log='ERROR',
-                contenido=f'Error en transferencia interna: {str(e)}'
-            )
-            
-            if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'error': f'Error al procesar la transferencia: {str(e)}'
-                }, status=500)
-                
-            messages.error(self.request, f'Error al procesar la transferencia: {str(e)}')            
-            form.add_error(None, f'Error al procesar la transferencia: {str(e)}')
-            return self.form_invalid(form)
-
-    def form_invalid(self, form):
-        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({
-                'error': 'Datos de formulario inválidos',
-                'errors': form.errors
-            }, status=400)
-        return super().form_invalid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = 'Nueva Transferencia Interna'
-        return context
 
 def get_accounts_by_debtor(request):
     """Vista para obtener las cuentas de un deudor vía AJAX"""
@@ -618,3 +559,50 @@ def send_transfer_conexion_view_gpt4(request, payment_id):
         )
         messages.error(request, f'Error al enviar transferencia al banco: {str(e)}')
         return redirect('transfer_detailGPT4', payment_id=payment_id)
+
+class TransferSCAView(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'api/GPT4/transfer_sca.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        payment_id = self.kwargs.get('payment_id')
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        context['transfer'] = transfer
+        context['otp_challenge'] = OTPChallenge.objects.filter(
+            payment_id=payment_id,
+            status='CREATED'
+        ).first()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        payment_id = self.kwargs.get('payment_id')
+        otp_code = request.POST.get('otp')
+        
+        try:
+            challenge = OTPChallenge.objects.get(
+                payment_id=payment_id,
+                status='CREATED'
+            )
+            
+            if challenge.otp != otp_code:
+                messages.error(request, 'Código OTP inválido')
+                return self.render_to_response(self.get_context_data())
+            
+            # Marcar el challenge como usado
+            challenge.status = 'USED'
+            challenge.save()
+            
+            # Actualizar el estado de la transferencia
+            transfer = Transfer.objects.get(payment_id=payment_id)
+            transfer.status = 'ACCP'
+            transfer.save()
+            
+            messages.success(request, 'Transferencia verificada exitosamente')
+            return redirect('transfer_detailGPT4', payment_id=payment_id)
+            
+        except OTPChallenge.DoesNotExist:
+            messages.error(request, 'Desafío OTP no encontrado o ya utilizado')
+            return self.render_to_response(self.get_context_data())
+        except Exception as e:
+            messages.error(request, f'Error al verificar la transferencia: {str(e)}')
+            return self.render_to_response(self.get_context_data())

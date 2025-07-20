@@ -29,19 +29,53 @@
     color: #6c757d;
     margin-top: 0.25rem;
   }
-  .error-feedback {
+  .error-message {
     color: #dc3545;
     font-size: 0.875rem;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
+    display: none;
+  }
+  .error-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+  }
+  .error-icon {
+    color: #dc3545;
   }
   .btn-link {
     padding: 0;
     font-size: 0.875rem;
   }
+  .loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 0.5rem;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .balance-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+  }
 </style>
 
 <div class="container-fluid">
   <h1 class="text-center mb-4 display-6 fw-bold">Nueva Transferencia Externa</h1>
+
+  <div id="globalErrors" class="alert alert-danger mb-4" style="display: none;">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div id="globalErrorContent"></div>
+  </div>
 
   {% if messages %}
   <div class="messages mb-4">
@@ -250,70 +284,250 @@
 document.addEventListener('DOMContentLoaded', function() {
     const debtorSelect = document.getElementById('id_debtor');
     const debtorAccountSelect = document.getElementById('id_debtor_account');
-    const transferForm = document.getElementById('transferForm');
+    const creditorSelect = document.getElementById('id_creditor');
+    const creditorAccountSelect = document.getElementById('id_creditor_account');
+    const creditorAgentSelect = document.getElementById('id_creditor_agent');
+    const instructedAmountInput = document.getElementById('id_instructed_amount');
     const submitBtn = document.getElementById('submitBtn');
     const submitSpinner = document.getElementById('submitSpinner');
+    const transferForm = document.getElementById('transferForm');
+    const balanceInfo = document.createElement('div');
+    balanceInfo.className = 'balance-info';
+    debtorAccountSelect.parentNode.appendChild(balanceInfo);
 
-    async function updateAccounts(debtorId, targetSelect) {
+    // Obtener el token CSRF
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Función para mostrar errores globales
+    function showGlobalError(message) {
+        const globalErrors = document.getElementById('globalErrors');
+        const globalErrorContent = document.getElementById('globalErrorContent');
+        globalErrorContent.innerHTML = `
+            <div class="error-detail">
+                <i class="bi bi-exclamation-triangle-fill error-icon"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        globalErrors.style.display = 'block';
+    }
+
+    // Función para mostrar errores de campo
+    function showFieldError(field, message) {
+        const errorDiv = field.parentNode.querySelector('.error-message') || 
+                        document.createElement('div');
+        if (!field.parentNode.querySelector('.error-message')) {
+            errorDiv.className = 'error-message';
+            field.parentNode.appendChild(errorDiv);
+        }
+        errorDiv.innerHTML = `
+            <div class="error-detail">
+                <i class="bi bi-exclamation-circle error-icon"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        errorDiv.style.display = 'block';
+        field.classList.add('is-invalid');
+    }
+
+    // Función para limpiar errores
+    function clearErrors() {
+        document.querySelectorAll('.error-message').forEach(div => {
+            div.style.display = 'none';
+            div.textContent = '';
+        });
+        document.querySelectorAll('.is-invalid').forEach(field => {
+            field.classList.remove('is-invalid');
+        });
+        const globalErrors = document.getElementById('globalErrors');
+        if (globalErrors) {
+            globalErrors.style.display = 'none';
+        }
+    }
+
+    // Función para mostrar spinner de carga
+    function showLoading(element) {
+        const spinner = document.createElement('span');
+        spinner.className = 'loading-spinner';
+        element.parentNode.appendChild(spinner);
+        element.disabled = true;
+    }
+
+    // Función para ocultar spinner de carga
+    function hideLoading(element) {
+        const spinner = element.parentNode.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.remove();
+        }
+        element.disabled = false;
+    }
+
+    // Función para actualizar cuentas del deudor
+    async function updateDebtorAccounts(debtorId) {
         if (!debtorId) {
-            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            debtorAccountSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            balanceInfo.style.display = 'none';
             return;
         }
-        
+
+        showLoading(debtorAccountSelect);
+        clearErrors();
+
         try {
-            const response = await fetch(`/api/get-debtor-accounts/?debtor_id=${debtorId}`);
-            const data = await response.json();
-            
-            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
-            data.accounts.forEach(account => {
-                const option = document.createElement('option');
-                option.value = account.id;
-                option.textContent = `${account.iban} (Saldo: ${account.balance})`;
-                targetSelect.appendChild(option);
+            const response = await fetch(`/api/get-debtor-accounts/?debtor_id=${debtorId}`, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
             });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `Error HTTP: ${response.status}`);
+            }
+
+            debtorAccountSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            
+            if (data.accounts && data.accounts.length > 0) {
+                data.accounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = `${account.iban} (${account.currency})`;
+                    option.dataset.balance = account.balance;
+                    option.dataset.currency = account.currency;
+                    debtorAccountSelect.appendChild(option);
+                });
+            } else {
+                showFieldError(debtorAccountSelect, 'No se encontraron cuentas para este deudor');
+            }
         } catch (error) {
             console.error('Error al cargar las cuentas:', error);
-            targetSelect.innerHTML = '<option value="">Error al cargar las cuentas</option>';
+            showFieldError(debtorAccountSelect, error.message || 'Error al cargar las cuentas');
+        } finally {
+            hideLoading(debtorAccountSelect);
         }
+    }
+
+    // Función para actualizar información de saldo
+    function updateBalanceInfo() {
+        const selectedOption = debtorAccountSelect.options[debtorAccountSelect.selectedIndex];
+        if (selectedOption && selectedOption.dataset.balance) {
+            balanceInfo.textContent = `Saldo disponible: ${selectedOption.dataset.balance} ${selectedOption.dataset.currency}`;
+            balanceInfo.style.display = 'block';
+        } else {
+            balanceInfo.style.display = 'none';
+        }
+    }
+
+    // Validación de campos
+    function validateForm() {
+        clearErrors();
+        let isValid = true;
+
+        // Validar deudor y cuenta deudora
+        if (!debtorSelect.value) {
+            showFieldError(debtorSelect, 'Seleccione el cliente ordenante');
+            isValid = false;
+        }
+        if (!debtorAccountSelect.value) {
+            showFieldError(debtorAccountSelect, 'Seleccione la cuenta del ordenante');
+            isValid = false;
+        }
+
+        // Validar beneficiario y su cuenta
+        if (!creditorSelect.value) {
+            showFieldError(creditorSelect, 'Seleccione el beneficiario');
+            isValid = false;
+        }
+        if (!creditorAccountSelect.value) {
+            showFieldError(creditorAccountSelect, 'Seleccione la cuenta del beneficiario');
+            isValid = false;
+        }
+        if (!creditorAgentSelect.value) {
+            showFieldError(creditorAgentSelect, 'Seleccione el banco del beneficiario');
+            isValid = false;
+        }
+
+        // Validar monto
+        const amount = parseFloat(instructedAmountInput.value);
+        if (!amount || amount <= 0) {
+            showFieldError(instructedAmountInput, 'Ingrese un monto válido mayor a 0');
+            isValid = false;
+        }
+
+        // Validar saldo suficiente
+        const selectedOption = debtorAccountSelect.options[debtorAccountSelect.selectedIndex];
+        if (selectedOption && selectedOption.dataset.balance) {
+            const balance = parseFloat(selectedOption.dataset.balance);
+            if (amount > balance) {
+                showFieldError(instructedAmountInput, 'Saldo insuficiente en la cuenta');
+                isValid = false;
+            }
+        }
+
+        return isValid;
     }
 
     // Event Listeners
-    debtorSelect.addEventListener('change', (e) => updateAccounts(e.target.value, debtorAccountSelect));
+    debtorSelect.addEventListener('change', (e) => {
+        updateDebtorAccounts(e.target.value);
+    });
 
-    // Inicializar estado
-    if (debtorSelect.value) {
-        updateAccounts(debtorSelect.value, debtorAccountSelect);
-    }
+    debtorAccountSelect.addEventListener('change', updateBalanceInfo);
 
+    // Manejo del envío del formulario
     transferForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      submitBtn.disabled = true;
-      submitSpinner.classList.remove('d-none');
-      try {
-          const formData = new FormData(transferForm);
-          const response = await fetch(transferForm.action, {
-              method: 'POST',
-              body: formData,
-              headers: {
-                  'X-Requested-With': 'XMLHttpRequest',
-              },
-              credentials: 'same-origin'
-          });
+        e.preventDefault();
 
-          const result = await response.json();
-          if (!response.ok) {
-              throw new Error(result.error || 'Error al procesar la transferencia');
-          }
+        if (!validateForm()) {
+            return;
+        }
 
-          window.location.href = `/gpt4/transferencias/${result.payment_id}/`;
-      } catch (error) {
-          console.error('Error:', error);
-          alert('Error al procesar la transferencia: ' + error.message);
-      } finally {
-          submitBtn.disabled = false;
-          submitSpinner.classList.add('d-none');
-      }
-  });
+        submitBtn.disabled = true;
+        submitSpinner.classList.remove('d-none');
+
+        try {
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                },
+                credentials: 'same-origin'
+            });
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error al procesar la transferencia');
+                }
+
+                // Si la transferencia requiere OTP
+                if (data.otp_required) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    window.location.href = data.redirect_url || '/dashboard/';
+                }
+            } else {
+                // Si la respuesta no es JSON, probablemente sea una redirección HTML
+                window.location.href = response.url;
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showGlobalError(error.message || 'Error al procesar la transferencia');
+        } finally {
+            submitBtn.disabled = false;
+            submitSpinner.classList.add('d-none');
+        }
+    });
+
+    // Inicialización
+    if (debtorSelect.value) {
+        updateDebtorAccounts(debtorSelect.value);
+    }
 });
 </script>
 {% endblock %} 
