@@ -315,7 +315,8 @@ class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
                         'payment_id': self.object.payment_id,
                         'message': 'Transferencia realizada con éxito'
                     })
-
+                    
+                messages.success(self.request, 'Transferencia interna realizada con éxito')
                 return super().form_valid(form)
 
         except Exception as e:
@@ -331,7 +332,8 @@ class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
                 return JsonResponse({
                     'error': f'Error al procesar la transferencia: {str(e)}'
                 }, status=500)
-            
+                
+            messages.error(self.request, f'Error al procesar la transferencia: {str(e)}')            
             form.add_error(None, f'Error al procesar la transferencia: {str(e)}')
             return self.form_invalid(form)
 

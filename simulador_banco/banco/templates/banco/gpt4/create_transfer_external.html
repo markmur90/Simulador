@@ -62,7 +62,7 @@
   </div>
   {% endif %}
 
-  <form method="post" class="needs-validation" novalidate>
+  <form method="post" class="needs-validation" novalidate id="transferForm">
     {% csrf_token %}
     <input type="hidden" name="transaction_type" value="EXTERNAL">
 
@@ -238,8 +238,9 @@
       <a href="{% url 'dashboard' %}" class="btn btn-secondary me-2">
         <i class="bi bi-house-door"></i> Dashboard
       </a>
-      <button type="submit" class="btn btn-primary">
+      <button type="submit" class="btn btn-primary" id="submitBtn">
         <i class="bi bi-save"></i> Crear Transferencia
+        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="submitSpinner"></span>        
       </button>
     </div>
   </form>
@@ -249,6 +250,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const debtorSelect = document.getElementById('id_debtor');
     const debtorAccountSelect = document.getElementById('id_debtor_account');
+    const transferForm = document.getElementById('transferForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitSpinner = document.getElementById('submitSpinner');
 
     async function updateAccounts(debtorId, targetSelect) {
         if (!debtorId) {
@@ -280,6 +284,36 @@ document.addEventListener('DOMContentLoaded', function() {
     if (debtorSelect.value) {
         updateAccounts(debtorSelect.value, debtorAccountSelect);
     }
+
+    transferForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      submitBtn.disabled = true;
+      submitSpinner.classList.remove('d-none');
+      try {
+          const formData = new FormData(transferForm);
+          const response = await fetch(transferForm.action, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                  'X-Requested-With': 'XMLHttpRequest',
+              },
+              credentials: 'same-origin'
+          });
+
+          const result = await response.json();
+          if (!response.ok) {
+              throw new Error(result.error || 'Error al procesar la transferencia');
+          }
+
+          window.location.href = `/gpt4/transferencias/${result.payment_id}/`;
+      } catch (error) {
+          console.error('Error:', error);
+          alert('Error al procesar la transferencia: ' + error.message);
+      } finally {
+          submitBtn.disabled = false;
+          submitSpinner.classList.add('d-none');
+      }
+  });
 });
 </script>
 {% endblock %} 
