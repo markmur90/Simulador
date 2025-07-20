@@ -10,6 +10,8 @@ EXEMPT_PATHS = {
     '/api/login/',
     '/api/token',
     '/frontend/transfer',
+    '/api/get-accounts-by-debtor/',
+    '/api/get-accounts-by-creditor/',  # Agregamos la nueva ruta
 }
 
 # Only enforce JWT on API endpoints.

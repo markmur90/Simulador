@@ -7,6 +7,30 @@
   .custom-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
   .custom-card-header { background: linear-gradient(45deg,#343a40,#495057); color: #fff; font-weight: 600; font-size: 1.3rem; padding: 1rem 1.5rem; border-top-left-radius: 1rem; border-top-right-radius: 1rem; }
   .custom-card-body { padding: 1.5rem; }
+  .balance-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+  }
+  .error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+  }
+  .loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 0.5rem;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
 </style>
 
 <div class="container-fluid">
@@ -15,10 +39,6 @@
   <form method="post" class="needs-validation" novalidate>
     {% csrf_token %}
 
-
-
-
-
     <div class="card custom-card mb-4">
       <div class="custom-card-header">Datos del Deudor</div>
       <div class="card-body custom-card-body">
@@ -26,11 +46,14 @@
           <div class="col-md-6">
             <label for="id_debtor" class="form-label">Deudor</label>
             {{ form.debtor }}
+            <div id="error_debtor" class="error-message"></div>
             <a href="{% url 'create_debtorGPT4' %}" class="btn btn-link">Crear nuevo deudor</a>
           </div>
           <div class="col-md-6">
             <label for="id_debtor_account" class="form-label">Cuenta del Deudor</label>
             {{ form.debtor_account }}
+            <div id="balance_debtor" class="balance-info"></div>
+            <div id="error_debtor_account" class="error-message"></div>
             <a href="{% url 'create_debtor_accountGPT4' %}" class="btn btn-link">Crear nueva cuenta</a>
           </div>
         </div>
@@ -44,16 +67,19 @@
           <div class="col-md-4">
             <label for="id_creditor" class="form-label">Acreedor</label>
             {{ form.creditor }}
+            <div id="error_creditor" class="error-message"></div>
             <a href="{% url 'create_creditorGPT4' %}" class="btn btn-link">Crear nuevo acreedor</a>
           </div>
           <div class="col-md-4">
             <label for="id_creditor_account" class="form-label">Cuenta del Acreedor</label>
             {{ form.creditor_account }}
+            <div id="error_creditor_account" class="error-message"></div>
             <a href="{% url 'create_creditor_accountGPT4' %}" class="btn btn-link">Crear nueva cuenta</a>
           </div>
           <div class="col-md-4">
             <label for="id_creditor_agent" class="form-label">Agente del Acreedor</label>
             {{ form.creditor_agent }}
+            <div id="error_creditor_agent" class="error-message"></div>
             <a href="{% url 'create_creditor_agentGPT4' %}" class="btn btn-link">Crear nuevo agente</a>
           </div>
         </div>
@@ -98,4 +124,185 @@
     </div>
   </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const debtorSelect = document.getElementById('id_debtor');
+    const debtorAccountSelect = document.getElementById('id_debtor_account');
+    const creditorSelect = document.getElementById('id_creditor');
+    const creditorAccountSelect = document.getElementById('id_creditor_account');
+    const balanceDebtorDiv = document.getElementById('balance_debtor');
+    const errorDebtorDiv = document.getElementById('error_debtor');
+    const errorDebtorAccountDiv = document.getElementById('error_debtor_account');
+    const errorCreditorDiv = document.getElementById('error_creditor');
+    const errorCreditorAccountDiv = document.getElementById('error_creditor_account');
+
+    function showLoading(select) {
+        const spinner = document.createElement('span');
+        spinner.className = 'loading-spinner';
+        select.parentNode.appendChild(spinner);
+        select.disabled = true;
+    }
+
+    function hideLoading(select) {
+        const spinner = select.parentNode.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.remove();
+        }
+        select.disabled = false;
+    }
+
+    function showError(errorDiv, message) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = 'block';
+    }
+
+    function clearError(errorDiv) {
+        errorDiv.textContent = '';
+        errorDiv.style.display = 'none';
+    }
+
+    async function updateDebtorAccounts(debtorId, targetSelect, balanceDiv, errorDiv) {
+        if (!debtorId) {
+            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            balanceDiv.textContent = '';
+            return;
+        }
+        
+        clearError(errorDiv);
+        showLoading(targetSelect);
+        
+        try {
+            const response = await fetch(`/api/get-accounts-by-debtor/?debtor_id=${debtorId}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin'
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `Error HTTP: ${response.status}`);
+            }
+            
+            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            
+            if (data.accounts && data.accounts.length > 0) {
+                data.accounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = `${account.iban} (${account.currency})`;
+                    option.dataset.balance = account.balance;
+                    option.dataset.currency = account.currency;
+                    targetSelect.appendChild(option);
+                });
+                
+                if (data.message) {
+                    console.log(data.message);
+                }
+            } else {
+                showError(errorDiv, data.message || 'No se encontraron cuentas para este deudor');
+            }
+        } catch (error) {
+            console.error('Error al cargar las cuentas:', error);
+            showError(errorDiv, error.message || 'Error al cargar las cuentas. Por favor, intente nuevamente.');
+            targetSelect.innerHTML = '<option value="">Error al cargar las cuentas</option>';
+        } finally {
+            hideLoading(targetSelect);
+        }
+    }
+
+    async function updateCreditorAccounts(creditorId, targetSelect, errorDiv) {
+        if (!creditorId) {
+            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            return;
+        }
+        
+        clearError(errorDiv);
+        showLoading(targetSelect);
+        
+        try {
+            const response = await fetch(`/api/get-accounts-by-creditor/?creditor_id=${creditorId}`, {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin'
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `Error HTTP: ${response.status}`);
+            }
+            
+            targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            
+            if (data.accounts && data.accounts.length > 0) {
+                data.accounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = `${account.iban} (${account.currency})`;
+                    targetSelect.appendChild(option);
+                });
+                
+                if (data.message) {
+                    console.log(data.message);
+                }
+            } else {
+                showError(errorDiv, data.message || 'No se encontraron cuentas para este acreedor');
+            }
+        } catch (error) {
+            console.error('Error al cargar las cuentas:', error);
+            showError(errorDiv, error.message || 'Error al cargar las cuentas. Por favor, intente nuevamente.');
+            targetSelect.innerHTML = '<option value="">Error al cargar las cuentas</option>';
+        } finally {
+            hideLoading(targetSelect);
+        }
+    }
+
+    function updateBalanceInfo(select, balanceDiv) {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption && selectedOption.dataset.balance) {
+            balanceDiv.textContent = `Saldo disponible: ${selectedOption.dataset.balance} ${selectedOption.dataset.currency}`;
+            balanceDiv.style.display = 'block';
+        } else {
+            balanceDiv.textContent = '';
+            balanceDiv.style.display = 'none';
+        }
+    }
+
+    // Event Listeners
+    debtorSelect.addEventListener('change', (e) => {
+        clearError(errorDebtorDiv);
+        updateDebtorAccounts(e.target.value, debtorAccountSelect, balanceDebtorDiv, errorDebtorAccountDiv);
+    });
+
+    debtorAccountSelect.addEventListener('change', () => {
+        clearError(errorDebtorAccountDiv);
+        updateBalanceInfo(debtorAccountSelect, balanceDebtorDiv);
+    });
+
+    creditorSelect.addEventListener('change', (e) => {
+        clearError(errorCreditorDiv);
+        updateCreditorAccounts(e.target.value, creditorAccountSelect, errorCreditorAccountDiv);
+    });
+
+    creditorAccountSelect.addEventListener('change', () => {
+        clearError(errorCreditorAccountDiv);
+    });
+
+    // Cargar las cuentas iniciales si hay un deudor o acreedor seleccionado
+    if (debtorSelect.value) {
+        updateDebtorAccounts(debtorSelect.value, debtorAccountSelect, balanceDebtorDiv, errorDebtorAccountDiv);
+    }
+    if (creditorSelect.value) {
+        updateCreditorAccounts(creditorSelect.value, creditorAccountSelect, errorCreditorAccountDiv);
+    }
+});
+</script>
 {% endblock %}

@@ -2,20 +2,29 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic, View
 from django.shortcuts import redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 import uuid
 from django.utils import timezone
 from django.db import transaction
+from django.contrib import messages
 
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
-    Transfer, AccountMovement, LogTransferencia
+    Transfer, AccountMovement, LogTransferencia, PaymentIdentification, PostalAddress
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,
     CreditorAgentForm, ClientIDForm, KidForm, TransferForm, TransferInternaForm,
     DebtorUpdateForm
 )
+
+from django.contrib.auth.decorators import login_required
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from io import BytesIO
 
 
 class DebtorListView(LoginRequiredMixin, generic.ListView):
@@ -108,7 +117,9 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
     model = Transfer
     form_class = TransferForm
     template_name = 'api/GPT4/create_transfer.html'
-    success_url = reverse_lazy('list_transferGPT4')
+    
+    def get_success_url(self):
+        return reverse_lazy('transfer_detailGPT4', kwargs={'payment_id': self.object.payment_id})
 
 
 class TransferDetailView(LoginRequiredMixin, generic.DetailView):
@@ -185,35 +196,96 @@ class DebtorDeleteView(LoginRequiredMixin, generic.DeleteView):
 class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'api/GPT4/create_transfer_interna.html'
     form_class = TransferInternaForm
-    success_url = reverse_lazy('list_transferGPT4')
+    
+    def get_success_url(self):
+        return reverse_lazy('transfer_detailGPT4', kwargs={'payment_id': self.object.payment_id})
 
     def get_debtor_accounts(self, debtor_id):
         """Obtener las cuentas de un deudor específico"""
         return DebtorAccount.objects.filter(debtor_id=debtor_id)
 
     def form_valid(self, form):
-        # Obtener los datos del formulario
-        cuenta_origen = form.cleaned_data['cuenta_origen']
-        cuenta_destino = form.cleaned_data['cuenta_destino']
-        monto = form.cleaned_data['monto']
-        concepto = form.cleaned_data['concepto']
-
         try:
-            # Iniciar transacción para asegurar la integridad
             with transaction.atomic():
+                # Obtener los datos del formulario
+                cuenta_origen = form.cleaned_data['cuenta_origen']
+                cuenta_destino = form.cleaned_data['cuenta_destino']
+                monto = form.cleaned_data['monto']
+                concepto = form.cleaned_data['concepto']
+                deudor_destino = cuenta_destino.debtor
+
+                # Validar que las cuentas sean diferentes
+                if cuenta_origen == cuenta_destino:
+                    if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'error': 'No se puede transferir a la misma cuenta'
+                        }, status=400)
+                    form.add_error(None, 'No se puede transferir a la misma cuenta')
+                    return self.form_invalid(form)
+
+                # Validar saldo suficiente
+                if cuenta_origen.balance < monto:
+                    if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return JsonResponse({
+                            'error': 'Saldo insuficiente en la cuenta origen'
+                        }, status=400)
+                    form.add_error(None, 'Saldo insuficiente en la cuenta origen')
+                    return self.form_invalid(form)
+
+                # Generar payment_id
+                payment_id = str(uuid.uuid4())
+                
+                # Crear PaymentIdentification
+                payment_identification = PaymentIdentification.objects.create(
+                    end_to_end_id=f'E2E-{payment_id[:8]}',
+                    instruction_id=f'INST-{payment_id[:8]}'
+                )
+
+                # Crear o obtener un Creditor basado en el Debtor destino
+                creditor, created = Creditor.objects.get_or_create(
+                    name=deudor_destino.name,
+                    defaults={
+                        'address': PostalAddress.objects.create(
+                            country=deudor_destino.address.country,
+                            street=deudor_destino.address.street,
+                            city=deudor_destino.address.city
+                        )
+                    }
+                )
+
+                # Crear o obtener CreditorAccount basada en la DebtorAccount destino
+                creditor_account, created = CreditorAccount.objects.get_or_create(
+                    creditor=creditor,
+                    iban=cuenta_destino.iban,
+                    defaults={
+                        'currency': cuenta_destino.currency
+                    }
+                )
+
+                # Crear o obtener CreditorAgent para transferencias internas
+                creditor_agent, created = CreditorAgent.objects.get_or_create(
+                    bic='INTERNALBIC',
+                    defaults={
+                        'financial_institution_id': 'INTERNAL001',
+                        'other_information': 'Agente para transferencias internas'
+                    }
+                )
+                
                 # Crear la transferencia
-                transfer = Transfer.objects.create(
-                    payment_id=str(uuid.uuid4()),
+                self.object = Transfer.objects.create(
+                    payment_id=payment_id,
                     debtor=cuenta_origen.debtor,
                     debtor_account=cuenta_origen,
-                    creditor=cuenta_destino.debtor,  # Usamos el deudor destino como acreedor
-                    creditor_account=cuenta_destino,  # Usamos la cuenta destino como cuenta acreedora
+                    creditor=creditor,  # Usamos el creditor creado
+                    creditor_account=creditor_account,  # Usamos la cuenta creditor creada
+                    creditor_agent=creditor_agent,  # Agregamos el agente financiero interno
                     instructed_amount=monto,
                     currency=cuenta_origen.currency,
                     purpose_code='OTHR',  # Código para transferencias internas
                     requested_execution_date=timezone.now().date(),
                     remittance_information_unstructured=concepto,
-                    status='ACSC'  # Completada exitosamente
+                    status='ACSC',  # Completada exitosamente
+                    payment_identification=payment_identification
                 )
 
                 # Crear movimiento de débito en cuenta origen
@@ -232,22 +304,44 @@ class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
 
                 # Registrar en el log
                 LogTransferencia.objects.create(
-                    registro=transfer.payment_id,
+                    registro=self.object.payment_id,
                     tipo_log='TRANSFER',
                     contenido=f'Transferencia interna exitosa de {cuenta_origen.iban} a {cuenta_destino.iban} por {monto} {cuenta_origen.currency}'
                 )
 
+                if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'status': 'success',
+                        'payment_id': self.object.payment_id,
+                        'message': 'Transferencia realizada con éxito'
+                    })
+
+                return super().form_valid(form)
+
         except Exception as e:
             # Si algo falla, registrar el error
+            error_id = str(uuid.uuid4())
             LogTransferencia.objects.create(
-                registro=str(uuid.uuid4()),
+                registro=error_id,
                 tipo_log='ERROR',
                 contenido=f'Error en transferencia interna: {str(e)}'
             )
+            
+            if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'error': f'Error al procesar la transferencia: {str(e)}'
+                }, status=500)
+            
             form.add_error(None, f'Error al procesar la transferencia: {str(e)}')
             return self.form_invalid(form)
 
-        return super().form_valid(form)
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'error': 'Datos de formulario inválidos',
+                'errors': form.errors
+            }, status=400)
+        return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -256,16 +350,269 @@ class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
 
 def get_accounts_by_debtor(request):
     """Vista para obtener las cuentas de un deudor vía AJAX"""
+    from django.contrib.auth.decorators import login_required
+    from django.utils.decorators import method_decorator
+
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'error': 'Debe iniciar sesión para acceder a esta funcionalidad',
+            'accounts': []
+        }, status=401)
+
     debtor_id = request.GET.get('debtor_id')
     if not debtor_id:
-        return JsonResponse({'accounts': []})
+        return JsonResponse({
+            'error': 'ID de deudor no proporcionado',
+            'accounts': []
+        }, status=400)
     
-    accounts = DebtorAccount.objects.filter(debtor_id=debtor_id)
-    accounts_data = [{
-        'id': account.id,
-        'iban': account.iban,
-        'balance': str(account.balance),
-        'currency': account.currency
-    } for account in accounts]
+    try:
+        # Verificar si el deudor existe
+        debtor = Debtor.objects.filter(id=debtor_id).first()
+        if not debtor:
+            return JsonResponse({
+                'error': 'Deudor no encontrado',
+                'accounts': []
+            }, status=404)
+
+        # Obtener las cuentas
+        accounts = DebtorAccount.objects.filter(debtor_id=debtor_id)
+        
+        if not accounts.exists():
+            return JsonResponse({
+                'message': 'El deudor no tiene cuentas asociadas',
+                'accounts': []
+            })
+
+        accounts_data = [{
+            'id': account.id,
+            'iban': account.iban,
+            'balance': str(account.balance),
+            'currency': account.currency
+        } for account in accounts]
+        
+        return JsonResponse({
+            'message': 'Cuentas obtenidas exitosamente',
+            'accounts': accounts_data
+        })
+
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("Error en get_accounts_by_debtor:", error_details)  # Para debugging
+        return JsonResponse({
+            'error': 'Error al obtener las cuentas. Por favor, contacte al administrador.',
+            'accounts': []
+        }, status=500)
+
+def get_accounts_by_creditor(request):
+    """Vista para obtener las cuentas de un acreedor vía AJAX"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'error': 'Debe iniciar sesión para acceder a esta funcionalidad',
+            'accounts': []
+        }, status=401)
+
+    creditor_id = request.GET.get('creditor_id')
+    if not creditor_id:
+        return JsonResponse({
+            'error': 'ID de acreedor no proporcionado',
+            'accounts': []
+        }, status=400)
     
-    return JsonResponse({'accounts': accounts_data})
+    try:
+        # Verificar si el acreedor existe
+        creditor = Creditor.objects.filter(id=creditor_id).first()
+        if not creditor:
+            return JsonResponse({
+                'error': 'Acreedor no encontrado',
+                'accounts': []
+            }, status=404)
+
+        # Obtener las cuentas
+        accounts = CreditorAccount.objects.filter(creditor_id=creditor_id)
+        
+        if not accounts.exists():
+            return JsonResponse({
+                'message': 'El acreedor no tiene cuentas asociadas',
+                'accounts': []
+            })
+
+        accounts_data = [{
+            'id': account.id,
+            'iban': account.iban,
+            'currency': account.currency
+        } for account in accounts]
+        
+        return JsonResponse({
+            'message': 'Cuentas obtenidas exitosamente',
+            'accounts': accounts_data
+        })
+
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print("Error en get_accounts_by_creditor:", error_details)
+        return JsonResponse({
+            'error': 'Error al obtener las cuentas. Por favor, contacte al administrador.',
+            'accounts': []
+        }, status=500)
+
+@login_required
+def descargar_pdf_gpt4(request, payment_id):
+    """Vista para descargar el PDF de una transferencia."""
+    try:
+        transfer = Transfer.objects.get(payment_id=payment_id)
+        
+        # Crear el PDF usando ReportLab
+        buffer = BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter)
+        elements = []
+        
+        # Estilos
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=16,
+            spaceAfter=30
+        )
+        
+        # Título
+        elements.append(Paragraph("Comprobante de Transferencia", title_style))
+        elements.append(Spacer(1, 20))
+        
+        # Datos de la transferencia
+        data = [
+            ["ID de Pago", transfer.payment_id],
+            ["Estado", transfer.get_status_display()],
+            ["Fecha", transfer.created_at.strftime("%d/%m/%Y %H:%M:%S")],
+            ["Monto", f"{transfer.instructed_amount} {transfer.currency}"],
+            ["Cuenta Origen", transfer.debtor_account.iban],
+            ["Titular Origen", transfer.debtor.name],
+            ["Cuenta Destino", transfer.creditor_account.iban],
+            ["Titular Destino", transfer.creditor.name],
+            ["Concepto", transfer.remittance_information_unstructured or ""],
+        ]
+        
+        # Crear tabla
+        table = Table(data, colWidths=[150, 350])
+        table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('TEXTCOLOR', (0, 0), (0, -1), colors.grey),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.lightgrey),
+            ('BOX', (0, 0), (-1, -1), 1, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('BACKGROUND', (0, 0), (0, -1), colors.whitesmoke),
+            ('PADDING', (0, 0), (-1, -1), 6),
+        ]))
+        
+        elements.append(table)
+        
+        # Generar PDF
+        doc.build(elements)
+        
+        # Obtener el valor del PDF del buffer y crear la respuesta
+        pdf = buffer.getvalue()
+        buffer.close()
+        
+        # Crear la respuesta HTTP con el PDF
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="transferencia_{payment_id}.pdf"'
+        response.write(pdf)
+        
+        return response
+        
+    except Transfer.DoesNotExist:
+        return HttpResponse("Transferencia no encontrada", status=404)
+    except Exception as e:
+        return HttpResponse(f"Error al generar PDF: {str(e)}", status=500)
+
+@login_required
+def send_transfer_view_gpt4(request, payment_id):
+    """Vista para enviar una transferencia."""
+    transfer = get_object_or_404(Transfer, payment_id=payment_id)
+    
+    try:
+        # Registrar el intento de envío
+        LogTransferencia.objects.create(
+            registro=transfer.payment_id,
+            tipo_log='TRANSFER',
+            contenido=f'Iniciando envío de transferencia {transfer.payment_id}'
+        )
+        
+        # Actualizar estado
+        transfer.status = 'ACSP'  # En proceso
+        transfer.save()
+        
+        messages.success(request, 'Transferencia enviada correctamente')
+        return redirect('transfer_detailGPT4', payment_id=payment_id)
+        
+    except Exception as e:
+        LogTransferencia.objects.create(
+            registro=transfer.payment_id,
+            tipo_log='ERROR',
+            contenido=f'Error al enviar transferencia: {str(e)}'
+        )
+        messages.error(request, f'Error al enviar transferencia: {str(e)}')
+        return redirect('transfer_detailGPT4', payment_id=payment_id)
+
+@login_required
+def send_transfer_simulator_view_gpt4(request, payment_id):
+    """Vista para enviar una transferencia al simulador."""
+    transfer = get_object_or_404(Transfer, payment_id=payment_id)
+    
+    try:
+        # Registrar el intento de envío
+        LogTransferencia.objects.create(
+            registro=transfer.payment_id,
+            tipo_log='TRANSFER',
+            contenido=f'Iniciando envío de transferencia {transfer.payment_id} al simulador'
+        )
+        
+        # Actualizar estado
+        transfer.status = 'ACSP'  # En proceso
+        transfer.save()
+        
+        messages.success(request, 'Transferencia enviada al simulador correctamente')
+        return redirect('transfer_detailGPT4', payment_id=payment_id)
+        
+    except Exception as e:
+        LogTransferencia.objects.create(
+            registro=transfer.payment_id,
+            tipo_log='ERROR',
+            contenido=f'Error al enviar transferencia al simulador: {str(e)}'
+        )
+        messages.error(request, f'Error al enviar transferencia al simulador: {str(e)}')
+        return redirect('transfer_detailGPT4', payment_id=payment_id)
+
+@login_required
+def send_transfer_conexion_view_gpt4(request, payment_id):
+    """Vista para enviar una transferencia al banco."""
+    transfer = get_object_or_404(Transfer, payment_id=payment_id)
+    
+    try:
+        # Registrar el intento de envío
+        LogTransferencia.objects.create(
+            registro=transfer.payment_id,
+            tipo_log='TRANSFER',
+            contenido=f'Iniciando envío de transferencia {transfer.payment_id} al banco'
+        )
+        
+        # Actualizar estado
+        transfer.status = 'ACSP'  # En proceso
+        transfer.save()
+        
+        messages.success(request, 'Transferencia enviada al banco correctamente')
+        return redirect('transfer_detailGPT4', payment_id=payment_id)
+        
+    except Exception as e:
+        LogTransferencia.objects.create(
+            registro=transfer.payment_id,
+            tipo_log='ERROR',
+            contenido=f'Error al enviar transferencia al banco: {str(e)}'
+        )
+        messages.error(request, f'Error al enviar transferencia al banco: {str(e)}')
+        return redirect('transfer_detailGPT4', payment_id=payment_id)

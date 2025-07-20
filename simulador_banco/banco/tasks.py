@@ -8,8 +8,8 @@ import openai
 from celery import shared_task
 from django.conf import settings
 from django.db import transaction
-
-from banco.models import DebtorAccount, Transfer
+from django.utils import timezone
+from .models import Transfer, LogTransferencia
 
 
 def analyze_transfer(transfer: Transfer) -> str:
@@ -55,65 +55,30 @@ def send_telegram_notification(message: str) -> None:
 
 @shared_task
 def process_transfer_task(transfer_id: int):
-    """
-    A los 5 minutos, procesa la transferencia:
-     1) Verifica fondos
-     2) Descuenta el monto del DebtorAccount.balance
-     3) Actualiza status a 'ACCP' o 'RJCT'
-     4) Notifica a la API externa
-     5) Realiza análisis con OpenAI y notifica por Telegram
-    """
+    """Procesa una transferencia de forma asíncrona."""
     try:
-        transfer = (
-            Transfer.objects.select_related('debtor_account')
-            .get(id=transfer_id)
+        transfer = Transfer.objects.get(id=transfer_id)
+        
+        # Simular procesamiento
+        transfer.status = 'ACSC'  # Completada con éxito
+        transfer.save()
+        
+        # Registrar en el log
+        LogTransferencia.objects.create(
+            registro=transfer.payment_id,
+            tipo_log='TRANSFER',
+            contenido=f'Transferencia procesada exitosamente: {transfer.payment_id}'
         )
+        
     except Transfer.DoesNotExist:
-        return
-
-    if transfer.status != 'PDNG':
-        return
-
-    # Bloque atómico para evitar race conditions
-    with transaction.atomic():
-        acct = (
-            DebtorAccount.objects.select_for_update()
-            .get(id=transfer.debtor_account.id)
+        LogTransferencia.objects.create(
+            registro='ERROR',
+            tipo_log='ERROR',
+            contenido=f'Transferencia no encontrada: {transfer_id}'
         )
-
-        # 1) Verificar fondos
-        if acct.balance < transfer.instructed_amount:
-            transfer.status = 'RJCT'
-            transfer.save(update_fields=['status'])
-            return
-
-        # 2) Descontar y actualizar
-        acct.balance -= transfer.instructed_amount
-        acct.save(update_fields=['balance'])
-
-        # 3) Marcar como ejecutada
-        transfer.status = 'ACCP'
-        transfer.save(update_fields=['status'])
-
-    # 4) Notificar a la API externa
-    payload = {
-        "payment_id": transfer.payment_id,
-        "status": transfer.status,
-        "debtor_account": acct.iban,
-        "amount": str(transfer.instructed_amount),
-    }
-    try:
-        requests.post(
-            settings.SIMULATOR_NOTIFY_URL,
-            json=payload,
-            timeout=5
+    except Exception as e:
+        LogTransferencia.objects.create(
+            registro='ERROR',
+            tipo_log='ERROR',
+            contenido=f'Error procesando transferencia {transfer_id}: {str(e)}'
         )
-    except requests.RequestException:
-        # Podríamos reintentar o loguear el fallo
-        pass
-
-    # 5) Análisis y notificación
-    analysis = analyze_transfer(transfer)
-    send_telegram_notification(
-        f"Transferencia {transfer.payment_id}: {analysis}"
-    )

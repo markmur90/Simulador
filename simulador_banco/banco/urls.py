@@ -28,7 +28,8 @@ urlpatterns = [
     path('api/transferencias/entrantes/', views.api_transfer_incoming),
     path('api/send-transfer', views.api_send_transfer),
     path('api/status-transfer', views.api_status_transfer),
-    # path('api/transferencia/', views.recibir_transferencia, name='api_transferencia'),
+    path('api/get-accounts-by-debtor/', gpt_views.get_accounts_by_debtor, name='get_accounts_by_debtor'),
+    path('api/get-accounts-by-creditor/', gpt_views.get_accounts_by_creditor, name='get_accounts_by_creditor'),
     path('frontend/transfer', views.transfer_simulator_frontend, name='transfer_simulator_frontend'),
 
     # Gestión de usuarios
@@ -71,14 +72,15 @@ urlpatterns = [
     path('gpt4/transferencias/nuevo/', gpt_views.TransferCreateView.as_view(), name='create_transferGPT4'),
     path('gpt4/transferencias/<str:payment_id>/', gpt_views.TransferDetailView.as_view(), name='transfer_detailGPT4'),
     path('gpt4/transferencias/<str:payment_id>/editar/', gpt_views.TransferUpdateView.as_view(), name='edit_transferGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/pdf/', gpt_views.descargar_pdf_gpt4, name='descargar_pdfGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/enviar/', gpt_views.send_transfer_view_gpt4, name='send_transfer_viewGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/enviar-simulador/', gpt_views.send_transfer_simulator_view_gpt4, name='send_transfer_simulator_viewGPT4'),
+    path('gpt4/transferencias/<str:payment_id>/enviar-banco/', gpt_views.send_transfer_conexion_view_gpt4, name='send_transfer_conexion_viewGPT4'),
     
     # URLs para transferencias internas
     path('gpt4/transferencias/interna/nueva/', 
          gpt_views.TransferInternaCreateView.as_view(), 
          name='create_transfer_internaGPT4'),
-    path('api/get-accounts-by-debtor/', 
-         gpt_views.get_accounts_by_debtor, 
-         name='get_accounts_by_debtor'),
 ]
 
 urlpatterns += [

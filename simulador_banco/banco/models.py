@@ -137,10 +137,10 @@ class Party(models.Model):
         return self.name
 
 class Account(models.Model):
-    iban = EncryptedCharField(
+    iban = models.CharField(
         max_length=34, unique=True,
         validators=[iban_validator],
-        help_text="IBAN cifrado"
+        help_text="IBAN de la cuenta"
     )
     currency = models.CharField(
         max_length=3, default='EUR',
