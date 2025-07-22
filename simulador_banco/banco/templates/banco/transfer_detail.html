@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+{% block title %}Detalle de Transferencia{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'transfer_list' %}">Transferencias</a></li>
+                    <li class="breadcrumb-item active">Detalle</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Transferencia #{{ transfer.payment_id }}</h5>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-file-pdf"></i> Descargar PDF
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item" href="{% url 'descargar_pdf_gpt4' transfer.payment_id %}?format=A4">
+                                    Formato A4
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'descargar_pdf_gpt4' transfer.payment_id %}?format=letter">
+                                    Formato Carta
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Información General</h6>
+                            <dl class="row">
+                                <dt class="col-sm-4">Estado</dt>
+                                <dd class="col-sm-8">
+                                    <span class="badge {% if transfer.status == 'ACSC' %}bg-success
+                                                      {% elif transfer.status == 'RJCT' %}bg-danger
+                                                      {% elif transfer.status == 'PDNG' %}bg-warning
+                                                      {% else %}bg-info{% endif %}">
+                                        {{ transfer.get_status_display }}
+                                    </span>
+                                </dd>
+
+                                <dt class="col-sm-4">Fecha</dt>
+                                <dd class="col-sm-8">{{ transfer.created_at|date:"d/m/Y H:i:s" }}</dd>
+
+                                <dt class="col-sm-4">Monto</dt>
+                                <dd class="col-sm-8">{{ transfer.currency }} {{ transfer.instructed_amount|floatformat:2 }}</dd>
+
+                                <dt class="col-sm-4">Concepto</dt>
+                                <dd class="col-sm-8">{{ transfer.remittance_information_unstructured|default:"-" }}</dd>
+                            </dl>
+                        </div>
+
+                        <div class="col-md-6">
+                            <h6 class="text-muted mb-3">Detalles de Cuentas</h6>
+                            <div class="card mb-3 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Cuenta Origen</h6>
+                                    <p class="card-text">
+                                        <strong>IBAN:</strong> {{ transfer.debtor_account.iban }}<br>
+                                        <strong>Titular:</strong> {{ transfer.debtor.name }}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-subtitle mb-2 text-muted">Cuenta Destino</h6>
+                                    <p class="card-text">
+                                        <strong>IBAN:</strong> {{ transfer.creditor_account.iban }}<br>
+                                        <strong>Titular:</strong> {{ transfer.creditor.name }}<br>
+                                        <strong>Banco:</strong> {{ transfer.creditor_agent.name }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if transfer.logs.exists %}
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Historial de la Transferencia</h5>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        {% for log in transfer.logs.all|dictsort:"created_at" %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker"></div>
+                            <div class="timeline-content">
+                                <h6 class="timeline-title">{{ log.get_tipo_log_display }}</h6>
+                                <p class="timeline-text">
+                                    {{ log.contenido }}<br>
+                                    <small class="text-muted">{{ log.created_at|date:"d/m/Y H:i:s" }}</small>
+                                </p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% block extra_css %}
+<style>
+    .timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    .timeline-item {
+        padding-left: 40px;
+        position: relative;
+        margin-bottom: 20px;
+    }
+    .timeline-marker {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #007bff;
+        border: 3px solid #fff;
+        box-shadow: 0 0 0 3px #007bff;
+    }
+    .timeline-item:not(:last-child) .timeline-marker:before {
+        content: '';
+        width: 3px;
+        background: #007bff;
+        position: absolute;
+        left: 6px;
+        top: 15px;
+        height: calc(100% + 20px);
+    }
+    .timeline-content {
+        padding: 0 15px;
+    }
+    .timeline-title {
+        margin-bottom: 5px;
+    }
+    .timeline-text {
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% endblock %} 

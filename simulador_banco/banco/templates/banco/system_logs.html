@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Logs del Sistema{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Filtros</h5>
+            <form method="get" class="row g-3">
+                <div class="col-md-2">
+                    <label for="level" class="form-label">Nivel</label>
+                    <select name="level" id="level" class="form-select">
+                        <option value="">Todos</option>
+                        {% for level_code, level_name in level_choices %}
+                        <option value="{{ level_code }}" {% if level_code == selected_level %}selected{% endif %}>
+                            {{ level_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="action" class="form-label">Acción</label>
+                    <select name="action" id="action" class="form-select">
+                        <option value="">Todas</option>
+                        {% for action_code, action_name in action_choices %}
+                        <option value="{{ action_code }}" {% if action_code == selected_action %}selected{% endif %}>
+                            {{ action_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="user" class="form-label">Usuario</label>
+                    <select name="user" id="user" class="form-select">
+                        <option value="">Todos</option>
+                        {% for user in users %}
+                        <option value="{{ user.id }}" {% if user.id|stringformat:"s" == selected_user %}selected{% endif %}>
+                            {{ user.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="start_date" class="form-label">Fecha Inicio</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" 
+                           value="{{ start_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="end_date" class="form-label">Fecha Fin</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date" 
+                           value="{{ end_date|date:'Y-m-d' }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a href="{% url 'system_logs' %}" class="btn btn-secondary ms-2">Limpiar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tabla de Logs -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Logs del Sistema</h5>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Nivel</th>
+                            <th>Acción</th>
+                            <th>Usuario</th>
+                            <th>IP</th>
+                            <th>Descripción</th>
+                            <th>Datos Adicionales</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr>
+                            <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                            <td>
+                                <span class="badge bg-{{ log.level|lower }}">
+                                    {{ log.get_level_display }}
+                                </span>
+                            </td>
+                            <td>{{ log.get_action_display }}</td>
+                            <td>{{ log.user.username|default:"Sistema" }}</td>
+                            <td>{{ log.ip_address|default:"-" }}</td>
+                            <td>{{ log.description }}</td>
+                            <td>
+                                {% if log.additional_data %}
+                                <button type="button" class="btn btn-sm btn-info" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#logModal{{ log.id }}">
+                                    Ver detalles
+                                </button>
+                                <!-- Modal -->
+                                <div class="modal fade" id="logModal{{ log.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Datos Adicionales</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <pre>{{ log.additional_data|pprint }}</pre>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No se encontraron logs con los filtros seleccionados.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

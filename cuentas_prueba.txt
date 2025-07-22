@@ -1,0 +1,64 @@
+CUENTAS DE PRUEBA - NO USAR EN PRODUCCIÓN
+=====================================
+
+NOTA IMPORTANTE: Estos datos son únicamente para pruebas y simulación.
+NO utilizar en un entorno de producción.
+
+1. CUENTA CLAUDIA KLAR
+---------------------
+Nombre: Claudia Klar
+IBAN: DE00 5007 0010 0200 0402 24
+BIC: DEUTDEFFXXX
+SecurityAccountID: 100 2040040 00
+
+2. CUENTA TOM WINTER
+-------------------
+Nombre: Tom Winter
+IBAN: DE00 5007 0010 0200 0448 74
+BIC: DEUTDEFFXXX
+Email: TomWinter@example.com
+Teléfono: 
+  - +49 170 123456
+  - 069 1234567
+FKN+PIN: 10020446900014432
+SecurityAccountID: 100 2044690 00
+Saldo: 1400.95
+Ingreso Mensual: 7000
+
+3. CUENTA BARONESS ANNA MEYER
+----------------------------
+Nombre: Baroness Anna Meyer
+IBAN: DE00 5007 0010 0200 0448 24
+BIC: DEUTDEFFXXX
+Email: AnnaMeyer@example.com
+Teléfono: 
+  - +49 170 123456
+  - 069 1234567
+SecurityAccountID: 100 2044640 00 20681
+Saldo: 100.95
+Ingreso Mensual: 700
+
+
+Cliente: Juan Pérez
+
+
+
+
+Beneficiario: Deutsche Bank AG
+Cuenta: DE89370400440532013000
+Banco: DEUTDEFF
+
+
+DATOS COMUNES PARA TODAS LAS CUENTAS
+----------------------------------
+IBAN de Contraparte: DE10 0100 0000 0000 0221 37
+Transaction Code: 123
+Domain Code: BFWA
+Family Code: CCRD
+Sub Family Code: CWDL
+
+=====================================
+ADVERTENCIA DE SEGURIDAD:
+Estos datos son únicamente para propósitos de prueba y simulación.
+NO utilizar en un entorno de producción real.
+Todos los datos deben ser cifrados y asegurados en producción. 

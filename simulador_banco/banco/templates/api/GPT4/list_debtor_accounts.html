@@ -14,17 +14,19 @@
 </style>
 
 <div class="container-fluid">
-  <h1 class="text-center display-6 fw-bold mb-4">GPT4 Cuentas de Deudor Registradas</h1>
+  <h1 class="text-center display-6 fw-bold mb-4">GPT4 Cuentas de Deudores Registradas</h1>
 
   <div class="card custom-card">
     <div class="custom-card-header d-flex justify-content-between align-items-center">
       <h2 class="mb-0">Listado de Cuentas</h2>
-      <a href="{% url 'create_debtor_accountGPT4' %}" class="btn btn-light btn-sm">
-        <i class="bi bi-plus-circle"></i> Nueva Cuenta
-      </a>
-      <a href="{% url 'dashboard' %}" class="btn btn-secondary me-2">
-        <i class="bi bi-house-door"></i> Dashboard
-      </a>      
+      <div>
+        <a href="{% url 'create_debtor_accountGPT4' %}" class="btn btn-light btn-sm me-2">
+          <i class="bi bi-plus-circle"></i> Nueva Cuenta
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary me-2">
+            <i class="bi bi-house-door"></i> Dashboard
+        </a>
+      </div>
     </div>
     <div class="card-body custom-card-body">
       <div class="table-responsive">
@@ -34,6 +36,8 @@
               <th>Deudor</th>
               <th>IBAN</th>
               <th>Moneda</th>
+              <th>Saldo</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -42,10 +46,21 @@
               <td>{{ account.debtor.name }}</td>
               <td>{{ account.iban }}</td>
               <td>{{ account.currency }}</td>
+              <td>{{ account.balance }}</td>
+              <td>
+                <div class="btn-group">
+                  <a href="{% url 'estado_cuenta' account.id %}" class="btn btn-info btn-sm">
+                    <i class="fas fa-file-alt"></i> Estado de Cuenta
+                  </a>
+                  <a href="{% url 'estado_cuenta_pdf' account.id %}" class="btn btn-success btn-sm">
+                    <i class="fas fa-file-pdf"></i> PDF
+                  </a>
+                </div>
+              </td>
             </tr>
             {% empty %}
             <tr>
-              <td colspan="3" class="text-center py-4">
+              <td colspan="5" class="text-center py-4">
                 <div class="alert alert-info mb-0">
                   <i class="bi bi-info-circle"></i> No hay registros.
                 </div>

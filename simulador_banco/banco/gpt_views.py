@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic, View
@@ -8,9 +9,12 @@ from django.utils import timezone
 from django.db import transaction
 from django.contrib import messages
 
+logger = logging.getLogger(__name__)
+
 from .models import (
     ClientID, CreditorAgent, Debtor, DebtorAccount, Creditor, CreditorAccount, Kid,
-    Transfer, AccountMovement, LogTransferencia, PaymentIdentification, PostalAddress
+    Transfer, AccountMovement, LogTransferencia, PaymentIdentification, PostalAddress,
+    OTPChallenge
 )
 from .forms import (
     DebtorForm, DebtorAccountForm, CreditorForm, CreditorAccountForm,
@@ -119,16 +123,22 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
     template_name = 'api/GPT4/create_transfer.html'
     
     def get_success_url(self):
+        logger.debug(f"Generando URL de éxito para payment_id: {self.object.payment_id}")
         return reverse_lazy('transfer_detailGPT4', kwargs={'payment_id': self.object.payment_id})
 
     def form_valid(self, form):
+        logger.debug("Iniciando form_valid en TransferCreateView")
         try:
             with transaction.atomic():
+                logger.debug("Iniciando transacción atómica")
                 # Validar saldo suficiente
                 debtor_account = form.cleaned_data['debtor_account']
                 amount = form.cleaned_data['instructed_amount']
                 
+                logger.debug(f"Validando saldo - Cuenta: {debtor_account.iban}, Saldo: {debtor_account.balance}, Monto solicitado: {amount}")
+                
                 if debtor_account.balance < amount:
+                    logger.debug("Error: Saldo insuficiente")
                     if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                         return JsonResponse({
                             'error': 'Saldo insuficiente en la cuenta origen'
@@ -150,9 +160,13 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
                     'remittance_information_unstructured': form.cleaned_data['remittance_information_unstructured'],
                 }
 
+                logger.debug(f"Datos preparados para TransferService: {transfer_data}")
+
                 # Usar TransferService para procesar la transferencia
                 from services.transfer_services import TransferService
+                logger.debug("Llamando a TransferService.ingest_transfer")
                 self.object = TransferService.ingest_transfer(transfer_data)
+                logger.debug(f"Transferencia creada con payment_id: {self.object.payment_id}")
 
                 if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     response_data = {
@@ -162,11 +176,13 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
                     
                     # Si la transferencia requiere OTP, incluir la información necesaria
                     if self.object.status == 'PDNG':
+                        logger.debug("Transferencia requiere OTP")
                         response_data.update({
                             'otp_required': True,
                             'redirect_url': reverse_lazy('transfer_sca', kwargs={'payment_id': self.object.payment_id})
                         })
                     else:
+                        logger.debug("Transferencia no requiere OTP")
                         response_data.update({
                             'redirect_url': self.get_success_url()
                         })
@@ -175,19 +191,28 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
 
                 # Si la transferencia requiere OTP, redirigir a la página de verificación
                 if self.object.status == 'PDNG':
+                    logger.debug("Redirigiendo a verificación OTP")
                     messages.info(self.request, 'Se requiere verificación OTP para completar la transferencia')
                     return redirect('transfer_sca', payment_id=self.object.payment_id)
                 
+                logger.debug("Transferencia creada exitosamente")
                 messages.success(self.request, 'Transferencia SEPA creada exitosamente')
                 return super().form_valid(form)
 
         except Exception as e:
-            # Si algo falla, registrar el error
+            import traceback
+            logger.error("Error en TransferCreateView:")
+            logger.error(f"Tipo de error: {type(e).__name__}")
+            logger.error(f"Mensaje de error: {str(e)}")
+            logger.error("Traceback completo:")
+            logger.error(traceback.format_exc())
+            
+            # Registrar el error
             error_id = str(uuid.uuid4())
             LogTransferencia.objects.create(
                 registro=error_id,
                 tipo_log='ERROR',
-                contenido=f'Error al crear transferencia SEPA: {str(e)}'
+                contenido=f'Error al crear transferencia SEPA: {str(e)}\n{traceback.format_exc()}'
             )
             if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                 return JsonResponse({
@@ -197,6 +222,8 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
             return self.form_invalid(form)
 
     def form_invalid(self, form):
+        logger.debug("Formulario inválido en TransferCreateView")
+        logger.debug(f"Errores del formulario: {form.errors}")
         if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'error': 'Datos de formulario inválidos',
@@ -205,6 +232,7 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
         return super().form_invalid(form)
 
     def get_context_data(self, **kwargs):
+        logger.debug("Obteniendo context data en TransferCreateView")
         context = super().get_context_data(**kwargs)
         context['title'] = 'Nueva Transferencia Interna'
         return context
@@ -564,17 +592,28 @@ class TransferSCAView(LoginRequiredMixin, generic.TemplateView):
     template_name = 'api/GPT4/transfer_sca.html'
 
     def get_context_data(self, **kwargs):
+        logger.debug("Obteniendo context data en TransferSCAView")
         context = super().get_context_data(**kwargs)
         payment_id = self.kwargs.get('payment_id')
         transfer = get_object_or_404(Transfer, payment_id=payment_id)
         context['transfer'] = transfer
-        context['otp_challenge'] = OTPChallenge.objects.filter(
+        
+        # Buscar el challenge OTP activo
+        otp_challenge = OTPChallenge.objects.filter(
             payment_id=payment_id,
             status='CREATED'
         ).first()
+        
+        if otp_challenge:
+            logger.debug(f"OTP Challenge encontrado para payment_id: {payment_id}")
+        else:
+            logger.debug(f"No se encontró OTP Challenge para payment_id: {payment_id}")
+            
+        context['otp_challenge'] = otp_challenge
         return context
 
     def post(self, request, *args, **kwargs):
+        logger.debug("Procesando POST en TransferSCAView")
         payment_id = self.kwargs.get('payment_id')
         otp_code = request.POST.get('otp')
         
@@ -585,6 +624,7 @@ class TransferSCAView(LoginRequiredMixin, generic.TemplateView):
             )
             
             if challenge.otp != otp_code:
+                logger.debug(f"Código OTP inválido para payment_id: {payment_id}")
                 messages.error(request, 'Código OTP inválido')
                 return self.render_to_response(self.get_context_data())
             
@@ -597,12 +637,15 @@ class TransferSCAView(LoginRequiredMixin, generic.TemplateView):
             transfer.status = 'ACCP'
             transfer.save()
             
+            logger.debug(f"Transferencia {payment_id} verificada exitosamente")
             messages.success(request, 'Transferencia verificada exitosamente')
             return redirect('transfer_detailGPT4', payment_id=payment_id)
             
         except OTPChallenge.DoesNotExist:
+            logger.error(f"Desafío OTP no encontrado para payment_id: {payment_id}")
             messages.error(request, 'Desafío OTP no encontrado o ya utilizado')
             return self.render_to_response(self.get_context_data())
         except Exception as e:
+            logger.error(f"Error al verificar la transferencia: {str(e)}")
             messages.error(request, f'Error al verificar la transferencia: {str(e)}')
             return self.render_to_response(self.get_context_data())

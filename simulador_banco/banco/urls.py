@@ -42,6 +42,12 @@ urlpatterns = [
     path('cuentas/<int:account_id>/pago/', views.account_movement_create, {'tipo': 'PAYMENT'}, name='pago_cuenta'),
     path('cuentas/<int:account_id>/estado/', views.estado_cuenta, name='estado_cuenta'),
     path('cuentas/<int:account_id>/estado/pdf/', views.estado_cuenta_pdf, name='estado_cuenta_pdf'),
+    path('cuentas-acreedor/<int:account_id>/estado/', views.estado_cuenta_acreedor, name='estado_cuenta_acreedor'),
+    path('cuentas-acreedor/<int:account_id>/estado/pdf/', views.estado_cuenta_acreedor_pdf, name='estado_cuenta_acreedor_pdf'),
+    
+    # Transferencias y PDFs
+    path('transferencias/<str:payment_id>/pdf/', views.descargar_pdf_gpt4, name='descargar_pdf_gpt4'),
+    path('transferencias/<str:payment_id>/detalle/', views.transfer_detail, name='transfer_detail'),
     
     # GPT4 CRUD
     path('gpt4/deudores/', gpt_views.DebtorListView.as_view(), name='list_debtorsGPT4'),
@@ -89,3 +95,10 @@ urlpatterns += [
     path('api/transferencia/',     views.api_send_transfer,     name='api_send_transfer'),
     path('api/transferencia/verify/', views.api_verify_otp,     name='api_verify_otp'),
 ]
+
+# URLs para estadísticas y logs
+path('dashboard/estadisticas/', views.dashboard_estadisticas, name='dashboard_estadisticas'),
+path('logs/sistema/', views.system_logs, name='system_logs'),
+path('estadisticas/usuario/<int:user_id>/', views.user_statistics, name='user_statistics'),
+path('estadisticas/usuario/', views.user_statistics, name='my_statistics'),
+path('estadisticas/transferencias/', views.transfer_statistics, name='transfer_statistics'),

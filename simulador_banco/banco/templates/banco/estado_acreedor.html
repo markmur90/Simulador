@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
-{% block title %}Estado de Cuenta{% endblock %}
+{% block title %}Estado de Cuenta Acreedor{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col">
-            <h1>Estado de cuenta de {{ account.debtor.name }}</h1>
+            <h1>Estado de cuenta de {{ account.creditor.name }}</h1>
             <p class="lead">IBAN: {{ account.iban }}</p>
             <div class="alert alert-info">
                 <strong>Saldo actual:</strong> {{ account.currency }} {{ account.balance|floatformat:2 }}
@@ -41,7 +41,7 @@
                                 <button class="btn btn-primary" type="submit">
                                     <i class="fas fa-filter"></i> Filtrar
                                 </button>
-                                <a href="{% url 'estado_cuenta_pdf' account.id %}?inicio={{ request.GET.inicio }}&fin={{ request.GET.fin }}&format={{ request.GET.format }}" 
+                                <a href="{% url 'estado_cuenta_acreedor_pdf' account.id %}?inicio={{ request.GET.inicio }}&fin={{ request.GET.fin }}&format={{ request.GET.format }}" 
                                    class="btn btn-success">
                                     <i class="fas fa-file-pdf"></i> Exportar PDF
                                 </a>
@@ -56,16 +56,8 @@
     <div class="row mb-4">
         <div class="col">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header">
                     <h5 class="mb-0">Movimientos</h5>
-                    <div class="btn-group">
-                        <a href="{% url 'deposito_cuenta' account.id %}" class="btn btn-success btn-sm">
-                            <i class="fas fa-plus"></i> Depósito
-                        </a>
-                        <a href="{% url 'pago_cuenta' account.id %}" class="btn btn-danger btn-sm">
-                            <i class="fas fa-minus"></i> Pago
-                        </a>
-                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -76,23 +68,29 @@
                                     <th>Tipo</th>
                                     <th>Monto</th>
                                     <th>Saldo</th>
+                                    <th>Detalles</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for m in movimientos %}
+                                {% for t in transfers %}
                                 <tr>
-                                    <td>{{ m.fecha|date:'Y-m-d H:i' }}</td>
+                                    <td>{{ t.created_at|date:'Y-m-d H:i' }}</td>
                                     <td>
-                                        <span class="badge {% if m.tipo == 'DEPOSIT' %}bg-success{% else %}bg-danger{% endif %}">
-                                            {{ m.get_tipo_display }}
+                                        <span class="badge {% if t.status == 'ACSC' %}bg-success{% else %}bg-warning{% endif %}">
+                                            {{ t.get_status_display }}
                                         </span>
                                     </td>
-                                    <td>{{ account.currency }} {{ m.monto|floatformat:2 }}</td>
-                                    <td>{{ account.currency }} {{ m.saldo_posterior|default:"-"|floatformat:2 }}</td>
+                                    <td>{{ t.currency }} {{ t.instructed_amount|floatformat:2 }}</td>
+                                    <td>{{ account.currency }} {{ t.saldo_posterior|default:"-"|floatformat:2 }}</td>
+                                    <td>
+                                        <a href="{% url 'transfer_detail' t.payment_id %}" class="btn btn-sm btn-info">
+                                            <i class="fas fa-info-circle"></i> Ver
+                                        </a>
+                                    </td>
                                 </tr>
                                 {% empty %}
                                 <tr>
-                                    <td colspan="4" class="text-center">No hay movimientos registrados</td>
+                                    <td colspan="5" class="text-center">No hay transferencias registradas</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -114,18 +112,15 @@
             const montoCell = row.cells[2];
             const saldoCell = row.cells[3];
             const monto = parseFloat(montoCell.textContent.replace(/[^0-9.-]+/g, ""));
-            const tipo = row.cells[1].textContent.trim();
+            const status = row.cells[1].textContent.trim();
             
-            if (tipo === 'Depósito') {
+            if (status === 'Ejecutada con éxito') {
                 saldo -= monto;
-            } else {
-                saldo += monto;
+                saldoCell.textContent = `${montoCell.textContent.split(' ')[0]} ${saldo.toFixed(2)}`;
             }
-            
-            saldoCell.textContent = `${montoCell.textContent.split(' ')[0]} ${saldo.toFixed(2)}`;
         });
     });
 </script>
 {% endblock %}
 
-{% endblock %}
+{% endblock %} 

@@ -24,6 +24,8 @@ from .models import (
     OficialBancario,
     OTPChallenge,
     PaymentIdentification,
+    Transfer,
+    LogTransferencia,
 )
 from .forms import UserCreateWithRoleForm
 from django.utils.crypto import get_random_string
@@ -31,6 +33,13 @@ from services.transfer_services import TransferService
 from django.core.exceptions import ValidationError
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
+from services.statistics_services import StatisticsService
+from django.contrib.auth.decorators import user_passes_test
+from django.utils import timezone
+from datetime import timedelta
+from .models import SystemLog
+from services.pdf_services import PDFService
+from django.utils.translation import gettext as _
 
 # Registros simples en memoria para OAuth y transferencias pendientes
 OAUTH_APPROVED = {}
@@ -509,32 +518,115 @@ def estado_cuenta_pdf(request, account_id):
     """Exporta el estado de cuenta en PDF."""
     account = get_object_or_404(DebtorAccount, pk=account_id)
     movimientos = account.movimientos.order_by('fecha')
+    
+    # Filtros de fecha
     start = request.GET.get('inicio')
     end = request.GET.get('fin')
     if start:
         movimientos = movimientos.filter(fecha__date__gte=start)
+        start_date = datetime.strptime(start, '%Y-%m-%d')
+    else:
+        start_date = None
+        
     if end:
         movimientos = movimientos.filter(fecha__date__lte=end)
+        end_date = datetime.strptime(end, '%Y-%m-%d')
+    else:
+        end_date = None
 
-    from io import BytesIO
-    from reportlab.lib.pagesizes import letter
-    from reportlab.pdfgen import canvas
+    # Crear PDF usando el servicio
+    pdf_service = PDFService(
+        page_size=request.GET.get('format', 'A4'),
+        language=request.LANGUAGE_CODE
+    )
+    
+    buffer = pdf_service.generate_account_statement(
+        account=account,
+        movements=movimientos,
+        start_date=start_date,
+        end_date=end_date
+    )
+    
+    filename = f'estado_cuenta_{account.iban}_{timezone.now().strftime("%Y%m%d")}.pdf'
+    return FileResponse(buffer, as_attachment=True, filename=filename)
 
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer, pagesize=letter)
-    p.drawString(100, 750, f"Estado de cuenta de {account.debtor.name}")
-    y = 720
-    for mov in movimientos:
-        p.drawString(80, y, f"{mov.fecha.strftime('%Y-%m-%d %H:%M')} - {mov.tipo} - {mov.monto}")
-        y -= 20
-        if y < 50:
-            p.showPage()
-            y = 750
-    p.drawString(80, y-20, f"Saldo actual: {account.balance}")
-    p.showPage()
-    p.save()
-    buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename='estado.pdf')
+@login_required
+def estado_cuenta_acreedor(request, account_id):
+    """Muestra el estado de cuenta de una cuenta de acreedor."""
+    account = get_object_or_404(CreditorAccount, pk=account_id)
+    transfers = Transfer.objects.filter(creditor_account=account).order_by('-created_at')
+    
+    # Filtros de fecha
+    start = request.GET.get('inicio')
+    end = request.GET.get('fin')
+    if start:
+        transfers = transfers.filter(created_at__date__gte=start)
+    if end:
+        transfers = transfers.filter(created_at__date__lte=end)
+    
+    return render(request, 'banco/estado_acreedor.html', {
+        'account': account,
+        'transfers': transfers,
+    })
+
+@login_required
+def estado_cuenta_acreedor_pdf(request, account_id):
+    """Exporta el estado de cuenta de acreedor en PDF."""
+    account = get_object_or_404(CreditorAccount, pk=account_id)
+    transfers = Transfer.objects.filter(creditor_account=account).order_by('created_at')
+    
+    # Filtros de fecha
+    start = request.GET.get('inicio')
+    end = request.GET.get('fin')
+    if start:
+        transfers = transfers.filter(created_at__date__gte=start)
+        start_date = datetime.strptime(start, '%Y-%m-%d')
+    else:
+        start_date = None
+        
+    if end:
+        transfers = transfers.filter(created_at__date__lte=end)
+        end_date = datetime.strptime(end, '%Y-%m-%d')
+    else:
+        end_date = None
+
+    # Crear PDF usando el servicio
+    pdf_service = PDFService(
+        page_size=request.GET.get('format', 'A4'),
+        language=request.LANGUAGE_CODE
+    )
+    
+    buffer = pdf_service.generate_account_statement(
+        account=account,
+        movements=transfers,
+        start_date=start_date,
+        end_date=end_date,
+        is_creditor=True
+    )
+    
+    filename = f'estado_cuenta_{account.iban}_{timezone.now().strftime("%Y%m%d")}.pdf'
+    return FileResponse(buffer, as_attachment=True, filename=filename)
+
+@login_required
+def descargar_pdf_gpt4(request, payment_id):
+    """Vista para descargar el PDF de una transferencia."""
+    try:
+        transfer = get_object_or_404(Transfer, payment_id=payment_id)
+        
+        # Crear PDF usando el servicio
+        pdf_service = PDFService(
+            page_size=request.GET.get('format', 'A4'),
+            language=request.LANGUAGE_CODE
+        )
+        
+        buffer = pdf_service.generate_transfer_receipt(transfer)
+        
+        filename = f'transferencia_{payment_id}.pdf'
+        return FileResponse(buffer, as_attachment=True, filename=filename)
+        
+    except Exception as e:
+        messages.error(request, _('Error al generar PDF: {}').format(str(e)))
+        return redirect('transfer_detailGPT4', payment_id=payment_id)
 
 
 
@@ -652,4 +744,177 @@ def api_verify_otp(request):
     return JsonResponse({
         'status': transfer.status,
         'transfer_id': transfer.payment_id
+    })
+
+
+@login_required
+def dashboard_estadisticas(request):
+    """
+    Dashboard principal con estadísticas generales.
+    """
+    # Obtener resúmenes
+    transfer_summary = StatisticsService.get_transfer_summary()
+    user_summary = StatisticsService.get_user_summary()
+    
+    # Obtener estadísticas de los últimos 7 días
+    end_date = timezone.now().date()
+    start_date = end_date - timedelta(days=7)
+    transfer_stats = StatisticsService.get_transfer_statistics(
+        start_date=start_date,
+        end_date=end_date
+    )
+
+    # Obtener logs recientes
+    recent_logs = StatisticsService.get_system_logs(limit=10)
+
+    context = {
+        'transfer_summary': transfer_summary,
+        'user_summary': user_summary,
+        'transfer_stats': transfer_stats,
+        'recent_logs': recent_logs,
+        'start_date': start_date,
+        'end_date': end_date
+    }
+    
+    return render(request, 'banco/dashboard_estadisticas.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def system_logs(request):
+    """
+    Vista detallada de logs del sistema.
+    """
+    # Obtener parámetros de filtro
+    level = request.GET.get('level')
+    action = request.GET.get('action')
+    user_id = request.GET.get('user')
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    
+    # Convertir fechas si están presentes
+    if start_date:
+        start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
+    if end_date:
+        end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
+    
+    # Obtener usuario si se especifica
+    user = None
+    if user_id:
+        user = User.objects.get(id=user_id)
+    
+    # Obtener logs filtrados
+    logs = StatisticsService.get_system_logs(
+        level=level,
+        action=action,
+        user=user,
+        start_date=start_date,
+        end_date=end_date
+    )
+    
+    context = {
+        'logs': logs,
+        'users': User.objects.all(),
+        'selected_level': level,
+        'selected_action': action,
+        'selected_user': user_id,
+        'start_date': start_date,
+        'end_date': end_date,
+        'level_choices': SystemLog.LEVEL_CHOICES,
+        'action_choices': SystemLog.ACTION_CHOICES
+    }
+    
+    return render(request, 'banco/system_logs.html', context)
+
+@login_required
+def user_statistics(request, user_id=None):
+    """
+    Estadísticas detalladas de un usuario específico.
+    """
+    if user_id is None:
+        user_id = request.user.id
+    
+    user = get_object_or_404(User, id=user_id)
+    
+    # Obtener parámetros de fecha
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    
+    # Convertir fechas si están presentes
+    if start_date:
+        start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
+    if end_date:
+        end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
+    
+    # Obtener estadísticas del usuario
+    user_stats = StatisticsService.get_user_statistics(
+        user=user,
+        start_date=start_date,
+        end_date=end_date
+    )
+    
+    # Obtener logs del usuario
+    user_logs = StatisticsService.get_system_logs(
+        user=user,
+        start_date=start_date,
+        end_date=end_date
+    )
+    
+    context = {
+        'user_stats': user_stats,
+        'user_logs': user_logs,
+        'selected_user': user,
+        'start_date': start_date,
+        'end_date': end_date
+    }
+    
+    return render(request, 'banco/user_statistics.html', context)
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def transfer_statistics(request):
+    """
+    Estadísticas detalladas de transferencias.
+    """
+    # Obtener parámetros de fecha
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+    
+    # Convertir fechas si están presentes
+    if start_date:
+        start_date = timezone.datetime.strptime(start_date, '%Y-%m-%d').date()
+    if end_date:
+        end_date = timezone.datetime.strptime(end_date, '%Y-%m-%d').date()
+    else:
+        end_date = timezone.now().date()
+        start_date = end_date - timedelta(days=30)
+    
+    # Obtener estadísticas
+    transfer_stats = StatisticsService.get_transfer_statistics(
+        start_date=start_date,
+        end_date=end_date
+    )
+    
+    context = {
+        'transfer_stats': transfer_stats,
+        'start_date': start_date,
+        'end_date': end_date
+    }
+    
+    return render(request, 'banco/transfer_statistics.html', context)
+
+@login_required
+def transfer_detail(request, payment_id):
+    """Vista detallada de una transferencia."""
+    transfer = get_object_or_404(Transfer, payment_id=payment_id)
+    
+    # Registrar la visualización en los logs
+    LogTransferencia.objects.create(
+        registro=payment_id,
+        tipo_log='VIEW',
+        contenido=f'Transferencia consultada por {request.user.username}'
+    )
+    
+    return render(request, 'banco/transfer_detail.html', {
+        'transfer': transfer,
+        'page_title': f'Transferencia #{payment_id}'
     })

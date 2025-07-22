@@ -176,7 +176,7 @@ class PaymentIdentificationForm(BootstrapModelForm):
 class TransferForm(BootstrapModelForm):
     class Meta:
         model = Transfer
-        exclude = ['created_at', 'updated_at', 'auth_id', 'payment_id', 'payment_identification']
+        exclude = ['created_at', 'updated_at', 'auth_id', 'payment_id', 'payment_identification', 'status']
         widgets = {
             'debtor': forms.Select(attrs={'class': 'form-control'}),
             'debtor_account': forms.Select(attrs={'class': 'form-control'}),
@@ -203,6 +203,10 @@ class TransferForm(BootstrapModelForm):
         transfer = super().save(commit=False)
         if not transfer.payment_id:
             transfer.payment_id = str(uuid.uuid4())
+        
+        # Establecer status inicial
+        if not transfer.status:
+            transfer.status = 'PDNG'
         
         # Crear PaymentIdentification si no existe
         if not transfer.payment_identification_id:

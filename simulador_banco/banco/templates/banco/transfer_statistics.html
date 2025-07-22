@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Estadísticas de Transferencias{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Filtros -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">Estadísticas de Transferencias</h4>
+                        <div>
+                            <form method="get" class="d-flex gap-2">
+                                <input type="date" class="form-control" name="start_date" 
+                                       value="{{ start_date|date:'Y-m-d' }}">
+                                <input type="date" class="form-control" name="end_date" 
+                                       value="{{ end_date|date:'Y-m-d' }}">
+                                <button type="submit" class="btn btn-primary">Filtrar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Transferencias</h5>
+                    <h2 class="card-text">
+                        {% with total=transfer_stats|dictsort:"date"|last %}
+                        {{ total.1.total_transfers }}
+                        {% endwith %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Monto Total</h5>
+                    <h2 class="card-text">
+                        {% with total=transfer_stats|dictsort:"date"|last %}
+                        ${{ total.1.total_amount|floatformat:2 }}
+                        {% endwith %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Transferencias Exitosas</h5>
+                    <h2 class="card-text">
+                        {% with total=transfer_stats|dictsort:"date"|last %}
+                        {{ total.1.successful_transfers }}
+                        {% endwith %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Monto Promedio</h5>
+                    <h2 class="card-text">
+                        {% with total=transfer_stats|dictsort:"date"|last %}
+                        ${{ total.1.avg_amount|floatformat:2 }}
+                        {% endwith %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Transferencias por Día</h5>
+                    <canvas id="transferChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Montos por Día</h5>
+                    <canvas id="amountChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Estadísticas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Detalle por Día</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Total Transferencias</th>
+                                    <th>Monto Total</th>
+                                    <th>Exitosas</th>
+                                    <th>Fallidas</th>
+                                    <th>Monto Promedio</th>
+                                    <th>Tasa de Éxito</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in transfer_stats %}
+                                <tr>
+                                    <td>{{ stat.date|date:"d/m/Y" }}</td>
+                                    <td>{{ stat.total_transfers }}</td>
+                                    <td>${{ stat.total_amount|floatformat:2 }}</td>
+                                    <td>{{ stat.successful_transfers }}</td>
+                                    <td>{{ stat.failed_transfers }}</td>
+                                    <td>${{ stat.avg_amount|floatformat:2 }}</td>
+                                    <td>
+                                        {% if stat.total_transfers > 0 %}
+                                        {{ stat.successful_transfers|multiply:100|divide:stat.total_transfers|floatformat:1 }}%
+                                        {% else %}
+                                        -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No hay datos para el período seleccionado.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Datos para los gráficos
+    const stats = {{ transfer_stats|safe }};
+    const dates = Object.keys(stats).sort();
+    const transfers = dates.map(date => stats[date].total_transfers);
+    const amounts = dates.map(date => stats[date].total_amount);
+    const successful = dates.map(date => stats[date].successful_transfers);
+    const failed = dates.map(date => stats[date].failed_transfers);
+
+    // Gráfico de transferencias
+    const transferCtx = document.getElementById('transferChart').getContext('2d');
+    new Chart(transferCtx, {
+        type: 'bar',
+        data: {
+            labels: dates.map(date => date.split('-').slice(1).join('/')),
+            datasets: [{
+                label: 'Exitosas',
+                data: successful,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgb(75, 192, 192)',
+                borderWidth: 1
+            }, {
+                label: 'Fallidas',
+                data: failed,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgb(255, 99, 132)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    stacked: true
+                },
+                x: {
+                    stacked: true
+                }
+            }
+        }
+    });
+
+    // Gráfico de montos
+    const amountCtx = document.getElementById('amountChart').getContext('2d');
+    new Chart(amountCtx, {
+        type: 'line',
+        data: {
+            labels: dates.map(date => date.split('-').slice(1).join('/')),
+            datasets: [{
+                label: 'Monto Total ($)',
+                data: amounts,
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1,
+                fill: true,
+                backgroundColor: 'rgba(54, 162, 235, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Estadísticas de Usuario - {{ selected_user.username }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Encabezado -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">
+                            Estadísticas de {{ selected_user.username }}
+                            {% if selected_user.get_full_name %}
+                            <small class="text-muted">({{ selected_user.get_full_name }})</small>
+                            {% endif %}
+                        </h4>
+                        <div>
+                            <form method="get" class="d-flex gap-2">
+                                <input type="date" class="form-control" name="start_date" 
+                                       value="{{ start_date|date:'Y-m-d' }}">
+                                <input type="date" class="form-control" name="end_date" 
+                                       value="{{ end_date|date:'Y-m-d' }}">
+                                <button type="submit" class="btn btn-primary">Filtrar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Transferencias</h5>
+                    <h2 class="card-text">
+                        {% with total_transfers=user_stats|dictsort:"date"|last %}
+                        {{ total_transfers.1.transfer_count }}
+                        {% endwith %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Monto Total</h5>
+                    <h2 class="card-text">
+                        {% with total_amount=user_stats|dictsort:"date"|last %}
+                        ${{ total_amount.1.total_transfer_amount|floatformat:2 }}
+                        {% endwith %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Inicios de Sesión</h5>
+                    <h2 class="card-text">
+                        {% with total_logins=user_stats|dictsort:"date"|last %}
+                        {{ total_logins.1.login_count }}
+                        {% endwith %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Última Actividad</h5>
+                    <h2 class="card-text">
+                        {% with last_activity=user_stats|dictsort:"date"|last %}
+                        {{ last_activity.1.last_activity|date:"d/m/Y H:i" }}
+                        {% endwith %}
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Transferencias por Día</h5>
+                    <canvas id="transferChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Montos por Día</h5>
+                    <canvas id="amountChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logs del Usuario -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Actividad Reciente</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha/Hora</th>
+                                    <th>Acción</th>
+                                    <th>Nivel</th>
+                                    <th>IP</th>
+                                    <th>Descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in user_logs %}
+                                <tr>
+                                    <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+                                    <td>{{ log.get_action_display }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ log.level|lower }}">
+                                            {{ log.get_level_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ log.ip_address|default:"-" }}</td>
+                                    <td>{{ log.description }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No hay registros de actividad.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Datos para los gráficos
+    const stats = {{ user_stats|safe }};
+    const dates = Object.keys(stats).sort();
+    const transfers = dates.map(date => stats[date].transfer_count);
+    const amounts = dates.map(date => stats[date].total_transfer_amount);
+
+    // Gráfico de transferencias
+    const transferCtx = document.getElementById('transferChart').getContext('2d');
+    new Chart(transferCtx, {
+        type: 'bar',
+        data: {
+            labels: dates.map(date => date.split('-').slice(1).join('/')),
+            datasets: [{
+                label: 'Transferencias',
+                data: transfers,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgb(75, 192, 192)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Gráfico de montos
+    const amountCtx = document.getElementById('amountChart').getContext('2d');
+    new Chart(amountCtx, {
+        type: 'line',
+        data: {
+            labels: dates.map(date => date.split('-').slice(1).join('/')),
+            datasets: [{
+                label: 'Monto Total ($)',
+                data: amounts,
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %} 

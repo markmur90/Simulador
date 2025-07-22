@@ -188,23 +188,22 @@ class AccountMovement(models.Model):
         (PAYMENT, 'Pago'),
     ]
 
-    # Campos para GenericForeignKey
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    account = GenericForeignKey('content_type', 'object_id')
-
+    account = models.ForeignKey(
+        DebtorAccount,
+        on_delete=models.CASCADE,
+        related_name='movimientos'
+    )
     tipo = models.CharField(max_length=10, choices=TYPE_CHOICES)
     monto = models.DecimalField(max_digits=12, decimal_places=2)
     fecha = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            if isinstance(self.account, (DebtorAccount, CreditorAccount)):
-                if self.tipo == self.DEPOSIT:
-                    self.account.balance += self.monto
-                else:
-                    self.account.balance -= self.monto
-                self.account.save()
+            if self.tipo == self.DEPOSIT:
+                self.account.balance += self.monto
+            else:
+                self.account.balance -= self.monto
+            self.account.save()
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -322,6 +321,23 @@ class Transfer(models.Model):
         ordering = ['-created_at']
         app_label = 'banco'
 
+    @property
+    def is_internal(self):
+        """
+        Determina si la transferencia es interna (entre cuentas del mismo banco).
+        Una transferencia es interna si:
+        1. Las cuentas origen y destino existen
+        2. Los IBANs de ambas cuentas pertenecen al mismo banco (mismo código de banco)
+        """
+        if not (self.debtor_account and self.creditor_account):
+            return False
+            
+        # Obtener el código del banco (posiciones 5-8 del IBAN español)
+        debtor_bank = self.debtor_account.iban[4:8]
+        creditor_bank = self.creditor_account.iban[4:8]
+        
+        return debtor_bank == creditor_bank
+
     def to_schema_data(self):
         return {
             "purposeCode": self.purpose_code or "GDSV",
@@ -412,3 +428,138 @@ class LogTransferencia(models.Model):
     def __str__(self):
         timestamp = self.created_at.strftime('%Y-%m-%d %H:%M:%S')
         return f"{self.tipo_log} – {self.registro} – {timestamp}"
+
+class SystemLog(models.Model):
+    """Registro detallado de todas las acciones del sistema."""
+    LEVEL_CHOICES = [
+        ('INFO', 'Información'),
+        ('WARNING', 'Advertencia'),
+        ('ERROR', 'Error'),
+        ('CRITICAL', 'Crítico'),
+        ('DEBUG', 'Depuración')
+    ]
+
+    ACTION_CHOICES = [
+        ('LOGIN', 'Inicio de Sesión'),
+        ('LOGOUT', 'Cierre de Sesión'),
+        ('TRANSFER_CREATE', 'Creación de Transferencia'),
+        ('TRANSFER_UPDATE', 'Actualización de Transferencia'),
+        ('OTP_GENERATE', 'Generación de OTP'),
+        ('OTP_VALIDATE', 'Validación de OTP'),
+        ('USER_CREATE', 'Creación de Usuario'),
+        ('USER_UPDATE', 'Actualización de Usuario'),
+        ('ACCOUNT_CREATE', 'Creación de Cuenta'),
+        ('ACCOUNT_UPDATE', 'Actualización de Cuenta'),
+        ('API_CALL', 'Llamada a API'),
+        ('SECURITY_EVENT', 'Evento de Seguridad')
+    ]
+
+    timestamp = models.DateTimeField(auto_now_add=True, db_index=True)
+    level = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='INFO')
+    action = models.CharField(max_length=20, choices=ACTION_CHOICES)
+    user = models.ForeignKey(
+        'auth.User',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='system_logs'
+    )
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    description = models.TextField()
+    additional_data = models.JSONField(null=True, blank=True)
+    
+    class Meta:
+        db_table = 'sim_system_log'
+        ordering = ['-timestamp']
+        verbose_name = 'Log del Sistema'
+        verbose_name_plural = 'Logs del Sistema'
+        app_label = 'banco'
+
+    def __str__(self):
+        return f"{self.timestamp} - {self.action} - {self.level}"
+
+class TransferStatistics(models.Model):
+    """Estadísticas agregadas de transferencias."""
+    date = models.DateField(unique=True)
+    total_transfers = models.IntegerField(default=0)
+    total_amount = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    successful_transfers = models.IntegerField(default=0)
+    failed_transfers = models.IntegerField(default=0)
+    avg_amount = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    
+    class Meta:
+        db_table = 'sim_transfer_statistics'
+        ordering = ['-date']
+        verbose_name = 'Estadística de Transferencias'
+        verbose_name_plural = 'Estadísticas de Transferencias'
+        app_label = 'banco'
+
+    def __str__(self):
+        return f"Estadísticas del {self.date}"
+
+    @classmethod
+    def update_statistics(cls, date):
+        """Actualiza las estadísticas para una fecha específica."""
+        from django.db.models import Count, Sum, Avg
+        from django.db.models.functions import TruncDate
+        
+        stats = Transfer.objects.filter(
+            created_at__date=date
+        ).aggregate(
+            total=Count('id'),
+            total_amount=Sum('instructed_amount'),
+            successful=Count('id', filter=models.Q(status__in=['ACSC', 'ACCC'])),
+            failed=Count('id', filter=models.Q(status__in=['RJCT', 'CANC'])),
+            avg_amount=Avg('instructed_amount')
+        )
+        
+        cls.objects.update_or_create(
+            date=date,
+            defaults={
+                'total_transfers': stats['total'],
+                'total_amount': stats['total_amount'] or 0,
+                'successful_transfers': stats['successful'],
+                'failed_transfers': stats['failed'],
+                'avg_amount': stats['avg_amount'] or 0
+            }
+        )
+
+class UserActivity(models.Model):
+    """Registro de actividad de usuarios."""
+    user = models.ForeignKey('auth.User', on_delete=models.CASCADE, related_name='activities')
+    date = models.DateField()
+    login_count = models.IntegerField(default=0)
+    transfer_count = models.IntegerField(default=0)
+    total_transfer_amount = models.DecimalField(max_digits=18, decimal_places=2, default=0)
+    last_activity = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'sim_user_activity'
+        unique_together = ['user', 'date']
+        ordering = ['-date', 'user']
+        verbose_name = 'Actividad de Usuario'
+        verbose_name_plural = 'Actividades de Usuarios'
+        app_label = 'banco'
+
+    def __str__(self):
+        return f"Actividad de {self.user.username} el {self.date}"
+
+    @classmethod
+    def log_activity(cls, user, activity_type, amount=None):
+        """Registra una actividad de usuario."""
+        from django.utils import timezone
+        today = timezone.now().date()
+        
+        activity, _ = cls.objects.get_or_create(
+            user=user,
+            date=today
+        )
+        
+        if activity_type == 'LOGIN':
+            activity.login_count += 1
+        elif activity_type == 'TRANSFER':
+            activity.transfer_count += 1
+            if amount:
+                activity.total_transfer_amount += amount
+        
+        activity.save()

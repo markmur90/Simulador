@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard de Estadísticas{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Resumen General -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Transferencias Hoy</h5>
+                    <h2 class="card-text">{{ transfer_summary.today.total_transfers|default:"0" }}</h2>
+                    <p class="text-muted">Total: ${{ transfer_summary.today.total_amount|default:"0"|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Usuarios Activos</h5>
+                    <h2 class="card-text">{{ user_summary.active_today }}</h2>
+                    <p class="text-muted">De {{ user_summary.total_users }} usuarios totales</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Monto Promedio</h5>
+                    <h2 class="card-text">${{ transfer_summary.avg_amount|floatformat:2 }}</h2>
+                    <p class="text-muted">Por transferencia</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Histórico</h5>
+                    <h2 class="card-text">${{ transfer_summary.total_amount|floatformat:2 }}</h2>
+                    <p class="text-muted">{{ transfer_summary.total_transfers }} transferencias</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Transferencias Últimos 7 Días</h5>
+                    <canvas id="transferChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Distribución por Estado</h5>
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actividad Reciente -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Usuarios Más Activos</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Transferencias</th>
+                                    <th>Monto Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for activity in user_summary.top_users %}
+                                <tr>
+                                    <td>{{ activity.user.username }}</td>
+                                    <td>{{ activity.transfer_count }}</td>
+                                    <td>${{ activity.total_transfer_amount|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Logs Recientes</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Acción</th>
+                                    <th>Usuario</th>
+                                    <th>Nivel</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in recent_logs %}
+                                <tr>
+                                    <td>{{ log.timestamp|date:"H:i:s" }}</td>
+                                    <td>{{ log.get_action_display }}</td>
+                                    <td>{{ log.user.username|default:"Sistema" }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ log.level|lower }}">
+                                            {{ log.get_level_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gráfico de transferencias
+    const transferCtx = document.getElementById('transferChart').getContext('2d');
+    new Chart(transferCtx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for stat in transfer_stats %}
+                    '{{ stat.date|date:"d/m" }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Total Transferencias',
+                data: [
+                    {% for stat in transfer_stats %}
+                        {{ stat.total_transfers }},
+                    {% endfor %}
+                ],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Gráfico de estados
+    const statusCtx = document.getElementById('statusChart').getContext('2d');
+    new Chart(statusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [
+                {% for status in transfer_summary.status_distribution %}
+                    '{{ status.status }}',
+                {% endfor %}
+            ],
+            datasets: [{
+                data: [
+                    {% for status in transfer_summary.status_distribution %}
+                        {{ status.count }},
+                    {% endfor %}
+                ],
+                backgroundColor: [
+                    'rgb(75, 192, 192)',
+                    'rgb(255, 205, 86)',
+                    'rgb(255, 99, 132)',
+                    'rgb(54, 162, 235)'
+                ]
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+});
+</script>
+{% endblock %} 
