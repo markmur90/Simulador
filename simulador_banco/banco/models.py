@@ -188,11 +188,18 @@ class AccountMovement(models.Model):
         (PAYMENT, 'Pago'),
     ]
 
+    # Mantener campos antiguos temporalmente
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    
+    # Nuevo campo con null=True temporalmente
     account = models.ForeignKey(
         DebtorAccount,
         on_delete=models.CASCADE,
-        related_name='movimientos'
+        related_name='movimientos',
+        null=True
     )
+    
     tipo = models.CharField(max_length=10, choices=TYPE_CHOICES)
     monto = models.DecimalField(max_digits=12, decimal_places=2)
     fecha = models.DateTimeField(auto_now_add=True)
