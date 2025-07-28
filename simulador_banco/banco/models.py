@@ -244,11 +244,11 @@ class CreditorAgent(models.Model):
 
 class PaymentIdentification(models.Model):
     """Identificadores internos de la transacción."""
-    end_to_end_id = models.CharField(max_length=35)
-    instruction_id = models.CharField(max_length=35)
+    end_to_end_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=True)
+    instruction_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=True)
 
     def __str__(self):
-        return self.end_to_end_id
+        return str(self.end_to_end_id)
 
     class Meta:
         db_table = 'sim_payment_identification'
@@ -291,7 +291,7 @@ class Transfer(models.Model):
         ('PDNG', 'Pendiente'),
     ]
 
-    payment_id = models.CharField(max_length=36, unique=True, db_index=True)
+    payment_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False, db_index=True)
     debtor = models.ForeignKey('Debtor', on_delete=models.PROTECT, related_name='transfers')
     creditor = models.ForeignKey('Creditor', on_delete=models.PROTECT, related_name='transfers')
     debtor_account = models.ForeignKey('DebtorAccount', on_delete=models.PROTECT)
@@ -312,7 +312,7 @@ class Transfer(models.Model):
         db_index=True
     )
     payment_identification = models.ForeignKey('PaymentIdentification', on_delete=models.CASCADE)
-    auth_id = models.CharField(max_length=100, blank=True, null=True)
+    auth_id = models.UUIDField(default=uuid.uuid4, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -393,7 +393,7 @@ class Transfer(models.Model):
         }.get(self.status, 'dark')
 
     def __str__(self):
-        return self.payment_id
+        return str(self.payment_id)
 
 
 

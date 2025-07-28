@@ -77,6 +77,7 @@ MIDDLEWARE = [
     'simulador_banco.middleware.jwt_auth.JWTAuthenticationMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # Agregado para soporte de internacionalización
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

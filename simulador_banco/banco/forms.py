@@ -170,7 +170,7 @@ class KidForm(BootstrapModelForm):
 class PaymentIdentificationForm(BootstrapModelForm):
     class Meta:
         model = PaymentIdentification
-        fields = ['end_to_end_id', 'instruction_id']
+        fields = []  # Removemos los campos no editables
 
 
 class TransferForm(BootstrapModelForm):
@@ -273,42 +273,58 @@ class TransferInternaForm(BootstrapModelForm):
     debtor_origen = forms.ModelChoiceField(
         queryset=Debtor.objects.all(),
         label='Deudor Origen',
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True,
+        error_messages={'required': 'Debe seleccionar un deudor origen'}
     )
     
     cuenta_origen = forms.ModelChoiceField(
         queryset=DebtorAccount.objects.none(),
         label='Cuenta Origen',
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True,
+        error_messages={'required': 'Debe seleccionar una cuenta origen'}
     )
     
     debtor_destino = forms.ModelChoiceField(
         queryset=Debtor.objects.all(),
         label='Deudor Destino',
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True,
+        error_messages={'required': 'Debe seleccionar un deudor destino'}
     )
     
     cuenta_destino = forms.ModelChoiceField(
         queryset=DebtorAccount.objects.none(),
         label='Cuenta Destino',
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=True,
+        error_messages={'required': 'Debe seleccionar una cuenta destino'}
     )
     
     monto = forms.DecimalField(
         max_digits=18,
         decimal_places=2,
         label='Monto a Transferir',
-        widget=forms.NumberInput(attrs={'class': 'form-control'})
+        widget=forms.NumberInput(attrs={'class': 'form-control'}),
+        required=True,
+        min_value=0.01,
+        error_messages={
+            'required': 'Debe ingresar un monto',
+            'min_value': 'El monto debe ser mayor a 0',
+            'invalid': 'Ingrese un monto válido'
+        }
     )
     
     concepto = forms.CharField(
         max_length=140,
         label='Concepto de la Transferencia',
-        required=False,
+        required=True,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Ingrese el concepto de la transferencia'
-        })
+        }),
+        error_messages={'required': 'Debe ingresar un concepto para la transferencia'}
     )
 
     def __init__(self, *args, **kwargs):
@@ -333,11 +349,17 @@ class TransferInternaForm(BootstrapModelForm):
         cuenta_origen = cleaned_data.get('cuenta_origen')
         cuenta_destino = cleaned_data.get('cuenta_destino')
         monto = cleaned_data.get('monto')
+        debtor_origen = cleaned_data.get('debtor_origen')
+        debtor_destino = cleaned_data.get('debtor_destino')
 
-        if cuenta_origen and cuenta_destino and monto:
+        if all([cuenta_origen, cuenta_destino, monto, debtor_origen, debtor_destino]):
             # Validar que no sea la misma cuenta
             if cuenta_origen == cuenta_destino:
                 raise forms.ValidationError('No se puede transferir a la misma cuenta')
+            
+            # Validar que no sea el mismo deudor
+            if debtor_origen == debtor_destino:
+                raise forms.ValidationError('No se puede transferir al mismo deudor')
             
             # Validar saldo suficiente
             if cuenta_origen.balance < monto:

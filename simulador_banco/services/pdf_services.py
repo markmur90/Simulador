@@ -26,21 +26,40 @@ from django.utils.translation import gettext as _
 
 class WaterMark(Flowable):
     """Clase para crear marcas de agua en los PDFs."""
-    def __init__(self, text="CONFIDENCIAL", angle=45):
+    def __init__(self, text="CONFIDENCIAL", angle=45, opacity=0.1):
         Flowable.__init__(self)
         self.text = text
         self.angle = angle
+        self.opacity = opacity
         
     def draw(self):
         canvas = self.canv
         canvas.saveState()
-        canvas.setFont('Helvetica', 70)
+        
+        # Configurar el estilo del texto
+        canvas.setFont('Helvetica-Bold', 70)
         canvas.setFillColor(colors.grey)
-        canvas.setFillAlpha(0.1)
-        canvas.translate(A4[0]/2, A4[1]/2)
+        canvas.setFillAlpha(self.opacity)
+        
+        # Obtener dimensiones de la página
+        page_width = self.canv._pagesize[0]
+        page_height = self.canv._pagesize[1]
+        
+        # Calcular el centro exacto de la página
+        center_x = page_width / 2
+        center_y = page_height / 2
+        
+        # Aplicar transformaciones para centrar y rotar
+        canvas.translate(center_x, center_y)
         canvas.rotate(self.angle)
+        
+        # Dibujar el texto centrado
         canvas.drawCentredString(0, 0, self.text)
+        
         canvas.restoreState()
+
+    def wrap(self, *args):
+        return (0, 0)  # Este flowable no ocupa espacio en el documento
 
 class PDFService:
     """Servicio principal para generación de PDFs."""
@@ -91,7 +110,7 @@ class PDFService:
         )
 
     def _add_header(self, canvas, doc):
-        """Agrega el encabezado al PDF."""
+        """Agrega el encabezado y pie de página al PDF."""
         canvas.saveState()
         # Logo
         logo_path = os.path.join(settings.STATIC_ROOT, 'img/mi-logo.png')
@@ -112,17 +131,14 @@ class PDFService:
             30,
             f'Página {canvas.getPageNumber()}'
         )
-        canvas.restoreState()
 
-    def _add_footer(self, canvas, doc):
-        """Agrega el pie de página al PDF."""
-        canvas.saveState()
-        canvas.setFont('Helvetica', 8)
+        # Pie de página
         footer_text = _(
             "Este documento es una representación digital de una transacción bancaria. "
             "Para verificar su autenticidad, escanee el código QR o visite nuestra página web."
         )
         canvas.drawString(40, 40, footer_text)
+        
         canvas.restoreState()
 
     def _create_qr(self, data: str, size: int = 100) -> Drawing:
@@ -297,14 +313,13 @@ class PDFService:
         qr_data = f"account={account.iban}&date={timezone.now().isoformat()}"
         qr = self._create_qr(qr_data)
         elements.append(Spacer(1, 20))
-        elements.append(renderPDF.draw(qr, doc))
+        elements.append(qr)
         
         # Construir el PDF
         doc.build(
             elements,
             onFirstPage=self._add_header,
-            onLaterPages=self._add_header,
-            onLastPage=self._add_footer
+            onLaterPages=self._add_header
         )
         
         buffer.seek(0)
@@ -388,7 +403,7 @@ class PDFService:
         )
         qr = self._create_qr(qr_data)
         elements.append(Spacer(1, 20))
-        elements.append(renderPDF.draw(qr, doc))
+        elements.append(qr)
         
         # Construir el PDF
         doc.build(

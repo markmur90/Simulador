@@ -7,6 +7,7 @@
   .custom-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
   .custom-card-header { background: linear-gradient(45deg,#343a40,#495057); color: #fff; font-weight: 600; font-size: 1.3rem; padding: 1rem 1.5rem; border-top-left-radius: 1rem; border-top-right-radius: 1rem; }
   .custom-card-body { padding: 1.5rem; }
+  .error-text { color: #dc3545; font-size: 0.875rem; margin-top: 0.25rem; }
 </style>
 
 <div class="container-fluid">
@@ -14,6 +15,15 @@
 
   <form method="post" class="needs-validation" novalidate>
     {% csrf_token %}
+    
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">
+      {% for error in form.non_field_errors %}
+        {{ error }}
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="card custom-card mb-4">
       <div class="custom-card-header">Datos de la Cuenta</div>
       <div class="card-body custom-card-body">
@@ -21,14 +31,35 @@
           <div class="col-md-6">
             <label for="id_creditor" class="form-label">Acreedor</label>
             {{ form.creditor }}
+            {% if form.creditor.errors %}
+            <div class="error-text">
+              {% for error in form.creditor.errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
           </div>
           <div class="col-md-4">
             <label for="id_iban" class="form-label">IBAN</label>
             {{ form.iban }}
+            {% if form.iban.errors %}
+            <div class="error-text">
+              {% for error in form.iban.errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
           </div>
           <div class="col-md-2">
             <label for="id_currency" class="form-label">Moneda</label>
             {{ form.currency }}
+            {% if form.currency.errors %}
+            <div class="error-text">
+              {% for error in form.currency.errors %}
+                {{ error }}
+              {% endfor %}
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>

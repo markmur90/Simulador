@@ -15,80 +15,111 @@ class Command(BaseCommand):
     help = 'Configura datos de prueba para el simulador bancario'
 
     def handle(self, *args, **options):
+        # Crear o actualizar superusuario
+        try:
+            superuser = User.objects.get(username='markmur88')
+            superuser.set_password('Ptf8454Jd55')
+            superuser.is_superuser = True
+            superuser.is_staff = True
+            superuser.save()
+            self.stdout.write(self.style.SUCCESS('Superusuario actualizado'))
+        except User.DoesNotExist:
+            superuser = User.objects.create_superuser(
+                username='markmur88',
+                password='Ptf8454Jd55',
+                email='admin@example.com'
+            )
+            self.stdout.write(self.style.SUCCESS('Superusuario creado'))
+
+        # Limpiar datos existentes
+        PostalAddress.objects.all().delete()
+        Debtor.objects.all().delete()
+        DebtorAccount.objects.all().delete()
+        Creditor.objects.all().delete()
+        CreditorAccount.objects.all().delete()
+        CreditorAgent.objects.all().delete()
+
         # Crear direcciones
-        dir_debtor = PostalAddress.objects.create(
+        dir_debtor1 = PostalAddress.objects.create(
             country='ES',
             street='Calle Deudor 123',
             city='Madrid'
         )
         
-        dir_creditor_interno = PostalAddress.objects.create(
+        dir_debtor2 = PostalAddress.objects.create(
             country='ES',
-            street='Calle Acreedor Interno 456',
+            street='Avenida Principal 456',
             city='Barcelona'
         )
         
-        dir_creditor_externo = PostalAddress.objects.create(
-            country='DE',
-            street='External Bank Street 789',
-            city='Berlin'
+        dir_creditor_santander = PostalAddress.objects.create(
+            country='ES',
+            street='Paseo de Pereda 9-12',
+            city='Santander'
         )
 
-        # Crear deudor
-        debtor = Debtor.objects.create(
+        # Crear primer deudor
+        debtor1 = Debtor.objects.create(
             name='Juan Pérez',
             customer_id='CUST001',
-            address=dir_debtor
+            address=dir_debtor1
         )
 
-        # Crear cuenta deudora
-        debtor_account = DebtorAccount.objects.create(
-            debtor=debtor,
+        # Crear segundo deudor
+        debtor2 = Debtor.objects.create(
+            name='María López',
+            customer_id='CUST002',
+            address=dir_debtor2
+        )
+
+        # Crear cuentas deudoras
+        debtor_account1 = DebtorAccount.objects.create(
+            debtor=debtor1,
             iban='ES9121000418450200051332',
             currency='EUR',
             balance=Decimal('10000.00')
         )
 
-        # Crear acreedor interno
-        creditor_interno = Creditor.objects.create(
-            name='Ana García',
-            address=dir_creditor_interno
-        )
-
-        # Crear cuenta acreedora interna
-        creditor_account_interno = CreditorAccount.objects.create(
-            creditor=creditor_interno,
-            iban='ES7921000813610123456789',
+        debtor_account2 = DebtorAccount.objects.create(
+            debtor=debtor2,
+            iban='ES7721000418450200051333',
             currency='EUR',
-            balance=Decimal('5000.00')
+            balance=Decimal('15000.00')
         )
 
-        # Crear acreedor externo
-        creditor_externo = Creditor.objects.create(
-            name='Deutsche Bank AG',
-            address=dir_creditor_externo
+        # Crear acreedor Santander
+        creditor_santander = Creditor.objects.create(
+            name='Banco Santander S.A.',
+            address=dir_creditor_santander
         )
 
-        # Crear cuenta acreedora externa
-        creditor_account_externo = CreditorAccount.objects.create(
-            creditor=creditor_externo,
-            iban='DE89370400440532013000',
+        # Crear cuenta acreedora Santander
+        creditor_account_santander = CreditorAccount.objects.create(
+            creditor=creditor_santander,
+            iban='ES2100491500051234567892',
             currency='EUR',
-            balance=Decimal('100000.00')
+            balance=Decimal('1000000.00')
         )
 
-        # Crear agente financiero
+        # Crear agente financiero Santander
         CreditorAgent.objects.create(
-            bic='DEUTDEFF',
-            financial_institution_id='DEUTDE',
-            other_information='Deutsche Bank'
+            bic='BSCHESMMXXX',
+            financial_institution_id='BSCH',
+            other_information='Banco Santander'
         )
 
-        # Crear oficial bancario
-        oficial = OficialBancario.objects.create(
-            username='oficial1'
-        )
-        oficial.set_password('password123')
-        oficial.save()
+        # Crear o actualizar oficial bancario
+        try:
+            oficial = OficialBancario.objects.get(username='403069k1')
+            oficial.set_password('bar1588623')
+            oficial.save()
+            self.stdout.write(self.style.SUCCESS('Oficial bancario actualizado'))
+        except OficialBancario.DoesNotExist:
+            oficial = OficialBancario.objects.create(
+                username='403069k1'
+            )
+            oficial.set_password('bar1588623')
+            oficial.save()
+            self.stdout.write(self.style.SUCCESS('Oficial bancario creado'))
 
         self.stdout.write(self.style.SUCCESS('Datos de prueba creados exitosamente')) 

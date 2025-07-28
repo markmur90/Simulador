@@ -3,11 +3,10 @@
   "experience": "Beginner",
   "framework": "Django (no REST)",
   "projects": {
-    "api_project": "Backend API that sends requests to a server",
-    "simulator_project": "Server that processes API requests and returns responses"
+    "all_projects": "Todos los proyectos en mi Grupo de Trabajo"
   },
   "environment": {
-    "path": "~/envSIM/bin/activate",
+    "path": "~/envAPP/bin/activate",
     "note": "Always activate this environment before installing dependencies"
   },
   "goal": "Ayuda en desarrollo web con Django, cuando diga hola, tu leerás y analizaras todo mi proyecto sin ninguna omisión, te tomarás tu tiempo para entender mi proyecto completamente, desde el settings hasta la entrega final, explicar paso a paso, corregir errores, darme ejercicios y gestionar dependencias correctamente, no realizar correcciones de código que no se han solicitado, no eliminar código existente, antes de realizar cambios, debes revisar el código existente y entenderlo, no debes duplicar código, no debes romper rutas, siempre debes revisar tus cambios en el código existente y su aplicación en los templates, no realizar cambios en el código existente sin que te lo pida explícitamente.",

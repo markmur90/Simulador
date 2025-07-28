@@ -34,6 +34,11 @@
     font-size: 0.875rem;
     margin-top: 0.25rem;
   }
+  .balance-info {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-top: 0.5rem;
+  }
 </style>
 
 <div class="container-fluid">
@@ -60,18 +65,17 @@
 
   <form method="post" class="needs-validation" novalidate>
     {% csrf_token %}
-    <input type="hidden" name="transaction_type" value="INTERNAL">
 
     <div class="card custom-card mb-4">
       <div class="custom-card-header">Datos del Ordenante</div>
       <div class="card-body custom-card-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label for="id_debtor" class="form-label">Cliente Ordenante</label>
-            {{ form.debtor }}
-            {% if form.debtor.errors %}
+            <label for="id_debtor_origen" class="form-label">Cliente Ordenante</label>
+            {{ form.debtor_origen }}
+            {% if form.debtor_origen.errors %}
             <div class="error-feedback">
-              {% for error in form.debtor.errors %}
+              {% for error in form.debtor_origen.errors %}
               {{ error }}
               {% endfor %}
             </div>
@@ -81,11 +85,12 @@
             </div>
           </div>
           <div class="col-md-6">
-            <label for="id_debtor_account" class="form-label">Cuenta del Ordenante</label>
-            {{ form.debtor_account }}
-            {% if form.debtor_account.errors %}
+            <label for="id_cuenta_origen" class="form-label">Cuenta del Ordenante</label>
+            {{ form.cuenta_origen }}
+            <div id="balance_origen" class="balance-info"></div>
+            {% if form.cuenta_origen.errors %}
             <div class="error-feedback">
-              {% for error in form.debtor_account.errors %}
+              {% for error in form.cuenta_origen.errors %}
               {{ error }}
               {% endfor %}
             </div>
@@ -103,11 +108,11 @@
       <div class="card-body custom-card-body">
         <div class="row g-3">
           <div class="col-md-6">
-            <label for="id_internal_creditor" class="form-label">Cliente Beneficiario</label>
-            {{ form.internal_creditor }}
-            {% if form.internal_creditor.errors %}
+            <label for="id_debtor_destino" class="form-label">Cliente Beneficiario</label>
+            {{ form.debtor_destino }}
+            {% if form.debtor_destino.errors %}
             <div class="error-feedback">
-              {% for error in form.internal_creditor.errors %}
+              {% for error in form.debtor_destino.errors %}
               {{ error }}
               {% endfor %}
             </div>
@@ -117,11 +122,12 @@
             </div>
           </div>
           <div class="col-md-6">
-            <label for="id_internal_creditor_account" class="form-label">Cuenta del Beneficiario</label>
-            {{ form.internal_creditor_account }}
-            {% if form.internal_creditor_account.errors %}
+            <label for="id_cuenta_destino" class="form-label">Cuenta del Beneficiario</label>
+            {{ form.cuenta_destino }}
+            <div id="balance_destino" class="balance-info"></div>
+            {% if form.cuenta_destino.errors %}
             <div class="error-feedback">
-              {% for error in form.internal_creditor_account.errors %}
+              {% for error in form.cuenta_destino.errors %}
               {{ error }}
               {% endfor %}
             </div>
@@ -138,12 +144,12 @@
       <div class="custom-card-header">Información de la Transferencia</div>
       <div class="card-body custom-card-body">
         <div class="row g-3">
-          <div class="col-md-4">
-            <label for="id_instructed_amount" class="form-label">Monto</label>
-            {{ form.instructed_amount }}
-            {% if form.instructed_amount.errors %}
+          <div class="col-md-6">
+            <label for="id_monto" class="form-label">Monto</label>
+            {{ form.monto }}
+            {% if form.monto.errors %}
             <div class="error-feedback">
-              {% for error in form.instructed_amount.errors %}
+              {% for error in form.monto.errors %}
               {{ error }}
               {% endfor %}
             </div>
@@ -152,62 +158,18 @@
               Ingrese el monto a transferir.
             </div>
           </div>
-          <div class="col-md-4">
-            <label for="id_currency" class="form-label">Moneda</label>
-            {{ form.currency }}
-            {% if form.currency.errors %}
-            <div class="error-feedback">
-              {% for error in form.currency.errors %}
-              {{ error }}
-              {% endfor %}
-            </div>
-            {% endif %}
-            <div class="help-text">
-              Seleccione la moneda de la transferencia.
-            </div>
-          </div>
-          <div class="col-md-4">
-            <label for="id_purpose_code" class="form-label">Código de Propósito</label>
-            {{ form.purpose_code }}
-            {% if form.purpose_code.errors %}
-            <div class="error-feedback">
-              {% for error in form.purpose_code.errors %}
-              {{ error }}
-              {% endfor %}
-            </div>
-            {% endif %}
-            <div class="help-text">
-              Seleccione el propósito de la transferencia.
-            </div>
-          </div>
-        </div>
-        <div class="row g-3 mt-3">
           <div class="col-md-6">
-            <label for="id_requested_execution_date" class="form-label">Fecha de Ejecución</label>
-            {{ form.requested_execution_date }}
-            {% if form.requested_execution_date.errors %}
+            <label for="id_concepto" class="form-label">Concepto</label>
+            {{ form.concepto }}
+            {% if form.concepto.errors %}
             <div class="error-feedback">
-              {% for error in form.requested_execution_date.errors %}
+              {% for error in form.concepto.errors %}
               {{ error }}
               {% endfor %}
             </div>
             {% endif %}
             <div class="help-text">
-              Seleccione la fecha en que se ejecutará la transferencia.
-            </div>
-          </div>
-          <div class="col-md-6">
-            <label for="id_remittance_information_unstructured" class="form-label">Referencia</label>
-            {{ form.remittance_information_unstructured }}
-            {% if form.remittance_information_unstructured.errors %}
-            <div class="error-feedback">
-              {% for error in form.remittance_information_unstructured.errors %}
-              {{ error }}
-              {% endfor %}
-            </div>
-            {% endif %}
-            <div class="help-text">
-              Ingrese una referencia o descripción para la transferencia.
+              Ingrese una descripción o motivo para la transferencia.
             </div>
           </div>
         </div>
@@ -227,57 +189,180 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const debtorSelect = document.getElementById('id_debtor');
-    const debtorAccountSelect = document.getElementById('id_debtor_account');
-    const internalCreditorSelect = document.getElementById('id_internal_creditor');
-    const internalCreditorAccountSelect = document.getElementById('id_internal_creditor_account');
+    const debtorOrigenSelect = document.getElementById('id_debtor_origen');
+    const cuentaOrigenSelect = document.getElementById('id_cuenta_origen');
+    const debtorDestinoSelect = document.getElementById('id_debtor_destino');
+    const cuentaDestinoSelect = document.getElementById('id_cuenta_destino');
+    const balanceOrigenDiv = document.getElementById('balance_origen');
+    const balanceDestinoDiv = document.getElementById('balance_destino');
+    const transferForm = document.querySelector('.needs-validation');
+    const submitBtn = document.querySelector('.btn-primary');
+    const submitSpinner = document.querySelector('.btn-primary .spinner-border');
 
-    async function updateAccounts(debtorId, targetSelect) {
+    async function updateAccounts(debtorId, targetSelect, balanceDiv) {
         if (!debtorId) {
             targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+            balanceDiv.textContent = '';
             return;
         }
         
         try {
-            const response = await fetch(`/api/get-debtor-accounts/?debtor_id=${debtorId}`);
+            const response = await fetch(`/api/get-accounts-by-debtor/?debtor_id=${debtorId}`);
             const data = await response.json();
             
             targetSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
-            data.accounts.forEach(account => {
-                const option = document.createElement('option');
-                option.value = account.id;
-                option.textContent = `${account.iban} (Saldo: ${account.balance})`;
-                targetSelect.appendChild(option);
-            });
+            
+            if (data.accounts && data.accounts.length > 0) {
+                data.accounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = `${account.iban} (${account.currency})`;
+                    option.dataset.balance = account.balance;
+                    option.dataset.currency = account.currency;
+                    targetSelect.appendChild(option);
+                });
+            }
         } catch (error) {
             console.error('Error al cargar las cuentas:', error);
             targetSelect.innerHTML = '<option value="">Error al cargar las cuentas</option>';
         }
     }
 
+    function updateBalanceInfo(select, balanceDiv) {
+        const selectedOption = select.options[select.selectedIndex];
+        if (selectedOption && selectedOption.dataset.balance) {
+            balanceDiv.textContent = `Saldo disponible: ${selectedOption.dataset.balance} ${selectedOption.dataset.currency}`;
+            balanceDiv.style.display = 'block';
+        } else {
+            balanceDiv.textContent = '';
+            balanceDiv.style.display = 'none';
+        }
+    }
+
+    function showError(element, message) {
+        element.textContent = message;
+        element.classList.remove('d-none');
+    }
+
+    function clearAllErrors() {
+        const errorElements = document.querySelectorAll('.error-feedback');
+        errorElements.forEach(el => el.textContent = '');
+        errorElements.forEach(el => el.classList.add('d-none'));
+    }
+
     // Event Listeners
-    debtorSelect.addEventListener('change', (e) => {
-        updateAccounts(e.target.value, debtorAccountSelect);
-        // Actualizar la lista de beneficiarios internos excluyendo al deudor seleccionado
-        const options = internalCreditorSelect.options;
+    debtorOrigenSelect.addEventListener('change', (e) => {
+        updateAccounts(e.target.value, cuentaOrigenSelect, balanceOrigenDiv);
+        // Deshabilitar el mismo deudor en el select de destino
+        const options = debtorDestinoSelect.options;
         for (let i = 0; i < options.length; i++) {
             if (options[i].value === e.target.value) {
                 options[i].disabled = true;
                 if (options[i].selected) {
-                    internalCreditorSelect.value = '';
-                    internalCreditorAccountSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+                    debtorDestinoSelect.value = '';
+                    cuentaDestinoSelect.innerHTML = '<option value="">Seleccione una cuenta</option>';
+                    balanceDestinoDiv.textContent = '';
                 }
             } else {
                 options[i].disabled = false;
             }
         }
     });
-    internalCreditorSelect.addEventListener('change', (e) => updateAccounts(e.target.value, internalCreditorAccountSelect));
+
+    debtorDestinoSelect.addEventListener('change', (e) => {
+        updateAccounts(e.target.value, cuentaDestinoSelect, balanceDestinoDiv);
+    });
+
+    cuentaOrigenSelect.addEventListener('change', () => {
+        updateBalanceInfo(cuentaOrigenSelect, balanceOrigenDiv);
+    });
+
+    cuentaDestinoSelect.addEventListener('change', () => {
+        updateBalanceInfo(cuentaDestinoSelect, balanceDestinoDiv);
+    });
 
     // Inicializar estado
-    if (debtorSelect.value) {
-        updateAccounts(debtorSelect.value, debtorAccountSelect);
+    if (debtorOrigenSelect.value) {
+        updateAccounts(debtorOrigenSelect.value, cuentaOrigenSelect, balanceOrigenDiv);
     }
+    if (debtorDestinoSelect.value) {
+        updateAccounts(debtorDestinoSelect.value, cuentaDestinoSelect, balanceDestinoDiv);
+    }
+
+    // Manejo del envío del formulario
+    transferForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        clearAllErrors();
+
+        // Validaciones básicas
+        if (!debtorOrigenSelect.value) {
+            showError(document.querySelector('#error_debtor_origen'), 'Seleccione un deudor origen');
+            return;
+        }
+        if (!cuentaOrigenSelect.value) {
+            showError(document.querySelector('#error_cuenta_origen'), 'Seleccione una cuenta origen');
+            return;
+        }
+        if (!debtorDestinoSelect.value) {
+            showError(document.querySelector('#error_debtor_destino'), 'Seleccione un deudor destino');
+            return;
+        }
+        if (!cuentaDestinoSelect.value) {
+            showError(document.querySelector('#error_cuenta_destino'), 'Seleccione una cuenta destino');
+            return;
+        }
+        if (!document.getElementById('id_monto').value) {
+            showError(document.querySelector('#error_monto'), 'Ingrese un monto válido');
+            return;
+        }
+        if (!document.getElementById('id_concepto').value) {
+            showError(document.querySelector('#error_concepto'), 'Ingrese un concepto para la transferencia');
+            return;
+        }
+
+        // Mostrar spinner y deshabilitar botón
+        submitBtn.disabled = true;
+        if (submitSpinner) submitSpinner.classList.remove('d-none');
+
+        try {
+            const formData = new FormData(transferForm);
+            const response = await fetch(transferForm.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                // Redireccionar a la URL proporcionada por el servidor
+                window.location.href = result.redirect_url;
+            } else {
+                // Mostrar errores
+                if (result.errors) {
+                    Object.entries(result.errors).forEach(([field, errors]) => {
+                        const errorDiv = document.querySelector(`#error_${field}`);
+                        if (errorDiv) {
+                            showError(errorDiv, errors.join(' '));
+                        }
+                    });
+                }
+                throw new Error(result.message || 'Error al procesar la transferencia');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger';
+            errorDiv.textContent = error.message || 'Error al procesar la transferencia';
+            transferForm.insertBefore(errorDiv, transferForm.firstChild);
+            
+            // Restaurar el botón
+            submitBtn.disabled = false;
+            if (submitSpinner) submitSpinner.classList.add('d-none');
+        }
+    });
 });
 </script>
 {% endblock %} 

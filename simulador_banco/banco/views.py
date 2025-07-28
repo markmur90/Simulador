@@ -74,7 +74,14 @@ def dashboard_view(request):
         template = "banco/dashboard_gerente.html"
     elif user.groups.filter(name="Administrador").exists():
         template = "banco/dashboard_administrador.html"
-    return render(request, template, {"saldo": saldo})
+    
+    # Obtener las transferencias GPT4
+    transfers = Transfer.objects.all().order_by('-created_at')[:10]  # Últimas 10 transferencias
+    
+    return render(request, template, {
+        "saldo": saldo,
+        "transfers": transfers
+    })
 
 
 @login_required

@@ -3,11 +3,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views import generic, View
 from django.shortcuts import redirect, get_object_or_404
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 import uuid
 from django.utils import timezone
 from django.db import transaction
 from django.contrib import messages
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -128,6 +129,10 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
 
     def form_valid(self, form):
         logger.debug("Iniciando form_valid en TransferCreateView")
+        logger.debug(f"Headers de la petición: {self.request.headers}")
+        logger.debug(f"Método de la petición: {self.request.method}")
+        logger.debug(f"Datos del formulario: {form.cleaned_data}")
+        
         try:
             with transaction.atomic():
                 logger.debug("Iniciando transacción atómica")
@@ -140,9 +145,11 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
                 if debtor_account.balance < amount:
                     logger.debug("Error: Saldo insuficiente")
                     if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                        return JsonResponse({
+                        response_data = {
                             'error': 'Saldo insuficiente en la cuenta origen'
-                        }, status=400)
+                        }
+                        logger.debug(f"Enviando respuesta JSON: {response_data}")
+                        return JsonResponse(response_data, status=400)
                     form.add_error(None, 'Saldo insuficiente en la cuenta origen')
                     return self.form_invalid(form)
 
@@ -214,10 +221,13 @@ class TransferCreateView(LoginRequiredMixin, generic.CreateView):
                 tipo_log='ERROR',
                 contenido=f'Error al crear transferencia SEPA: {str(e)}\n{traceback.format_exc()}'
             )
+            
             if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse({
-                    'error': 'Error al procesar la transferencia: ' + str(e)
-                }, status=500)
+                response_data = {
+                    'error': f'Error al procesar la transferencia: {str(e)}'
+                }
+                logger.debug(f"Enviando respuesta de error JSON: {response_data}")
+                return JsonResponse(response_data, status=500)
             messages.error(self.request, f'Error al procesar la transferencia: {str(e)}')
             return self.form_invalid(form)
 
@@ -309,7 +319,7 @@ class DebtorDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 
 class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
-    template_name = 'api/GPT4/create_transfer_interna.html'
+    template_name = 'banco/gpt4/create_transfer_internal.html'
     form_class = TransferInternaForm
     
     def get_success_url(self):
@@ -318,6 +328,120 @@ class TransferInternaCreateView(LoginRequiredMixin, generic.CreateView):
     def get_debtor_accounts(self, debtor_id):
         """Obtener las cuentas de un deudor específico"""
         return DebtorAccount.objects.filter(debtor_id=debtor_id)
+
+    def form_valid(self, form):
+        logger.debug("Iniciando form_valid en TransferInternaCreateView")
+        logger.debug(f"Datos del formulario: {form.cleaned_data}")
+        
+        try:
+            with transaction.atomic():
+                # Obtener los datos del formulario
+                cuenta_origen = form.cleaned_data['cuenta_origen']
+                cuenta_destino = form.cleaned_data['cuenta_destino']
+                monto = form.cleaned_data['monto']
+                concepto = form.cleaned_data['concepto']
+                debtor_origen = form.cleaned_data['debtor_origen']
+                debtor_destino = form.cleaned_data['debtor_destino']
+                
+                logger.debug(f"Cuenta origen: {cuenta_origen.iban}, Saldo: {cuenta_origen.balance}")
+                logger.debug(f"Cuenta destino: {cuenta_destino.iban}")
+                logger.debug(f"Monto: {monto}")
+                
+                # Validar saldo suficiente
+                if cuenta_origen.balance < monto:
+                    logger.warning(f"Saldo insuficiente. Saldo: {cuenta_origen.balance}, Monto: {monto}")
+                    form.add_error(None, 'Saldo insuficiente en la cuenta origen')
+                    return self.form_invalid(form)
+
+                # Generar payment_id único
+                payment_id = str(uuid.uuid4())
+
+                # Crear PaymentIdentification
+                payment_identification = PaymentIdentification.objects.create(
+                    end_to_end_id=str(uuid.uuid4()),
+                    instruction_id=str(uuid.uuid4())
+                )
+                logger.debug(f"PaymentIdentification creado: {payment_identification.id}")
+
+                # Crear o obtener un Creditor basado en el Debtor destino
+                creditor, created = Creditor.objects.get_or_create(
+                    name=debtor_destino.name,
+                    defaults={
+                        'address': PostalAddress.objects.create(
+                            country='ES',
+                            street=debtor_destino.address.street if hasattr(debtor_destino, 'address') else '',
+                            city=debtor_destino.address.city if hasattr(debtor_destino, 'address') else ''
+                        )
+                    }
+                )
+
+                # Crear o obtener CreditorAccount basada en la cuenta destino
+                creditor_account, created = CreditorAccount.objects.get_or_create(
+                    creditor=creditor,
+                    iban=cuenta_destino.iban,
+                    defaults={
+                        'currency': cuenta_destino.currency
+                    }
+                )
+
+                # Obtener o crear CreditorAgent
+                creditor_agent, created = CreditorAgent.objects.get_or_create(
+                    bic='INTERNALBIC',
+                    defaults={
+                        'financial_institution_id': 'INTERNAL_BANK',
+                        'other_information': 'Banco Interno para Transferencias Internas'
+                    }
+                )
+
+                # Crear la transferencia
+                self.object = Transfer.objects.create(
+                    debtor=debtor_origen,
+                    creditor=creditor,
+                    debtor_account=cuenta_origen,
+                    creditor_account=creditor_account,
+                    creditor_agent=creditor_agent,
+                    instructed_amount=monto,
+                    currency=cuenta_origen.currency,
+                    purpose_code='GDSV',
+                    requested_execution_date=timezone.now().date(),
+                    remittance_information_unstructured=concepto,
+                    status='PDNG',
+                    payment_identification=payment_identification
+                )
+                logger.debug(f"Transferencia creada con payment_id: {self.object.payment_id}")
+
+                # Usar TransferService para procesar la transferencia
+                from services.transfer_services import TransferService
+                self.object = TransferService.process_transfer(self.object)
+                logger.debug(f"Transferencia procesada. Estado final: {self.object.status}")
+
+                # Si es una petición AJAX, devolver JSON
+                if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'payment_id': self.object.payment_id,
+                        'redirect_url': self.get_success_url()
+                    })
+                
+                # Si no es AJAX, redirigir normalmente
+                return HttpResponseRedirect(self.get_success_url())
+
+        except Exception as e:
+            logger.error(f"Error en form_valid: {str(e)}")
+            form.add_error(None, f'Error al procesar la transferencia: {str(e)}')
+            return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        logger.warning("Formulario inválido")
+        logger.warning(f"Errores del formulario: {form.errors}")
+        
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'error',
+                'errors': form.errors
+            }, status=400)
+        
+        return super().form_invalid(form)
 
 def get_accounts_by_debtor(request):
     """Vista para obtener las cuentas de un deudor vía AJAX"""

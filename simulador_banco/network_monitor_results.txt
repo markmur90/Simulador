@@ -1,0 +1,176 @@
+Timestamp: 2025-07-26 20:43:48
+Download Speed: 19.93 Mbps
+Upload Speed: 16.39 Mbps
+Ping: 316.904 ms
+Server: Cluj-Napoca (Romania, RO)
+
+Bytes Sent: 87861229
+Bytes Received: 397024620
+Packets Sent: 220731
+Packets Received: 334679
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 19
+
+
+Timestamp: 2025-07-26 20:49:22
+Download Speed: 10.85 Mbps
+Upload Speed: 11.25 Mbps
+Ping: 365.044 ms
+Server: Bucharest (Romania, RO)
+
+Bytes Sent: 121528423
+Bytes Received: 433832335
+Packets Sent: 261750
+Packets Received: 377424
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 19
+
+
+Timestamp: 2025-07-26 20:55:24
+Download Speed: 17.71 Mbps
+Upload Speed: 16.19 Mbps
+Ping: 306.399 ms
+Server: Cluj-Napoca (Romania, RO)
+
+Bytes Sent: 179271727
+Bytes Received: 512546204
+Packets Sent: 333827
+Packets Received: 461060
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 19
+
+
+Timestamp: 2025-07-27 07:35:10
+Download Speed: 5.40 Mbps
+Upload Speed: 3.06 Mbps
+Ping: 340.029 ms
+Server: Iasi (Romania, RO)
+
+Bytes Sent: 5273418933
+Bytes Received: 3896343804
+Packets Sent: 5338943
+Packets Received: 4897460
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 21
+
+
+Timestamp: 2025-07-27 07:40:54
+Download Speed: 8.58 Mbps
+Upload Speed: 3.68 Mbps
+Ping: 332.238 ms
+Server: Sniatyn (Ukraine, UA)
+
+Bytes Sent: 5288016579
+Bytes Received: 3936353699
+Packets Sent: 5370066
+Packets Received: 4933793
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 21
+
+
+Timestamp: 2025-07-27 07:46:33
+Download Speed: 4.41 Mbps
+Upload Speed: 4.66 Mbps
+Ping: 323.618 ms
+Server: Iasi (Romania, RO)
+
+Bytes Sent: 5307315017
+Bytes Received: 3972922601
+Packets Sent: 5400829
+Packets Received: 4970530
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 21
+
+
+Timestamp: 2025-07-27 07:52:36
+Download Speed: 3.38 Mbps
+Upload Speed: 5.22 Mbps
+Ping: 325.405 ms
+Server: Cluj-Napoca (Romania, RO)
+
+Bytes Sent: 5324417377
+Bytes Received: 4003140944
+Packets Sent: 5428725
+Packets Received: 5002399
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 21
+
+
+Timestamp: 2025-07-27 07:58:09
+Download Speed: 3.94 Mbps
+Upload Speed: 2.07 Mbps
+Ping: 355.34 ms
+Server: Sniatyn (Ukraine, UA)
+
+Bytes Sent: 5332628919
+Bytes Received: 4020051401
+Packets Sent: 5445000
+Packets Received: 5019939
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 21
+
+
+Timestamp: 2025-07-27 08:48:35
+Download Speed: 7.40 Mbps
+Upload Speed: 3.74 Mbps
+Ping: 310.092 ms
+Server: Sniatyn (Ukraine, UA)
+
+Bytes Sent: 5369895809
+Bytes Received: 4091255750
+Packets Sent: 5530569
+Packets Received: 5113707
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 21
+
+
+Timestamp: 2025-07-27 08:54:12
+Download Speed: 2.84 Mbps
+Upload Speed: 5.01 Mbps
+Ping: 354.398 ms
+Server: Iasi (Romania, RO)
+
+Bytes Sent: 5388602001
+Bytes Received: 4110560824
+Packets Sent: 5554741
+Packets Received: 5137871
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 21
+
+
+Timestamp: 2025-07-27 08:59:47
+Download Speed: 2.50 Mbps
+Upload Speed: 2.96 Mbps
+Ping: 305.092 ms
+Server: Cluj-Napoca (Romania, RO)
+
+Bytes Sent: 5403598063
+Bytes Received: 4152942257
+Packets Sent: 5584976
+Packets Received: 5178539
+Errors In: 0
+Errors Out: 0
+Drops In: 0
+Drops Out: 21
+
+
