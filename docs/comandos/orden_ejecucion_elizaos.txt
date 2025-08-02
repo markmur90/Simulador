@@ -1,0 +1,84 @@
+ORDEN DE EJECUCIÓN - ELIZAOS SOLUCIÓN COMPLETA
+===============================================
+
+📋 PASO 1: ORGANIZAR ARCHIVOS (LOCAL)
+-------------------------------------
+1. ejecutar: organizar_elizaos.ps1
+   - Crea la carpeta "elizaos_solucion_completa"
+   - Organiza todos los archivos en subcarpetas
+   - Genera README.md con instrucciones
+
+📋 PASO 2: SUBIR ARCHIVOS AL VPS (LOCAL)
+----------------------------------------
+2. ejecutar: subir_elizaos_completo.ps1
+   - Sube la carpeta elizaos_completo al VPS
+   - Configura permisos de ejecución
+   - Verifica que los archivos estén en el VPS
+
+📋 PASO 3: SOLUCIONAR PROBLEMA DE BASE DE DATOS (VPS)
+----------------------------------------------------
+3. Conectar al VPS:
+   ssh -i vps_njalla_nueva markmur88@80.78.30.242
+
+4. ejecutar: solucionar_base_datos.sh
+   - Detiene el agente problemático
+   - Elimina la base de datos corrupta (.eliza)
+   - Crea nueva base de datos limpia
+   - Reinicia el agente correctamente
+
+📋 PASO 4: VERIFICAR FUNCIONAMIENTO (VPS)
+----------------------------------------
+5. Verificar estado:
+   pm2 list
+   netstat -tlnp | grep :9190
+
+6. Verificar logs:
+   pm2 logs amara-complete --lines 10
+
+7. Probar acceso:
+   curl http://localhost:9190
+
+📋 PASO 5: ACCESO FINAL
+-----------------------
+8. URLs de acceso:
+   - http://amara.coretransapi.com:9190
+   - http://80.78.30.242:9190
+
+📁 ARCHIVOS POR ORDEN DE IMPORTANCIA
+====================================
+
+🔥 CRÍTICOS (Ejecutar en este orden):
+1. organizar_elizaos.ps1 (local)
+2. subir_elizaos_completo.ps1 (local)
+3. solucionar_base_datos.sh (VPS)
+
+📄 DOCUMENTACIÓN:
+- comandos_manuales_vps.txt (referencia manual)
+- solucion_final_elizaos.txt (explicación del problema)
+
+🔧 ALTERNATIVOS:
+- subir_elizaos_simple.ps1 (versión simplificada)
+- ejecutar_solucion_completa.ps1 (automático)
+- reiniciar_elizaos_simple.bat (Windows)
+
+📋 COMANDOS MANUALES (si los scripts fallan)
+============================================
+
+En el VPS, ejecutar en orden:
+1. pm2 stop amara-complete
+2. cd ~/eliza-develop
+3. rm -rf .eliza
+4. mkdir -p .eliza
+5. source ~/.zshrc
+6. cd packages/cli
+7. pm2 start dist/index.js --name 'amara-complete' -- start
+8. sleep 10
+9. pm2 list
+10. curl http://localhost:9190
+
+🎯 RESULTADO FINAL
+==================
+- ✅ ElizaOS funcionando en puerto 9190
+- ✅ Todos los módulos locales activos
+- ✅ Sin dependencias de APIs externas
+- ✅ Agente "Amara-AI-Complete" operativo 

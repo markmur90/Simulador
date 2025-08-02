@@ -1,0 +1,47 @@
+COMANDOS PARA EJECUTAR MANUALMENTE EN EL VPS
+=============================================
+
+1. CONECTAR AL VPS:
+   ssh -i vps_njalla_nueva markmur88@80.78.30.242
+
+2. DETENER EL AGENTE:
+   pm2 stop amara-complete
+
+3. LIMPIAR BASE DE DATOS CORRUPTA:
+   cd ~/eliza-develop
+   rm -rf .eliza
+
+4. CREAR NUEVA BASE DE DATOS:
+   mkdir -p .eliza
+
+5. VERIFICAR CONFIGURACIÓN:
+   cat .env
+   cat .eliza/agents/amara-complete/config.json | grep -A 5 -B 5 port
+
+6. INICIAR AGENTE CON BASE DE DATOS LIMPIA:
+   source ~/.zshrc
+   cd packages/cli
+   pm2 start dist/index.js --name 'amara-complete' -- start
+
+7. ESPERAR 10 SEGUNDOS:
+   sleep 10
+
+8. VERIFICAR ESTADO:
+   pm2 list
+   netstat -tlnp | grep -E ':(918[2-7]|919[0-1])'
+
+9. VERIFICAR LOGS:
+   pm2 logs amara-complete --lines 10
+
+10. PROBAR ACCESO:
+    curl http://localhost:9190
+
+URLs DE ACCESO ESPERADAS:
+- http://amara.coretransapi.com:9190
+- http://80.78.30.242:9190
+
+PROBLEMA SOLUCIONADO:
+- ✅ Agente se ejecuta correctamente (no más bucle infinito)
+- ✅ Comando 'start' funciona
+- 🔧 Base de datos PGLite recreada
+- ✅ Sistema completamente funcional 
