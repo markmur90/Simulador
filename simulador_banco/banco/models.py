@@ -508,7 +508,7 @@ class TransferStatistics(models.Model):
         ).aggregate(
             total=Count('id'),
             total_amount=Sum('instructed_amount'),
-            successful=Count('id', filter=models.Q(status__in=['ACSC', 'ACCC'])),
+            successful=Count('id', filter=models.Q(status__in=['ACSC', 'ACCC', 'ACSP'])),
             failed=Count('id', filter=models.Q(status__in=['RJCT', 'CANC'])),
             avg_amount=Avg('instructed_amount')
         )

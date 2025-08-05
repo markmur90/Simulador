@@ -39,6 +39,66 @@ class StatisticsService:
         TransferStatistics.update_statistics(today)
 
     @staticmethod
+    def get_transfer_summary():
+        """
+        Obtiene un resumen general de transferencias, incluyendo estadísticas
+        del día y acumuladas.
+        """
+        today = timezone.now().date()
+        
+        # Estadísticas del día
+        today_transfers = Transfer.objects.filter(created_at__date=today)
+        today_stats = today_transfers.aggregate(
+            total_transfers=Count('id'),
+            total_amount=Sum('instructed_amount'),
+            avg_amount=Avg('instructed_amount')
+        )
+
+        # Estadísticas acumuladas
+        all_transfers = Transfer.objects.all()
+        total_stats = all_transfers.aggregate(
+            total_transfers=Count('id'),
+            total_amount=Sum('instructed_amount'),
+            avg_amount=Avg('instructed_amount')
+        )
+
+        # Distribución de estados
+        status_distribution = Transfer.objects.values('status').annotate(
+            count=Count('id'),
+            percentage=Count('id') * 100.0 / all_transfers.count()
+        ).order_by('-count')
+
+        return {
+            'today': {
+                'total_transfers': today_stats['total_transfers'] or 0,
+                'total_amount': today_stats['total_amount'] or 0,
+                'avg_amount': today_stats['avg_amount'] or 0,
+            },
+            'accumulated': {
+                'total_transfers': total_stats['total_transfers'] or 0,
+                'total_amount': total_stats['total_amount'] or 0,
+                'avg_amount': total_stats['avg_amount'] or 0,
+            },
+            'status_distribution': status_distribution
+        }
+
+    @staticmethod
+    def get_user_summary():
+        """
+        Obtiene un resumen de actividad de usuarios.
+        """
+        today = timezone.now().date()
+        
+        return {
+            'active_today': UserActivity.objects.filter(date=today).count(),
+            'total_users': User.objects.filter(is_active=True).count(),
+            'top_users': UserActivity.objects.values('user__username').annotate(
+                transfer_count=Sum('transfer_count'),
+                total_transfer_amount=Sum('total_transfer_amount')
+            ).order_by('-transfer_count')[:5]
+        }
+
+    @staticmethod
     def get_transfer_statistics(start_date=None, end_date=None):
         """
         Obtiene estadísticas de transferencias en un rango de fechas.
@@ -94,36 +154,8 @@ class StatisticsService:
         return queryset[:limit]
 
     @staticmethod
-    def get_transfer_summary():
+    def get_system_logs(limit=10):
         """
-        Obtiene un resumen general de transferencias.
+        Obtiene los logs más recientes del sistema.
         """
-        today = timezone.now().date()
-        
-        return {
-            'today': TransferStatistics.objects.filter(date=today).first(),
-            'total_transfers': Transfer.objects.count(),
-            'total_amount': Transfer.objects.aggregate(total=Sum('instructed_amount'))['total'] or 0,
-            'avg_amount': Transfer.objects.aggregate(avg=Avg('instructed_amount'))['avg'] or 0,
-            'status_distribution': Transfer.objects.values('status').annotate(
-                count=Count('id')
-            ).order_by('-count')
-        }
-
-    @staticmethod
-    def get_user_summary():
-        """
-        Obtiene un resumen de actividad de usuarios.
-        """
-        today = timezone.now().date()
-        
-        return {
-            'total_users': User.objects.count(),
-            'active_today': UserActivity.objects.filter(date=today).count(),
-            'top_users': UserActivity.objects.filter(date=today).order_by(
-                '-transfer_count'
-            )[:5],
-            'recent_activities': UserActivity.objects.select_related('user').order_by(
-                '-last_activity'
-            )[:10]
-        } 
+        return SystemLog.objects.all()[:limit] 

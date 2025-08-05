@@ -5,195 +5,163 @@
 
 {% block content %}
 <div class="container-fluid py-4">
-    <!-- Resumen General -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Transferencias Hoy</h5>
-                    <h2 class="card-text">{{ transfer_summary.today.total_transfers|default:"0" }}</h2>
-                    <p class="text-muted">Total: ${{ transfer_summary.today.total_amount|default:"0"|floatformat:2 }}</p>
-                </div>
-            </div>
+    <!-- Tabla Principal de Estadísticas -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Estadísticas del Sistema</h4>
         </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Usuarios Activos</h5>
-                    <h2 class="card-text">{{ user_summary.active_today }}</h2>
-                    <p class="text-muted">De {{ user_summary.total_users }} usuarios totales</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Monto Promedio</h5>
-                    <h2 class="card-text">${{ transfer_summary.avg_amount|floatformat:2 }}</h2>
-                    <p class="text-muted">Por transferencia</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Total Histórico</h5>
-                    <h2 class="card-text">${{ transfer_summary.total_amount|floatformat:2 }}</h2>
-                    <p class="text-muted">{{ transfer_summary.total_transfers }} transferencias</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Gráficos -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Transferencias Últimos 7 Días</h5>
-                    <canvas id="transferChart"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Distribución por Estado</h5>
-                    <canvas id="statusChart"></canvas>
-                </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-center" colspan="2">Transferencias</th>
+                            <th class="text-center" colspan="2">Usuarios</th>
+                            <th class="text-center" colspan="2">Montos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="fas fa-calendar-day"></i> Hoy</td>
+                            <td class="text-end">{{ transfer_summary.today.total_transfers|default:"0" }}</td>
+                            <td><i class="fas fa-users"></i> Activos Hoy</td>
+                            <td class="text-end">{{ user_summary.active_today }}</td>
+                            <td><i class="fas fa-money-bill"></i> Total Hoy</td>
+                            <td class="text-end">${{ transfer_summary.today.total_amount|default:"0"|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-history"></i> Total Histórico</td>
+                            <td class="text-end">{{ transfer_summary.total_transfers }}</td>
+                            <td><i class="fas fa-user-check"></i> Total Usuarios</td>
+                            <td class="text-end">{{ user_summary.total_users }}</td>
+                            <td><i class="fas fa-chart-line"></i> Total Histórico</td>
+                            <td class="text-end">${{ transfer_summary.total_amount|floatformat:2 }}</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-percentage"></i> Tasa de Éxito</td>
+                            <td class="text-end">
+                                {% with success_rate=transfer_summary.status_distribution|dictsort:"status"|first %}
+                                {{ success_rate.percentage|default:"0" }}%
+                                {% endwith %}
+                            </td>
+                            <td><i class="fas fa-user-clock"></i> Activos/Total</td>
+                            <td class="text-end">
+                                {% widthratio user_summary.active_today user_summary.total_users 100 %}%
+                            </td>
+                            <td><i class="fas fa-calculator"></i> Promedio</td>
+                            <td class="text-end">${{ transfer_summary.avg_amount|floatformat:2 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Actividad Reciente -->
-    <div class="row">
+    <!-- Tabla de Distribución de Estados -->
+    <div class="row mb-4">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Usuarios Más Activos</h5>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Usuario</th>
-                                    <th>Transferencias</th>
-                                    <th>Monto Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for activity in user_summary.top_users %}
-                                <tr>
-                                    <td>{{ activity.user.username }}</td>
-                                    <td>{{ activity.transfer_count }}</td>
-                                    <td>${{ activity.total_transfer_amount|floatformat:2 }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Distribución por Estado</h5>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Logs Recientes</h5>
                     <div class="table-responsive">
-                        <table class="table">
-                            <thead>
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
                                 <tr>
-                                    <th>Hora</th>
-                                    <th>Acción</th>
-                                    <th>Usuario</th>
-                                    <th>Nivel</th>
+                                    <th>Estado</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-center">Porcentaje</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for log in recent_logs %}
+                                {% for status in transfer_summary.status_distribution %}
                                 <tr>
-                                    <td>{{ log.timestamp|date:"H:i:s" }}</td>
-                                    <td>{{ log.get_action_display }}</td>
-                                    <td>{{ log.user.username|default:"Sistema" }}</td>
                                     <td>
-                                        <span class="badge bg-{{ log.level|lower }}">
-                                            {{ log.get_level_display }}
-                                        </span>
+                                        <i class="fas {% if status.status == 'COMPLETED' %}fa-check-circle text-success
+                                                    {% elif status.status == 'PENDING' %}fa-clock text-warning
+                                                    {% elif status.status == 'FAILED' %}fa-times-circle text-danger
+                                                    {% else %}fa-info-circle text-info{% endif %}"></i>
+                                        {{ status.status }}
                                     </td>
+                                    <td class="text-center">{{ status.count }}</td>
+                                    <td class="text-center">{{ status.percentage|floatformat:1 }}%</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Tendencia de Transferencias (7 días)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th class="text-center">Transferencias</th>
+                                    <th class="text-end">Monto Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stat in transfer_stats %}
+                                <tr>
+                                    <td>{{ stat.date|date:"d/m/Y" }}</td>
+                                    <td class="text-center">{{ stat.total_transfers }}</td>
+                                    <td class="text-end">${{ stat.total_amount|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Logs -->
+    <div class="card">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Logs del Sistema</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Usuario</th>
+                            <th>Acción</th>
+                            <th class="text-center">Nivel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in recent_logs %}
+                        <tr>
+                            <td>{{ log.timestamp|date:"d/m/Y H:i:s" }}</td>
+                            <td>{{ log.user.username|default:"Sistema" }}</td>
+                            <td>{{ log.get_action_display }}</td>
+                            <td class="text-center">
+                                <span class="badge {% if log.level == 'ERROR' %}bg-danger
+                                                  {% elif log.level == 'WARNING' %}bg-warning
+                                                  {% else %}bg-info{% endif %}">
+                                    {{ log.get_level_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Gráfico de transferencias
-    const transferCtx = document.getElementById('transferChart').getContext('2d');
-    new Chart(transferCtx, {
-        type: 'line',
-        data: {
-            labels: [
-                {% for stat in transfer_stats %}
-                    '{{ stat.date|date:"d/m" }}',
-                {% endfor %}
-            ],
-            datasets: [{
-                label: 'Total Transferencias',
-                data: [
-                    {% for stat in transfer_stats %}
-                        {{ stat.total_transfers }},
-                    {% endfor %}
-                ],
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-
-    // Gráfico de estados
-    const statusCtx = document.getElementById('statusChart').getContext('2d');
-    new Chart(statusCtx, {
-        type: 'doughnut',
-        data: {
-            labels: [
-                {% for status in transfer_summary.status_distribution %}
-                    '{{ status.status }}',
-                {% endfor %}
-            ],
-            datasets: [{
-                data: [
-                    {% for status in transfer_summary.status_distribution %}
-                        {{ status.count }},
-                    {% endfor %}
-                ],
-                backgroundColor: [
-                    'rgb(75, 192, 192)',
-                    'rgb(255, 205, 86)',
-                    'rgb(255, 99, 132)',
-                    'rgb(54, 162, 235)'
-                ]
-            }]
-        },
-        options: {
-            responsive: true
-        }
-    });
-});
-</script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 {% endblock %} 
