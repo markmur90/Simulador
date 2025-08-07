@@ -34,7 +34,7 @@ class TransferService:
 
             window_start = timezone.now() - datetime.timedelta(minutes=TransferService.WINDOW_MINUTES)
             recent_count = Transfer.objects.filter(
-                debtor_account_name=data["debtor_account_id"],
+                debtor_account_id=data["debtor_account_id"],
                 created_at__gte=window_start
             ).count()
             logger.debug(f"Transferencias recientes para la cuenta: {recent_count}")
