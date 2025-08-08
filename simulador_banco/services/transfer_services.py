@@ -17,16 +17,36 @@ class TransferService:
     @staticmethod
     @transaction.atomic
     def ingest_transfer(data: Dict[str, Any]) -> Transfer:
+        """
+        Recibe los datos de transferencia enviados por la API y los procesa.
+        Los datos esperados son los mismos que envía send_transfer:
+        - payment_id: str
+        - debtor_account: str (nombre/IBAN)
+        - creditor_account: str (nombre/IBAN)
+        - debtor: str (nombre)
+        - creditor: str (nombre)
+        - creditor_agent: str (BIC)
+        - instructed_amount: float
+        - currency: str
+        - requested_execution_date: str
+        - purpose_code: str
+        - remittance_information_unstructured: str
+        - payment_identification: str o None
+        - auth_id: str
+        - status: str
+        """
         logger.debug("Iniciando ingest_transfer")
-        logger.debug(f"Datos recibidos: {data}")
+        logger.debug(f"Datos recibidos de la API: {data}")
         
         try:
-            payment_id = data.pop("Idempotency-Id", None) or data.get("payment_id")
+            # Extraer payment_id del payload de la API
+            payment_id = data.get("payment_id")
             if not payment_id:
                 payment_id = str(uuid.uuid4())
-            data["payment_id"] = payment_id
-            logger.debug(f"Payment ID generado/recibido: {payment_id}")
+                data["payment_id"] = payment_id
+            logger.debug(f"Payment ID recibido: {payment_id}")
 
+            # Verificar si ya existe una transferencia con este payment_id
             existing = Transfer.objects.filter(payment_id=payment_id).first()
             if existing:
                 logger.debug(f"Transferencia existente encontrada con payment_id: {payment_id}")
@@ -233,8 +253,24 @@ class TransferService:
                 processed_data["creditor"] = creditor
                 logger.debug(f"Creditor creado: {creditor}")
 
-        # Procesar creditor_agent (la API no lo envía, crear uno por defecto)
-        if "creditor_agent" not in processed_data:
+        # Procesar creditor_agent (la API envía el BIC como string, necesitamos el objeto)
+        if "creditor_agent" in processed_data and isinstance(processed_data["creditor_agent"], str):
+            try:
+                creditor_agent = CreditorAgent.objects.get(bic=processed_data["creditor_agent"])
+                processed_data["creditor_agent"] = creditor_agent
+                logger.debug(f"CreditorAgent encontrado: {creditor_agent}")
+            except CreditorAgent.DoesNotExist:
+                # Si no existe, crear uno con el BIC proporcionado
+                logger.warning(f"CreditorAgent no encontrado para BIC: {processed_data['creditor_agent']}")
+                creditor_agent = CreditorAgent.objects.create(
+                    bic=processed_data["creditor_agent"],
+                    financial_institution_id=f"FIID_{processed_data['creditor_agent']}",
+                    other_information=f"Agente creado automáticamente para BIC: {processed_data['creditor_agent']}"
+                )
+                processed_data["creditor_agent"] = creditor_agent
+                logger.debug(f"CreditorAgent creado: {creditor_agent}")
+        elif "creditor_agent" not in processed_data:
+            # Si no viene creditor_agent, crear uno por defecto
             try:
                 creditor_agent = CreditorAgent.objects.first()
                 if not creditor_agent:
@@ -244,7 +280,7 @@ class TransferService:
                         other_information="Agente por defecto"
                     )
                 processed_data["creditor_agent"] = creditor_agent
-                logger.debug(f"CreditorAgent asignado: {creditor_agent}")
+                logger.debug(f"CreditorAgent por defecto asignado: {creditor_agent}")
             except Exception as e:
                 logger.error(f"Error al procesar creditor_agent: {e}")
                 raise ValidationError(f"Error al procesar creditor_agent: {str(e)}")
@@ -379,29 +415,156 @@ class TransferService:
         return transfer
 
     @staticmethod
-    def confirm_transfer(payment_id: str, otp_input: str, user: Any) -> Dict[str, Any]:
-        """Confirma una transferencia con OTP."""
+    def confirm_transfer(payment_id: str, otp_input: str, auth_id: str = None) -> Dict[str, Any]:
+        """
+        Confirma una transferencia con OTP.
+        Recibe los mismos parámetros que envía send_transfer:
+        - payment_id: str - ID de la transferencia
+        - otp_input: str - Código OTP para confirmar
+        - auth_id: str - ID del usuario autorizador (opcional)
+        """
         with transaction.atomic():
-            challenge = OTPChallenge.objects.select_for_update().get(
-                payment_id=payment_id, 
-                otp=otp_input, 
-                status="CREATED"
-            )
-            challenge.status = "CONFIRMED"
-            challenge.auth_id = user.username
-            challenge.save()
+            try:
+                # Buscar el challenge OTP
+                challenge = OTPChallenge.objects.select_for_update().get(
+                    payment_id=payment_id, 
+                    otp=otp_input, 
+                    status="CREATED"
+                )
+                challenge.status = "CONFIRMED"
+                if auth_id:
+                    challenge.auth_id = auth_id
+                challenge.save()
 
-            transfer = Transfer.objects.select_for_update().get(payment_id=payment_id)
-            transfer.status = "ACCP"
-            transfer.auth_id = user.username
-            transfer.save()
+                # Actualizar la transferencia
+                transfer = Transfer.objects.select_for_update().get(payment_id=payment_id)
+                transfer.status = "ACCP"
+                if auth_id:
+                    transfer.auth_id = auth_id
+                transfer.save()
 
-            # Procesar la transferencia
-            transfer = TransferService.process_transfer(transfer)
+                # Procesar la transferencia
+                transfer = TransferService.process_transfer(transfer)
 
+                logger.info(f"Transferencia {payment_id} confirmada exitosamente con OTP")
+
+                return {
+                    "payment_id": payment_id,
+                    "status": transfer.status,
+                    "timestamp": timezone.now().isoformat(),
+                    "auth_id": auth_id or transfer.auth_id
+                }
+                
+            except OTPChallenge.DoesNotExist:
+                logger.error(f"OTP Challenge no encontrado para payment_id: {payment_id}, OTP: {otp_input}")
+                return {
+                    "payment_id": payment_id,
+                    "status": "RJCT",
+                    "error": "OTP inválido o expirado",
+                    "timestamp": timezone.now().isoformat()
+                }
+            except Transfer.DoesNotExist:
+                logger.error(f"Transferencia no encontrada para payment_id: {payment_id}")
+                return {
+                    "payment_id": payment_id,
+                    "status": "RJCT",
+                    "error": "Transferencia no encontrada",
+                    "timestamp": timezone.now().isoformat()
+                }
+            except Exception as e:
+                logger.error(f"Error al confirmar transferencia {payment_id}: {str(e)}")
+                return {
+                    "payment_id": payment_id,
+                    "status": "RJCT",
+                    "error": f"Error interno: {str(e)}",
+                    "timestamp": timezone.now().isoformat()
+                }
+
+    @staticmethod
+    def confirm_transfer_with_payload(payload: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Confirma una transferencia recibiendo el payload completo de la API.
+        Este método recibe exactamente los mismos datos que envía send_transfer.
+        
+        Args:
+            payload: Dict con los datos de la transferencia incluyendo payment_id y auth_id
+            
+        Returns:
+            Dict con la respuesta de confirmación
+        """
+        logger.debug(f"Confirmando transferencia con payload: {payload}")
+        
+        try:
+            payment_id = payload.get("payment_id")
+            auth_id = payload.get("auth_id")
+            
+            if not payment_id:
+                return {
+                    "status": "RJCT",
+                    "error": "payment_id es requerido",
+                    "timestamp": timezone.now().isoformat()
+                }
+            
+            # Buscar la transferencia existente
+            try:
+                transfer = Transfer.objects.get(payment_id=payment_id)
+                logger.debug(f"Transferencia encontrada: {transfer.payment_id} con status: {transfer.status}")
+            except Transfer.DoesNotExist:
+                return {
+                    "payment_id": payment_id,
+                    "status": "RJCT",
+                    "error": "Transferencia no encontrada",
+                    "timestamp": timezone.now().isoformat()
+                }
+            
+            # Si la transferencia ya está procesada, devolver su estado actual
+            if transfer.status in ['ACSC', 'RJCT']:
+                return {
+                    "payment_id": payment_id,
+                    "status": transfer.status,
+                    "timestamp": timezone.now().isoformat(),
+                    "auth_id": auth_id or transfer.auth_id
+                }
+            
+            # Buscar el OTP challenge más reciente para esta transferencia
+            try:
+                otp_challenge = OTPChallenge.objects.filter(
+                    payment_id=payment_id,
+                    status="CREATED"
+                ).latest('created_at')
+                
+                # Confirmar la transferencia con el OTP
+                return TransferService.confirm_transfer(
+                    payment_id=payment_id,
+                    otp_input=otp_challenge.otp,
+                    auth_id=auth_id
+                )
+                
+            except OTPChallenge.DoesNotExist:
+                # Si no hay OTP challenge, procesar directamente
+                logger.warning(f"No se encontró OTP challenge para payment_id: {payment_id}, procesando directamente")
+                
+                with transaction.atomic():
+                    transfer.status = "ACCP"
+                    if auth_id:
+                        transfer.auth_id = auth_id
+                    transfer.save()
+                    
+                    # Procesar la transferencia
+                    transfer = TransferService.process_transfer(transfer)
+                    
+                    return {
+                        "payment_id": payment_id,
+                        "status": transfer.status,
+                        "timestamp": timezone.now().isoformat(),
+                        "auth_id": auth_id or transfer.auth_id
+                    }
+                    
+        except Exception as e:
+            logger.error(f"Error en confirm_transfer_with_payload: {str(e)}")
             return {
-                "paymentId": payment_id,
-                "status": transfer.status,
-                "timestamp": timezone.now().isoformat(),
-                "auth_id": user.username
+                "payment_id": payload.get("payment_id"),
+                "status": "RJCT",
+                "error": f"Error interno: {str(e)}",
+                "timestamp": timezone.now().isoformat()
             }
